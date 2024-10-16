@@ -32,7 +32,7 @@ endfunction
 
 // You want to notify a specific player in the form of a system message. Use this:
 function SystemChat takes player ForPlayer, string message returns nothing 
-    set msg = "[SYSTEM]: |cffffcc00" + message + "|r" 
+    set msg = SYSTEM_CHAT + message + "|r" 
     if(GetLocalPlayer() == ForPlayer) then 
         // call ClearTextMessages()       
         call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
