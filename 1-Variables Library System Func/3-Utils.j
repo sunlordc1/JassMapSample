@@ -1,4 +1,5 @@
 
+/// Preload Function
 function Preload_Unit takes integer id returns nothing
     call RemoveUnit(CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), id, 0, 0, 270))
 endfunction
@@ -22,3 +23,12 @@ function Preload_Sound takes unit u, string path returns nothing
     call StartSound(s)
     call KillSoundWhenDone(s)
 endfunction
+
+/// Ultils 
+function SystemChat takes player ForPlayer, string msg returns nothing 
+    set msg = "[SYSTEM]: |cffffcc00" + msg + "|r" 
+    if(GetLocalPlayer() == ForPlayer) then 
+        // call ClearTextMessages()       
+        call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, msg) 
+    endif 
+endfunction 

@@ -1,11 +1,18 @@
 struct EVENT_UNIT_DROP_ITEM 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
-        local integer itcode = GetItemTypeId(GetManipulatedItem()) 
+        local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
         local item dropitem = GetManipulatedItem() 
         local integer pid = GetPlayerId(GetTriggerPlayer()) 
         local integer charge = GetItemCharges(dropitem) 
 
+        //commonly used sample trick :When you lose a fake item (power-up) and use it to increase resources 
+        //that are not available in the game's UI or to craft equipment.
+        if dropitem_id == '0000' and false then 
+            call SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
+        endif
+        //===========================================================================
+        
         set dropitem = null 
         set caster = null 
         return false 
