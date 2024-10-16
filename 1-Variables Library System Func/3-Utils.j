@@ -1,5 +1,8 @@
 
-/// Preload Function
+///======= Preload Function 
+// === When creating a new ability or unit that hasn't been used in the map,he game may experience a slight lag. 
+// === Therefore, you should initialize them at the start of the game to ensure a smooth gameplay experience.
+
 function Preload_Unit takes integer id returns nothing
     call RemoveUnit(CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), id, 0, 0, 270))
 endfunction
@@ -24,11 +27,14 @@ function Preload_Sound takes unit u, string path returns nothing
     call KillSoundWhenDone(s)
 endfunction
 
-/// Ultils 
-function SystemChat takes player ForPlayer, string msg returns nothing 
-    set msg = "[SYSTEM]: |cffffcc00" + msg + "|r" 
+//====================================================================================
+///======= Ultils 
+
+// You want to notify a specific player in the form of a system message. Use this:
+function SystemChat takes player ForPlayer, string message returns nothing 
+    set msg = "[SYSTEM]: |cffffcc00" + message + "|r" 
     if(GetLocalPlayer() == ForPlayer) then 
         // call ClearTextMessages()       
-        call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, msg) 
+        call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
     endif 
 endfunction 
