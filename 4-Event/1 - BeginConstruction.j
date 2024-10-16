@@ -18,9 +18,8 @@ struct EVENT_BEGIN_STRUCTION
         return false 
     endmethod 
     private static method SetupEvent takes nothing returns nothing 
-        local trigger t = CreateTrigger() // Create a trigger                      
+        local trigger t = CreateTrigger()                    
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_CONSTRUCT_START) 
         call TriggerAddAction(t, function thistype.Checking) 
-        call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 endstruct 
