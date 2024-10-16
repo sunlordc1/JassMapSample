@@ -13,7 +13,7 @@ globals
     //Storage  
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.    
     //Timer  
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.   
+    constant real TIME_SETUP_EVENT = 0.02 // The time to start setting up events for the game.   
     constant real P32 = 0.03125 // Explore this number; it truly has significance. 
     //Utils  
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
