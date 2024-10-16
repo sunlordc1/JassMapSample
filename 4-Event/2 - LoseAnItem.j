@@ -10,6 +10,7 @@ struct EVENT_UNIT_DROP_ITEM
         //that are not available in the game's UI or to craft equipment.
         if dropitem_id == '0000' and false then 
             call SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
+            return false
         endif
         //===========================================================================
         
