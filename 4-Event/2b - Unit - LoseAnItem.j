@@ -1,9 +1,9 @@
 struct EVENT_UNIT_DROP_ITEM 
     static method Checking takes nothing returns boolean 
-        local unit caster = GetTriggerUnit() 
+        local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
         local item dropitem = GetManipulatedItem() 
-        local integer pid = GetPlayerId(GetTriggerPlayer()) 
+        local integer pid = GetPlayerId(GetOwningPlayer(u)) 
         local integer charge = GetItemCharges(dropitem) 
 
         //commonly used sample trick :When you lose a fake item (power-up) and use it to increase resources 
@@ -15,7 +15,7 @@ struct EVENT_UNIT_DROP_ITEM
         //===========================================================================
         
         set dropitem = null 
-        set caster = null 
+        set u = null 
         return false 
     endmethod 
     static method SetupEvent takes nothing returns nothing 
