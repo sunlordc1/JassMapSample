@@ -7,7 +7,7 @@ struct EVENT_TARGET_ORDER
         local integer w = GetUnitTypeId(e) 
         local integer d = GetUnitTypeId(u) 
         local integer id = GetUID(u) 
-        local integer orderid == GetIssuedOrderId() 
+        local integer orderid = GetIssuedOrderId() 
         //commonly used sample trick : Use item target spell 
         if i != null then 
             if orderid >= 852008 and orderid <= 852013 then 
@@ -26,7 +26,7 @@ struct EVENT_TARGET_ORDER
         set u = null 
         set i = null 
     endmethod 
-    private static method SetupEvent takes nothing returns nothing 
+    static method SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER) 
         call TriggerAddAction(t, function thistype.Checking) 

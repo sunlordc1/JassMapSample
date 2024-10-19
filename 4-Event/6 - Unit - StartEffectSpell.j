@@ -11,7 +11,7 @@ struct EVENT_START_SPELL_EFFECT
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
-        local real yc = GetUnitY(cater) 
+        local real yc = GetUnitY(caster) 
         local real xt = GetUnitX(target) //Position X of target unit 
         local real yt = GetUnitY(target) //Position T of target unit 
       
@@ -22,7 +22,7 @@ struct EVENT_START_SPELL_EFFECT
         set it = null 
         return false 
     endmethod 
-    private static method SetupEvent takes nothing returns nothing 
+    static method SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_EFFECT) 
         call TriggerAddAction(t, function thistype.Checking) 

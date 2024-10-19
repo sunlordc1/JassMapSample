@@ -8,7 +8,7 @@ struct EVENT_LEARN_SKILL
         return false 
     endmethod 
 
-    private static method SetupEvent takes nothing returns nothing 
+    static method SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_HERO_SKILL) 
         call TriggerAddAction(t, function thistype.Checking) 

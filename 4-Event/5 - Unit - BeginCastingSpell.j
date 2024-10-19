@@ -16,7 +16,7 @@ struct EVENT_CASTING_SPELL
         set it = null 
         return false 
     endmethod 
-    private static method SetupEvent takes nothing returns nothing 
+    static method SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_CAST) 
         call TriggerAddAction(t, function thistype.Checking) 
