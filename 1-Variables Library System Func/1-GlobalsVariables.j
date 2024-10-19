@@ -19,5 +19,10 @@ globals
     //Utils  
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
     constant boolean ENV_DEV = true // Are u on a testing mode ?
+
+    //Setting Game 
+    constant boolean CREEP_SLEEP = false
+    constant boolean LOCK_RESOURCE_TRADING = true
+    constant boolean SHARED_ADVANCED_CONTROL = false
 endglobals 
 

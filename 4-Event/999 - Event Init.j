@@ -7,6 +7,8 @@ struct REGISTER_EVENT
         call EVENT_UNIT_DEATH.SetupEvent()
         call EVENT_CASTING_SPELL.SetupEvent()
         call EVENT_START_SPELL_EFFECT.SetupEvent()
+        call EVENT_LEARN_SKILL.SetupEvent()
+        call EVENT_UNIT_SELL.SetupEvent()
         
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
