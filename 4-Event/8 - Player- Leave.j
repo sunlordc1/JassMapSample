@@ -1,4 +1,4 @@
-struct EVENT_PLAYER_LEAVES 
+struct EV_PLAYER_LEAVES 
     static method Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         

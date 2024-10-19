@@ -1,4 +1,4 @@
-struct EVENT_POINT_ORDER 
+struct EV_POINT_ORDER 
     static method Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local real x = GetOrderPointX() 

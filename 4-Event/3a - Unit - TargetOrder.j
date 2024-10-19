@@ -1,5 +1,5 @@
 
-struct EVENT_TARGET_ORDER 
+struct EV_TARGET_ORDER 
     static method Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local item i = GetOrderTargetItem() 

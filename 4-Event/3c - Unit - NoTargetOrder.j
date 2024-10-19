@@ -1,4 +1,4 @@
-struct EVENT_NO_TARGET_ORDER 
+struct EV_NO_TARGET_ORDER 
     static method Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
           

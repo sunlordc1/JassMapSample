@@ -1,4 +1,4 @@
-struct EVENT_BEGIN_STRUCTION 
+struct EV_BEGIN_STRUCTION 
     static method Checking takes nothing returns boolean 
         local unit builder = GetTriggerUnit() 
         local unit constructing = GetConstructingStructure() 

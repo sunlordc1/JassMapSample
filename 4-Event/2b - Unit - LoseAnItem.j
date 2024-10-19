@@ -1,4 +1,4 @@
-struct EVENT_UNIT_DROP_ITEM 
+struct EV_UNIT_DROP_ITEM 
     static method Checking takes nothing returns boolean 
         local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 

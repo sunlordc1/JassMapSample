@@ -1,4 +1,4 @@
-struct EVENT_LEARN_SKILL 
+struct EV_LEARN_SKILL 
     static method Checking takes nothing returns boolean 
         local unit caster = GetLearningUnit() 
         local integer id = GetLearnedSkill()  //Ability ID learning spell

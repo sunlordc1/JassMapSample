@@ -1,7 +1,7 @@
 
 
 
-struct EVENT_UNIT_ATTACK
+struct EV_UNIT_ATTACK
     static method Checking takes nothing returns boolean 
         local unit attacker = GetAttacker() 
         local unit attacked = GetTriggerUnit() 

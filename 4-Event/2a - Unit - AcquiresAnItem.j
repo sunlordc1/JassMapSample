@@ -1,5 +1,5 @@
 //
-struct EVENT_UNIT_ACQUIRES_ITEM 
+struct EV_UNIT_ACQUIRES_ITEM 
     static method Checking takes nothing returns boolean 
         local item acquire_item = GetManipulatedItem() 
         local integer ItemID = GetItemTypeId(acquire_item) 

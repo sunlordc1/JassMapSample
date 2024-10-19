@@ -1,6 +1,6 @@
 
 
-struct EVENT_UNIT_DEATH 
+struct EV_UNIT_DEATH 
     static method Checking takes nothing returns boolean 
         local unit killer = GetKillingUnit() 
         local unit dying = GetDyingUnit() 

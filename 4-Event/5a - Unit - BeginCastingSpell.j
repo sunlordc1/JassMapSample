@@ -1,5 +1,5 @@
 
-struct EVENT_CASTING_SPELL 
+struct EV_CASTING_SPELL 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 

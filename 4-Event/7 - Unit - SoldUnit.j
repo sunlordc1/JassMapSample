@@ -1,5 +1,5 @@
 
-struct EVENT_UNIT_SELL 
+struct EV_UNIT_SELL 
     static method Checking takes nothing returns boolean 
         local unit u = GetSoldUnit() 
         local unit caster = GetTriggerUnit() 

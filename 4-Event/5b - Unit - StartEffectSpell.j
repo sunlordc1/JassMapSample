@@ -1,4 +1,4 @@
-struct EVENT_START_SPELL_EFFECT 
+struct EV_START_SPELL_EFFECT 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 
