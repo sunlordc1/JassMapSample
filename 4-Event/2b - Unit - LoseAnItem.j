@@ -1,5 +1,5 @@
 struct EV_UNIT_DROP_ITEM 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
         local item dropitem = GetManipulatedItem() 
@@ -18,10 +18,10 @@ struct EV_UNIT_DROP_ITEM
         set u = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DROP_ITEM) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 
 endstruct

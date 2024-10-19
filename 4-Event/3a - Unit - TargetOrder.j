@@ -1,6 +1,6 @@
 
 struct EV_TARGET_ORDER 
-    static method Checking takes nothing returns nothing 
+    static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local item i = GetOrderTargetItem() 
         local unit e = GetOrderTargetUnit() 
@@ -26,10 +26,10 @@ struct EV_TARGET_ORDER
         set u = null 
         set i = null 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 

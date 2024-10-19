@@ -25,7 +25,7 @@ struct GAME
     private static method GameStatus takes nothing returns nothing 
         local integer n = 0 
         if ENV_DEV then 
-            call DisplayTextToForce(GetPlayersAll(),"Checking Status ...")
+            call DisplayTextToForce(GetPlayersAll(),"f_Checking Status ...")
         endif 
         // Check player is online in game  
         set n = 0 

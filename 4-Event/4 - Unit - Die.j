@@ -1,7 +1,7 @@
 
 
 struct EV_UNIT_DEATH 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit killer = GetKillingUnit() 
         local unit dying = GetDyingUnit() 
         local integer hdid = GetHandleId(dying) 
@@ -18,9 +18,9 @@ struct EV_UNIT_DEATH
         return false 
     endmethod 
  
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct

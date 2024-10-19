@@ -249,7 +249,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/1 - Unit - BeginConstruction.j ---
 struct EVENT_BEGIN_STRUCTION 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit builder = GetTriggerUnit() 
         local unit constructing = GetConstructingStructure() 
         local integer sid = GetUnitTypeId(constructing) 
@@ -268,10 +268,10 @@ struct EVENT_BEGIN_STRUCTION
         set constructing = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_CONSTRUCT_START) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -279,7 +279,7 @@ endstruct
 //--- Content from folder: ./4-Event/2a - Unit - AcquiresAnItem.j ---
 //
 struct EVENT_UNIT_ACQUIRES_ITEM 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local item acquire_item = GetManipulatedItem() 
         local integer ItemID = GetItemTypeId(acquire_item) 
         local unit u = GetTriggerUnit() 
@@ -292,17 +292,17 @@ struct EVENT_UNIT_ACQUIRES_ITEM
         set u = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_PICKUP_ITEM) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 
 endstruct
 
 //--- Content from folder: ./4-Event/2b - Unit - LoseAnItem.j ---
 struct EVENT_UNIT_DROP_ITEM 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
         local item dropitem = GetManipulatedItem() 
@@ -321,10 +321,10 @@ struct EVENT_UNIT_DROP_ITEM
         set u = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DROP_ITEM) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 
 endstruct
@@ -332,7 +332,7 @@ endstruct
 //--- Content from folder: ./4-Event/3a - Unit - TargetOrder.j ---
 
 struct EVENT_TARGET_ORDER 
-    static method Checking takes nothing returns nothing 
+    static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local item i = GetOrderTargetItem() 
         local unit e = GetOrderTargetUnit() 
@@ -358,10 +358,10 @@ struct EVENT_TARGET_ORDER
         set u = null 
         set i = null 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -369,7 +369,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/3b - Unit - TargetPoint.j ---
 struct EVENT_POINT_ORDER 
-    static method Checking takes nothing returns nothing 
+    static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local real x = GetOrderPointX() 
         local real y = GetOrderPointY() 
@@ -378,10 +378,10 @@ struct EVENT_POINT_ORDER
           
         set u = null 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -389,15 +389,15 @@ endstruct
 
 //--- Content from folder: ./4-Event/3c - Unit - NoTargetOrder.j ---
 struct EVENT_NO_TARGET_ORDER 
-    static method Checking takes nothing returns nothing 
+    static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
           
         set u = null 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_ORDER) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -407,7 +407,7 @@ endstruct
 
 
 struct EVENT_UNIT_DEATH 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit killer = GetKillingUnit() 
         local unit dying = GetDyingUnit() 
         local integer hdid = GetHandleId(dying) 
@@ -424,17 +424,17 @@ struct EVENT_UNIT_DEATH
         return false 
     endmethod 
  
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_DEATH) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct
 
 //--- Content from folder: ./4-Event/5a - Unit - BeginCastingSpell.j ---
 
 struct EVENT_CASTING_SPELL 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 
         local unit target = GetSpellTargetUnit() 
@@ -450,10 +450,10 @@ struct EVENT_CASTING_SPELL
         set it = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_CAST) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 
 endstruct 
@@ -461,7 +461,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/5b - Unit - StartEffectSpell.j ---
 struct EVENT_START_SPELL_EFFECT 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 
         local unit target = GetSpellTargetUnit() 
@@ -484,10 +484,10 @@ struct EVENT_START_SPELL_EFFECT
         set it = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SPELL_EFFECT) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -495,7 +495,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/6 - Hero - LearnSpell.j ---
 struct EVENT_LEARN_SKILL 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit caster = GetLearningUnit() 
         local integer id = GetLearnedSkill()  //Ability ID learning spell
         local integer uid = GetUnitTypeId(caster) 
@@ -504,17 +504,17 @@ struct EVENT_LEARN_SKILL
         return false 
     endmethod 
 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_HERO_SKILL) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
 //--- Content from folder: ./4-Event/7 - Unit - SoldUnit.j ---
 
 struct EVENT_UNIT_SELL 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit u = GetSoldUnit() 
         local unit caster = GetTriggerUnit() 
         local integer pid = GetPlayerId(GetOwningPlayer(GetSoldUnit())) 
@@ -523,17 +523,17 @@ struct EVENT_UNIT_SELL
         set caster = null 
         return false 
     endmethod 
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_SELL) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
 
 //--- Content from folder: ./4-Event/8 - Player- Leave.j ---
 struct EVENT_PLAYER_LEAVES 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         
         set PLAYER.IsDisconect[GetPID(p)] = true 
@@ -543,7 +543,7 @@ struct EVENT_PLAYER_LEAVES
         set p = null 
         return false 
     endmethod 
-    private static method SetupEvent takes nothing returns nothing 
+    private static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() // Create a trigger                                                                                                                          
         local integer n = 0 
         loop 
@@ -551,7 +551,7 @@ struct EVENT_PLAYER_LEAVES
             call TriggerRegisterPlayerEventLeave(t, Player(n)) 
             set n = n + 1 
         endloop 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
 
@@ -560,7 +560,7 @@ endstruct
 
 
 struct EVENT_UNIT_ATTACK
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local unit attacker = GetAttacker() 
         local unit attacked = GetTriggerUnit() 
         //Trick: Someone use it for stop attack to ally
@@ -572,10 +572,10 @@ struct EVENT_UNIT_ATTACK
         return false 
     endmethod 
  
-    static method SetupEvent takes nothing returns nothing 
+    static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() 
         call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ATTACKED) 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct
 
@@ -583,22 +583,22 @@ endstruct
 struct REGISTER_EVENT 
     private static method SetupAllEvent takes nothing returns nothing 
         //Comment if u don't use the event 
-        call EVENT_BEGIN_STRUCTION.SetupEvent()
+        call EVENT_BEGIN_STRUCTION.f_SetupEvent()
         // ITEM
-        call EVENT_UNIT_ACQUIRES_ITEM.SetupEvent()
-        call EVENT_UNIT_DROP_ITEM.SetupEvent()
+        call EVENT_UNIT_ACQUIRES_ITEM.f_SetupEvent()
+        call EVENT_UNIT_DROP_ITEM.f_SetupEvent()
         // ORDER
-        call EVENT_TARGET_ORDER.SetupEvent()
-        call EVENT_POINT_ORDER.SetupEvent()
-        call EVENT_NO_TARGET_ORDER.SetupEvent()
+        call EVENT_TARGET_ORDER.f_SetupEvent()
+        call EVENT_POINT_ORDER.f_SetupEvent()
+        call EVENT_NO_TARGET_ORDER.f_SetupEvent()
         // SPELL
-        call EVENT_CASTING_SPELL.SetupEvent()
-        call EVENT_START_SPELL_EFFECT.SetupEvent()
-        call EVENT_LEARN_SKILL.SetupEvent()
+        call EVENT_CASTING_SPELL.f_SetupEvent()
+        call EVENT_START_SPELL_EFFECT.f_SetupEvent()
+        call EVENT_LEARN_SKILL.f_SetupEvent()
         // MISC
-        call EVENT_UNIT_DEATH.SetupEvent()
-        call EVENT_UNIT_ATTACK.SetupEvent()
-        call EVENT_UNIT_SELL.SetupEvent()
+        call EVENT_UNIT_DEATH.f_SetupEvent()
+        call EVENT_UNIT_ATTACK.f_SetupEvent()
+        call EVENT_UNIT_SELL.f_SetupEvent()
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
     private static method onInit takes nothing returns nothing 
@@ -641,7 +641,7 @@ struct GAME
     private static method GameStatus takes nothing returns nothing 
         local integer n = 0 
         if ENV_DEV then 
-            call DisplayTextToForce(GetPlayersAll(),"Checking Status ...")
+            call DisplayTextToForce(GetPlayersAll(),"f_Checking Status ...")
         endif 
         // Check player is online in game  
         set n = 0 

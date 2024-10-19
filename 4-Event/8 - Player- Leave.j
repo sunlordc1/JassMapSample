@@ -1,5 +1,5 @@
 struct EV_PLAYER_LEAVES 
-    static method Checking takes nothing returns boolean 
+    static method f_Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         
         set PLAYER.IsDisconect[GetPID(p)] = true 
@@ -9,7 +9,7 @@ struct EV_PLAYER_LEAVES
         set p = null 
         return false 
     endmethod 
-    private static method SetupEvent takes nothing returns nothing 
+    private static method f_SetupEvent takes nothing returns nothing 
         local trigger t = CreateTrigger() // Create a trigger                                                                                                                          
         local integer n = 0 
         loop 
@@ -17,6 +17,6 @@ struct EV_PLAYER_LEAVES
             call TriggerRegisterPlayerEventLeave(t, Player(n)) 
             set n = n + 1 
         endloop 
-        call TriggerAddAction(t, function thistype.Checking) 
+        call TriggerAddAction(t, function thistype.f_Checking) 
     endmethod 
 endstruct 
