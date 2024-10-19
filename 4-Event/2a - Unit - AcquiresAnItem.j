@@ -10,7 +10,7 @@ struct EVENT_UNIT_ACQUIRES_ITEM
   
         
         set acquire_item = null 
-        set caster = null 
+        set u = null 
         return false 
     endmethod 
     static method SetupEvent takes nothing returns nothing 

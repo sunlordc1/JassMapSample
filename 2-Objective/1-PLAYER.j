@@ -1,13 +1,13 @@
 struct PLAYER 
     static boolean array IsDisconect 
 
-    
+
     //============PLAYER STATUS ==========
     static method IsPlayerOnline takes player p returns boolean 
         return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
     endmethod 
     //=============GOLD=================== 
-    static method GetGold takes integer id returns nothing 
+    static method GetGold takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
     static method SetGold takes integer id, integer value returns nothing 
@@ -17,7 +17,7 @@ struct PLAYER
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
     //=============LUMBER=================== 
-    static method GetLumber takes integer id returns nothing 
+    static method GetLumber takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
     static method SetLumber takes integer id, integer value returns nothing 
@@ -27,7 +27,7 @@ struct PLAYER
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
     endmethod 
     //=============FOODCAP=================== 
-    static method GetFoodCap takes integer id returns nothing 
+    static method GetFoodCap takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
     static method SetFoodCap takes integer id, integer value returns nothing 

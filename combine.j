@@ -10,13 +10,13 @@ globals
     //Objective  
     item bj_item = null // instead of bj_lastCreatedItem   
     unit bj_unit = null // instead of bj_lastCreatedUnit   
-    effect bj_effect = null // instead of bj_lastCreatedEffect   
+    effect bj_eff = null // instead of bj_lastCreatedEffect   
     //Storage  
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.    
     //Timer  
     constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.   
     constant real P32 = 0.03125 // Explore this number; it truly has significance. 
-    constant real P50 = 0.02 // Explore this number; it truly has significance. 
+    constant real P64 = 0.03125*2 // Explore this number; it truly has significance. 
     //Utils  
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
     constant boolean ENV_DEV = true // Are u on a testing mode ?
@@ -116,15 +116,7 @@ endfunction
 //====================================================================================  
 ///======= Ultils   
 
-// You want to notify a specific player in the form of a system message. Use this:  
-function SystemChat takes player ForPlayer, string message returns nothing 
-    local string msg = ""
-    set msg = SYSTEM_CHAT + message + "|r" 
-    if(GetLocalPlayer() == ForPlayer) then 
-        // call ClearTextMessages()         
-        call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
-    endif 
-endfunction 
+
 
 //====================================================================================
 ///======Player 
@@ -140,24 +132,50 @@ endfunction
 struct PLAYER 
     static boolean array IsDisconect 
 
+
+    //============PLAYER STATUS ==========
     static method IsPlayerOnline takes player p returns boolean 
         return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
+    endmethod 
+    //=============GOLD=================== 
+    static method GetGold takes integer id returns integer 
+        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+    endmethod 
+    static method SetGold takes integer id, integer value returns nothing 
+        call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_GOLD, value) 
     endmethod 
     static method AddGold takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
+    //=============LUMBER=================== 
+    static method GetLumber takes integer id returns integer 
+        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+    endmethod 
+    static method SetLumber takes integer id, integer value returns nothing 
+        call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_LUMBER, value) 
+    endmethod 
     static method AddLumber takes integer id, integer value returns nothing 
-        call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+        call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
+    endmethod 
+    //=============FOODCAP=================== 
+    static method GetFoodCap takes integer id returns integer 
+        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
+    endmethod 
+    static method SetFoodCap takes integer id, integer value returns nothing 
+        call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP, value) 
     endmethod 
     static method AddFoodCap takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
+    //=============FLAG=================== 
     static method BountyFlag takes integer id, boolean flag returns nothing 
         call SetPlayerFlagBJ(PLAYER_STATE_GIVES_BOUNTY, flag, Player(id)) 
     endmethod 
-    static method SetTech takes integer tech_id, integer level, integer pid returns nothing 
+    //=============RESEARCH=================== 
+    static method SetResearchLevel takes integer tech_id, integer level, integer pid returns nothing 
         call SetPlayerTechResearchedSwap(tech_id, level, Player(pid)) 
     endmethod 
+    //=============ALLIANCE=================== 
     static method SetAllyWith takes integer pid, integer to_pid returns nothing 
         call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_ALLIED_VISION) 
     endmethod 
@@ -175,8 +193,56 @@ struct PLAYER
             call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_NEUTRAL) 
         endif 
     endmethod 
-
+    //=============CHAT=================== 
+    // You want to notify a specific player in the form of a system message. Use this:          
+    static method SystemChat takes player ForPlayer, string message returns nothing 
+        local string msg = "" 
+        set msg = SYSTEM_CHAT + message + "|r" 
+        if(GetLocalPlayer() == ForPlayer) then 
+            // call ClearTextMessages()                 
+            call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
+        endif 
+    endmethod 
+    //=============MISC=================== 
+    //Force player use a key in board
+    static method ForceUIKeyBJ takes player whichPlayer, string key, unit u returns nothing 
+        if(GetLocalPlayer() == whichPlayer) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.        
+            call ClearSelection() 
+            call SelectUnit(u, true) 
+            call ForceUIKey(key) 
+        endif 
+    endmethod 
+    //Ping minimap     
+    static method PingMinimapExe takes player p, real x, real y, real duration, integer red, integer green, integer blue, boolean extraEffects returns nothing 
+        if IsPlayerAlly(GetLocalPlayer(), p) then 
+            call PingMinimapEx(x, y, duration, red, green, blue, extraEffects) 
+        endif 
+        set p = null 
+    endmethod 
 endstruct
+
+//--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
+struct DESTRUCTABLE //Destructable  
+    static method OpenGate takes destructable d returns nothing 
+        call KillDestructable(d) 
+        call SetDestructableAnimation(d, "death alternate") 
+        set d = null 
+    endmethod 
+    
+    static method DestroyGate takes destructable d returns nothing 
+        call KillDestructable(d) 
+        call SetDestructableAnimation(d, "death") 
+        set d = null 
+    endmethod 
+    
+    static method CloseGate takes destructable d returns nothing 
+        call DestructableRestoreLife(d, GetDestructableMaxLife(d), true) 
+        call SetDestructableAnimation(d, "stand") 
+        set d = null 
+    endmethod 
+endstruct 
+
 
 //--- Content from folder: ./3-Skill/1-SampleSkill.j ---
 
@@ -210,25 +276,49 @@ struct EVENT_BEGIN_STRUCTION
 endstruct 
 
 
-//--- Content from folder: ./4-Event/2 - Unit - LoseAnItem.j ---
+//--- Content from folder: ./4-Event/2a - Unit - AcquiresAnItem.j ---
+//
+struct EVENT_UNIT_ACQUIRES_ITEM 
+    static method Checking takes nothing returns boolean 
+        local item acquire_item = GetManipulatedItem() 
+        local integer ItemID = GetItemTypeId(acquire_item) 
+        local unit u = GetTriggerUnit() 
+        local integer pid = GetPlayerId(GetOwningPlayer(u)) 
+        local integer charge = GetItemCharges(acquire_item) 
+
+  
+        
+        set acquire_item = null 
+        set u = null 
+        return false 
+    endmethod 
+    static method SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() 
+        call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_PICKUP_ITEM) 
+        call TriggerAddAction(t, function thistype.Checking) 
+    endmethod 
+
+endstruct
+
+//--- Content from folder: ./4-Event/2b - Unit - LoseAnItem.j ---
 struct EVENT_UNIT_DROP_ITEM 
     static method Checking takes nothing returns boolean 
-        local unit caster = GetTriggerUnit() 
+        local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
         local item dropitem = GetManipulatedItem() 
-        local integer pid = GetPlayerId(GetTriggerPlayer()) 
+        local integer pid = GetPlayerId(GetOwningPlayer(u)) 
         local integer charge = GetItemCharges(dropitem) 
 
         //commonly used sample trick :When you lose a fake item (power-up) and use it to increase resources 
         //that are not available in the game's UI or to craft equipment.
         if dropitem_id == '0000' and false then 
-            call SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
+            call PLAYER.SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
             return false
         endif
         //===========================================================================
         
         set dropitem = null 
-        set caster = null 
+        set u = null 
         return false 
     endmethod 
     static method SetupEvent takes nothing returns nothing 
@@ -239,7 +329,7 @@ struct EVENT_UNIT_DROP_ITEM
 
 endstruct
 
-//--- Content from folder: ./4-Event/3 - Unit - TargetOrder.j ---
+//--- Content from folder: ./4-Event/3a - Unit - TargetOrder.j ---
 
 struct EVENT_TARGET_ORDER 
     static method Checking takes nothing returns nothing 
@@ -277,6 +367,42 @@ endstruct
 
 
 
+//--- Content from folder: ./4-Event/3b - Unit - TargetPoint.j ---
+struct EVENT_POINT_ORDER 
+    static method Checking takes nothing returns nothing 
+        local unit u = GetTriggerUnit() 
+        local real x = GetOrderPointX() 
+        local real y = GetOrderPointY() 
+
+   
+          
+        set u = null 
+    endmethod 
+    static method SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() 
+        call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER) 
+        call TriggerAddAction(t, function thistype.Checking) 
+    endmethod 
+endstruct 
+
+
+
+//--- Content from folder: ./4-Event/3c - Unit - NoTargetOrder.j ---
+struct EVENT_NO_TARGET_ORDER 
+    static method Checking takes nothing returns nothing 
+        local unit u = GetTriggerUnit() 
+          
+        set u = null 
+    endmethod 
+    static method SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() 
+        call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ISSUED_ORDER) 
+        call TriggerAddAction(t, function thistype.Checking) 
+    endmethod 
+endstruct 
+
+
+
 //--- Content from folder: ./4-Event/4 - Unit - Die.j ---
 
 
@@ -305,7 +431,7 @@ struct EVENT_UNIT_DEATH
     endmethod 
 endstruct
 
-//--- Content from folder: ./4-Event/5 - Unit - BeginCastingSpell.j ---
+//--- Content from folder: ./4-Event/5a - Unit - BeginCastingSpell.j ---
 
 struct EVENT_CASTING_SPELL 
     static method Checking takes nothing returns boolean 
@@ -333,7 +459,7 @@ struct EVENT_CASTING_SPELL
 endstruct 
 
 
-//--- Content from folder: ./4-Event/6 - Unit - StartEffectSpell.j ---
+//--- Content from folder: ./4-Event/5b - Unit - StartEffectSpell.j ---
 struct EVENT_START_SPELL_EFFECT 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
@@ -367,7 +493,7 @@ endstruct
 
 
 
-//--- Content from folder: ./4-Event/7 - Hero - LearnSpell.j ---
+//--- Content from folder: ./4-Event/6 - Hero - LearnSpell.j ---
 struct EVENT_LEARN_SKILL 
     static method Checking takes nothing returns boolean 
         local unit caster = GetLearningUnit() 
@@ -385,7 +511,7 @@ struct EVENT_LEARN_SKILL
     endmethod 
 endstruct 
 
-//--- Content from folder: ./4-Event/8 - Unit - SoldUnit.j ---
+//--- Content from folder: ./4-Event/7 - Unit - SoldUnit.j ---
 
 struct EVENT_UNIT_SELL 
     static method Checking takes nothing returns boolean 
@@ -405,7 +531,7 @@ struct EVENT_UNIT_SELL
 endstruct 
 
 
-//--- Content from folder: ./4-Event/9 - Player- Leave.j ---
+//--- Content from folder: ./4-Event/8 - Player- Leave.j ---
 struct EVENT_PLAYER_LEAVES 
     static method Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
@@ -429,19 +555,50 @@ struct EVENT_PLAYER_LEAVES
     endmethod 
 endstruct 
 
+//--- Content from folder: ./4-Event/9 - Unit - Attacked.j ---
+
+
+
+struct EVENT_UNIT_ATTACK
+    static method Checking takes nothing returns boolean 
+        local unit attacker = GetAttacker() 
+        local unit attacked = GetTriggerUnit() 
+        //Trick: Someone use it for stop attack to ally
+
+
+
+        set attacker = null 
+        set attacked = null 
+        return false 
+    endmethod 
+ 
+    static method SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() 
+        call TriggerRegisterAnyUnitEventBJ(t, EVENT_PLAYER_UNIT_ATTACKED) 
+        call TriggerAddAction(t, function thistype.Checking) 
+    endmethod 
+endstruct
+
 //--- Content from folder: ./4-Event/999 - Event Init.j ---
 struct REGISTER_EVENT 
     private static method SetupAllEvent takes nothing returns nothing 
         //Comment if u don't use the event 
         call EVENT_BEGIN_STRUCTION.SetupEvent()
+        // ITEM
+        call EVENT_UNIT_ACQUIRES_ITEM.SetupEvent()
         call EVENT_UNIT_DROP_ITEM.SetupEvent()
+        // ORDER
         call EVENT_TARGET_ORDER.SetupEvent()
-        call EVENT_UNIT_DEATH.SetupEvent()
+        call EVENT_POINT_ORDER.SetupEvent()
+        call EVENT_NO_TARGET_ORDER.SetupEvent()
+        // SPELL
         call EVENT_CASTING_SPELL.SetupEvent()
         call EVENT_START_SPELL_EFFECT.SetupEvent()
         call EVENT_LEARN_SKILL.SetupEvent()
+        // MISC
+        call EVENT_UNIT_DEATH.SetupEvent()
+        call EVENT_UNIT_ATTACK.SetupEvent()
         call EVENT_UNIT_SELL.SetupEvent()
-        
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
     private static method onInit takes nothing returns nothing 
