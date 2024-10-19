@@ -24,5 +24,7 @@ globals
     constant boolean CREEP_SLEEP = false
     constant boolean LOCK_RESOURCE_TRADING = true
     constant boolean SHARED_ADVANCED_CONTROL = false
+    constant real GAME_PRELOAD_TIME = 1.00
+    constant real GAME_STATUS_TIME = 2.00
 endglobals 
 

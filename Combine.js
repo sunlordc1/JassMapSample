@@ -1,14 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
-// Danh sách các thư mục chứa các file .txt
+// List of folders containing .j files
 const folderPaths = ['./1-Variables Library System Func', './2-Objective', './3-Skill', './4-Event', './5-Features', './6-Timers']; // Thay thế với đường dẫn thực tế của cậu
-// Danh sách các thư mục chứa các file .txt
-const individualFiles = ['./GAME.j']; // Thay thế với đường dẫn thực tế của các file lẻ
-// Đường dẫn file output
+// Replace with your actual folder paths
+const individualFiles = ['./GAME.j']; // Replace with your actual individual file paths
+// Output file path with .j extension
 const outputPath = './combine.j';
 
-// Hàm để đọc và chép nội dung từ một thư mục
+
+
+// Function to read and copy content from a folder
 const readAndCopyFromFolder = (folderPath) => {
     const files = fs.readdirSync(folderPath);
     const txtFiles = files.filter(file => path.extname(file) === '.j');
@@ -17,45 +19,45 @@ const readAndCopyFromFolder = (folderPath) => {
     txtFiles.forEach(file => {
         const filePath = path.join(folderPath, file);
         const content = fs.readFileSync(filePath, 'utf-8');
-        allContent += `//--- Nội dung từ thư mục: ${folderPath}/${file} ---\n`; // Tiêu đề cho mỗi file
-        allContent += content + '\n\n'; // Thêm hai lần xuống dòng sau mỗi file
+        allContent += `//--- Content from folder: ${folderPath}/${file} ---\n`; // Title for each file
+        allContent += content + '\n\n'; // Add two new lines after each file
     });
 
     return allContent;
 };
 
-// Hàm để đọc nội dung từ các file lẻ
+// Function to read content from individual files
 const readAndCopyIndividualFiles = (files) => {
     let allContent = '';
     files.forEach(file => {
         try {
             const content = fs.readFileSync(file, 'utf-8');
-            allContent += `//--- Nội dung từ file lẻ: ${file} ---\n`; // Tiêu đề cho mỗi file lẻ
-            allContent += content + '\n\n'; // Thêm hai lần xuống dòng sau mỗi file
+            allContent += `//--- Content from individual file: ${file} ---\n`; // Title for each individual file
+            allContent += content + '\n\n'; // Add two new lines after each file
         } catch (err) {
-            console.error(`Lỗi khi đọc file ${file}:`, err);
+            console.error(`Error reading file ${file}:`, err);
         }
     });
     return allContent;
 };
 
-// Biến để lưu tất cả nội dung
+// Variable to store all content
 let totalContent = '';
 
-// Xử lý từng thư mục theo thứ tự
+// Process each folder in order
 folderPaths.forEach(folderPath => {
     try {
         const content = readAndCopyFromFolder(folderPath);
-        totalContent += content; // Gộp nội dung từ tất cả các thư mục
+        totalContent += content; // Merge content from all folders
     } catch (err) {
-        console.error(`Lỗi khi đọc thư mục ${folderPath}:`, err);
+        console.error(`Error reading folder ${folderPath}:`, err);
     }
 });
 
-// Ghi nội dung từ các file lẻ sau cùng
+// Write content from individual files last
 const individualContent = readAndCopyIndividualFiles(individualFiles);
-totalContent += individualContent; // Gộp nội dung từ các file lẻ vào cuối
+totalContent += individualContent; // Merge content from individual files at the end
 
-// Ghi tất cả nội dung vào file output
+// Write all content to the output file with .j extension
 fs.writeFileSync(outputPath, totalContent);
-console.log('Hoàn thành chép nội dung vào:', outputPath);
+console.log('Finished copying content to:', outputPath);

@@ -1,4 +1,4 @@
-//--- Nội dung từ thư mục: ./1-Variables Library System Func/1-GlobalsVariables.j ---
+//--- Content from folder: ./1-Variables Library System Func/1-GlobalsVariables.j ---
 
 //Constant : A constant value does not change, and you use it to set fixed parameters in the game. 
 globals 
@@ -25,14 +25,16 @@ globals
     constant boolean CREEP_SLEEP = false
     constant boolean LOCK_RESOURCE_TRADING = true
     constant boolean SHARED_ADVANCED_CONTROL = false
+    constant real GAME_PRELOAD_TIME = 1.00
+    constant real GAME_STATUS_TIME = 2.00
 endglobals 
 
 
 
-//--- Nội dung từ thư mục: ./1-Variables Library System Func/2-Library.j ---
+//--- Content from folder: ./1-Variables Library System Func/2-Library.j ---
 
 
-//--- Nội dung từ thư mục: ./1-Variables Library System Func/2-Runtime.j ---
+//--- Content from folder: ./1-Variables Library System Func/2-Runtime.j ---
 //I will use this for the skill writing section, so don’t worry about it if you don’t want to rewrite the library.
 struct runtime
     static method new takes integer i, real timeout, boolean periodic, code func returns timer
@@ -71,7 +73,7 @@ struct runtime
     endmethod
 endstruct
 
-//--- Nội dung từ thư mục: ./1-Variables Library System Func/3-Utils.j ---
+//--- Content from folder: ./1-Variables Library System Func/3-Utils.j ---
 
 ///======= Preload Function   
 // === When creating a new ability or unit that hasn't been used in the map,he game may experience a slight lag.   
@@ -130,13 +132,28 @@ function GetUID takes unit u returns integer
     return GetPlayerId(GetOwningPlayer(u))
 endfunction
 
-//--- Nội dung từ thư mục: ./2-Objective/1-PLAYER.j ---
+//--- Content from folder: ./2-Objective/1-PLAYER.j ---
+struct PLAYER 
+    static boolean array IsDisconect 
+
+    static method IsPlayerOnline takes player p returns boolean 
+        return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
+    endmethod 
+    static method AddGold takes integer id , integer value returns nothing 
+        call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+    endmethod
+    static method AddLumber takes integer id , integer value returns nothing 
+        call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+    endmethod
+    static method AddFoodCap takes integer id , integer value returns nothing 
+        call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
+    endmethod
+endstruct
+
+//--- Content from folder: ./3-Skill/1-SampleSkill.j ---
 
 
-//--- Nội dung từ thư mục: ./3-Skill/1-SampleSkill.j ---
-
-
-//--- Nội dung từ thư mục: ./4-Event/1 - Unit - BeginConstruction.j ---
+//--- Content from folder: ./4-Event/1 - Unit - BeginConstruction.j ---
 struct EVENT_BEGIN_STRUCTION 
     static method Checking takes nothing returns boolean 
         local unit builder = GetTriggerUnit() 
@@ -165,7 +182,7 @@ struct EVENT_BEGIN_STRUCTION
 endstruct 
 
 
-//--- Nội dung từ thư mục: ./4-Event/2 - Unit - LoseAnItem.j ---
+//--- Content from folder: ./4-Event/2 - Unit - LoseAnItem.j ---
 struct EVENT_UNIT_DROP_ITEM 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
@@ -194,7 +211,7 @@ struct EVENT_UNIT_DROP_ITEM
 
 endstruct
 
-//--- Nội dung từ thư mục: ./4-Event/3 - Unit - TargetOrder.j ---
+//--- Content from folder: ./4-Event/3 - Unit - TargetOrder.j ---
 
 struct EVENT_TARGET_ORDER 
     static method Checking takes nothing returns nothing 
@@ -232,7 +249,7 @@ endstruct
 
 
 
-//--- Nội dung từ thư mục: ./4-Event/4 - Unit - Die.j ---
+//--- Content from folder: ./4-Event/4 - Unit - Die.j ---
 
 
 struct EVENT_UNIT_DEATH 
@@ -260,7 +277,7 @@ struct EVENT_UNIT_DEATH
     endmethod 
 endstruct
 
-//--- Nội dung từ thư mục: ./4-Event/5 - Unit - BeginCastingSpell.j ---
+//--- Content from folder: ./4-Event/5 - Unit - BeginCastingSpell.j ---
 
 struct EVENT_CASTING_SPELL 
     static method Checking takes nothing returns boolean 
@@ -288,7 +305,7 @@ struct EVENT_CASTING_SPELL
 endstruct 
 
 
-//--- Nội dung từ thư mục: ./4-Event/6 - Unit - StartEffectSpell.j ---
+//--- Content from folder: ./4-Event/6 - Unit - StartEffectSpell.j ---
 struct EVENT_START_SPELL_EFFECT 
     static method Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
@@ -322,7 +339,7 @@ endstruct
 
 
 
-//--- Nội dung từ thư mục: ./4-Event/7 - Hero - LearnSpell.j ---
+//--- Content from folder: ./4-Event/7 - Hero - LearnSpell.j ---
 struct EVENT_LEARN_SKILL 
     static method Checking takes nothing returns boolean 
         local unit caster = GetLearningUnit() 
@@ -340,7 +357,7 @@ struct EVENT_LEARN_SKILL
     endmethod 
 endstruct 
 
-//--- Nội dung từ thư mục: ./4-Event/7 - Unit - SoldUnit.j ---
+//--- Content from folder: ./4-Event/8 - Unit - SoldUnit.j ---
 
 struct EVENT_UNIT_SELL 
     static method Checking takes nothing returns boolean 
@@ -360,7 +377,29 @@ struct EVENT_UNIT_SELL
 endstruct 
 
 
-//--- Nội dung từ thư mục: ./4-Event/999 - Event Init.j ---
+//--- Content from folder: ./4-Event/9 - Player- Leave.j ---
+struct EVENT_PLAYER_LEAVES 
+    static method Checking takes nothing returns boolean 
+        local player p = GetTriggerPlayer() 
+        set PLAYER.IsDisconect[GetPID(p)] = true 
+
+
+        set p = null 
+        return false 
+    endmethod 
+    private static method SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() // Create a trigger                                                                                                                          
+        local integer n = 0 
+        loop 
+            exitwhen n > bj_MAX_PLAYER_SLOTS 
+            call TriggerRegisterPlayerEventLeave(t, Player(n)) 
+            set n = n + 1 
+        endloop 
+        call TriggerAddAction(t, function thistype.Checking) 
+    endmethod 
+endstruct 
+
+//--- Content from folder: ./4-Event/999 - Event Init.j ---
 struct REGISTER_EVENT 
     private static method SetupAllEvent takes nothing returns nothing 
         //Comment if u don't use the event 
@@ -381,18 +420,19 @@ struct REGISTER_EVENT
 endstruct 
 
 
-//--- Nội dung từ thư mục: ./5-Features/1-UI.j ---
+//--- Content from folder: ./5-Features/1-UI.j ---
 
 
-//--- Nội dung từ thư mục: ./6-Timers/1-Interval.j ---
+//--- Content from folder: ./6-Timers/1-Interval.j ---
 
 
-//--- Nội dung từ file lẻ: ./GAME.j ---
+//--- Content from individual file: ./GAME.j ---
 struct GAME 
     static boolean IsSinglePlay = false 
 
     private static method GameStart takes nothing returns nothing 
-        
+
+        call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
     private static method GameSetting takes nothing returns nothing 
@@ -400,15 +440,34 @@ struct GAME
         call SetMapFlag(MAP_SHARED_ADVANCED_CONTROL, SHARED_ADVANCED_CONTROL) 
         call EnableCreepSleepBJ(CREEP_SLEEP) 
 
+        call DestroyTimer(GetExpiredTimer()) 
       
     endmethod 
+    private static method GameStatus takes nothing returns nothing 
+        local integer n = 0 
+        // Check player is online in game
+        set n = 0 
+        loop 
+            exitwhen n > bj_MAX_PLAYER_SLOTS 
+            if PLAYER.IsPlayerOnline(Player(n)) then 
+                set PLAYER.IsDisconect[n] = false 
+            else 
+                set PLAYER.IsDisconect[n] = true 
+            endif 
+            set n = n + 1 
+        endloop 
+        call DestroyTimer(GetExpiredTimer()) 
+         
+    endmethod 
     private static method PreloadMap takes nothing returns nothing 
-        call Preload_Ability('Amls') // Preload skill          
-        call Preload_Unit('uloc') // Preload unit          
+        call Preload_Ability('Amls') // Preload skill             
+        call Preload_Unit('uloc') // Preload unit            
+        call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
     private static method onInit takes nothing returns nothing 
-
+        call TimerStart(CreateTimer(), GAME_PRELOAD_TIME, false, function thistype.PreloadMap) 
+        call TimerStart(CreateTimer(), GAME_STATUS_TIME, false, function thistype.GameStatus) 
     endmethod 
 endstruct 
 
