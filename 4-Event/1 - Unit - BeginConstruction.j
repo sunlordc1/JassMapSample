@@ -1,21 +1,21 @@
 struct EVENT_BEGIN_STRUCTION 
     static method Checking takes nothing returns boolean 
         local unit builder = GetTriggerUnit() 
-        local unit structuring = GetConstructingStructure() 
-        local integer sid = GetUnitTypeId(structuring) 
-        local integer pid = GetPlayerId(GetOwningPlayer(structuring)) 
+        local unit constructing = GetConstructingStructure() 
+        local integer sid = GetUnitTypeId(constructing) 
+        local integer pid = GetPlayerId(GetOwningPlayer(constructing)) 
 
 
         // commonly used sample trick : Cancel a build under construction with conditions 
         if sid == '0000' and  false then //Make your condition 
             call TriggerSleepAction(0.01) //need for the trick 
-            call IssueImmediateOrderById(structuring, 851976) //order cancel build 
+            call IssueImmediateOrderById(constructing, 851976) //order cancel build 
             return false
         endif 
         //=============================================================================== 
 
         set builder = null 
-        set structuring = null 
+        set constructing = null 
         return false 
     endmethod 
     private static method SetupEvent takes nothing returns nothing 

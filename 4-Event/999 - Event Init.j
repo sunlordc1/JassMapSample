@@ -3,6 +3,11 @@ struct REGISTER_EVENT
         //Comment if u don't use the event 
         call EVENT_BEGIN_STRUCTION.SetupEvent()
         call EVENT_UNIT_DROP_ITEM.SetupEvent()
+        call EVENT_TARGET_ORDER.SetupEvent()
+        call EVENT_UNIT_DEATH.SetupEvent()
+        call EVENT_CASTING_SPELL.SetupEvent()
+        call EVENT_START_SPELL_EFFECT.SetupEvent()
+        
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
     private static method onInit takes nothing returns nothing 

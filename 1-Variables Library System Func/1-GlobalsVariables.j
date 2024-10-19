@@ -18,5 +18,6 @@ globals
     constant real P50 = 0.02 // Explore this number; it truly has significance. 
     //Utils  
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
+    constant boolean ENV_DEV = true // Are u on a testing mode ?
 endglobals 
 
