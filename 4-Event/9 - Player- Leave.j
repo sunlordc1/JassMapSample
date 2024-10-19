@@ -1,7 +1,9 @@
 struct EVENT_PLAYER_LEAVES 
     static method Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
+        
         set PLAYER.IsDisconect[GetPID(p)] = true 
+        set GAME.CountPlayer = GAME.CountPlayer - 1 
 
 
         set p = null 

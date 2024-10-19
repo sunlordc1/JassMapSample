@@ -25,8 +25,12 @@ globals
     constant boolean CREEP_SLEEP = false
     constant boolean LOCK_RESOURCE_TRADING = true
     constant boolean SHARED_ADVANCED_CONTROL = false
-    constant real GAME_PRELOAD_TIME = 1.00
-    constant real GAME_STATUS_TIME = 2.00
+    constant real GAME_PRELOAD_TIME = 0.01
+    constant real GAME_STATUS_TIME = 1.00
+    constant real GAME_SETTING_TIME = 3.00
+    constant real GAME_START_TIME = 5.00
+
+    
 endglobals 
 
 
@@ -139,15 +143,39 @@ struct PLAYER
     static method IsPlayerOnline takes player p returns boolean 
         return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
     endmethod 
-    static method AddGold takes integer id , integer value returns nothing 
+    static method AddGold takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
-    endmethod
-    static method AddLumber takes integer id , integer value returns nothing 
+    endmethod 
+    static method AddLumber takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
-    endmethod
-    static method AddFoodCap takes integer id , integer value returns nothing 
+    endmethod 
+    static method AddFoodCap takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
-    endmethod
+    endmethod 
+    static method BountyFlag takes integer id, boolean flag returns nothing 
+        call SetPlayerFlagBJ(PLAYER_STATE_GIVES_BOUNTY, flag, Player(id)) 
+    endmethod 
+    static method SetTech takes integer tech_id, integer level, integer pid returns nothing 
+        call SetPlayerTechResearchedSwap(tech_id, level, Player(pid)) 
+    endmethod 
+    static method SetAllyWith takes integer pid, integer to_pid returns nothing 
+        call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_ALLIED_VISION) 
+    endmethod 
+    static method SetEnemyWith takes integer pid, integer to_pid, boolean share_vision returns nothing 
+        if share_vision then 
+            call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_UNALLIED_VISION) 
+        else 
+            call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_UNALLIED) 
+        endif 
+    endmethod 
+    static method SetNeutralWith takes integer pid, integer to_pid, boolean share_vision returns nothing 
+        if share_vision then 
+            call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_NEUTRAL_VISION) 
+        else 
+            call SetPlayerAllianceStateBJ(Player(pid), Player(to_pid), bj_ALLIANCE_NEUTRAL) 
+        endif 
+    endmethod 
+
 endstruct
 
 //--- Content from folder: ./3-Skill/1-SampleSkill.j ---
@@ -381,7 +409,9 @@ endstruct
 struct EVENT_PLAYER_LEAVES 
     static method Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
+        
         set PLAYER.IsDisconect[GetPID(p)] = true 
+        set GAME.CountPlayer = GAME.CountPlayer - 1 
 
 
         set p = null 
@@ -429,28 +459,40 @@ endstruct
 //--- Content from individual file: ./GAME.j ---
 struct GAME 
     static boolean IsSinglePlay = false 
-
+    static integer CountPlayer = 0 
     private static method GameStart takes nothing returns nothing 
-
+        call FogMaskEnable(false) 
+        if ENV_DEV then 
+            call DisplayTextToForce(GetPlayersAll(),"Game Start ...")
+        endif 
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
     private static method GameSetting takes nothing returns nothing 
+        if ENV_DEV then 
+            call DisplayTextToForce(GetPlayersAll(),"Setting Game ...")
+        endif 
         call SetMapFlag(MAP_LOCK_RESOURCE_TRADING, LOCK_RESOURCE_TRADING) 
         call SetMapFlag(MAP_SHARED_ADVANCED_CONTROL, SHARED_ADVANCED_CONTROL) 
         call EnableCreepSleepBJ(CREEP_SLEEP) 
+
+ 
 
         call DestroyTimer(GetExpiredTimer()) 
       
     endmethod 
     private static method GameStatus takes nothing returns nothing 
         local integer n = 0 
-        // Check player is online in game
+        if ENV_DEV then 
+            call DisplayTextToForce(GetPlayersAll(),"Checking Status ...")
+        endif 
+        // Check player is online in game  
         set n = 0 
         loop 
             exitwhen n > bj_MAX_PLAYER_SLOTS 
             if PLAYER.IsPlayerOnline(Player(n)) then 
                 set PLAYER.IsDisconect[n] = false 
+                set GAME.CountPlayer = GAME.CountPlayer + 1 
             else 
                 set PLAYER.IsDisconect[n] = true 
             endif 
@@ -460,14 +502,22 @@ struct GAME
          
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
-        call Preload_Ability('Amls') // Preload skill             
-        call Preload_Unit('uloc') // Preload unit            
+        call FogMaskEnable(true) 
+        call PanCameraToTimed(0, 0, 0) 
+        if ENV_DEV then 
+            call DisplayTextToForce(GetPlayersAll(),"Preload ...")
+        endif 
+       
+        call Preload_Ability('Amls') // Preload skill               
+        call Preload_Unit('uloc') // Preload unit              
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
     private static method onInit takes nothing returns nothing 
         call TimerStart(CreateTimer(), GAME_PRELOAD_TIME, false, function thistype.PreloadMap) 
         call TimerStart(CreateTimer(), GAME_STATUS_TIME, false, function thistype.GameStatus) 
+        call TimerStart(CreateTimer(), GAME_SETTING_TIME, false, function thistype.GameSetting) 
+        call TimerStart(CreateTimer(), GAME_START_TIME, false, function thistype.GameStart) 
     endmethod 
 endstruct 
 

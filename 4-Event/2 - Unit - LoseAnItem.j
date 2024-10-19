@@ -9,7 +9,7 @@ struct EVENT_UNIT_DROP_ITEM
         //commonly used sample trick :When you lose a fake item (power-up) and use it to increase resources 
         //that are not available in the game's UI or to craft equipment.
         if dropitem_id == '0000' and false then 
-            call SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
+            call PLAYER.SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
             return false
         endif
         //===========================================================================
