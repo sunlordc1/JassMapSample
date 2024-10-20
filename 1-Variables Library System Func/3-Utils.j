@@ -47,3 +47,15 @@ endfunction
 function GetUID takes unit u returns integer
     return GetPlayerId(GetOwningPlayer(u))
 endfunction
+
+// Convert to string by Real to Int
+function RI2S takes real r returns string 
+    return I2S(R2I(r)) 
+endfunction 
+//Boolean to String
+function B2S takes boolean b returns string 
+    if b then 
+        return "True" 
+    endif 
+    return "False" 
+endfunction 

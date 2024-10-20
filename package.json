@@ -1,0 +1,24 @@
+{
+  "name": "jass_sample_map",
+  "version": "1.0.0",
+  "description": "make map fast than",
+  "main": "Combine.js",
+  "scripts": {
+    "combine": "node Combine.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunlordc1/JassMapSample.git"
+  },
+  "keywords": [
+    "warcraft",
+    "3",
+    "jass"
+  ],
+  "author": "SunLordC1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sunlordc1/JassMapSample/issues"
+  },
+  "homepage": "https://github.com/sunlordc1/JassMapSample#readme"
+}

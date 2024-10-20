@@ -1,34 +1,45 @@
 //--- Content from folder: ./1-Variables Library System Func/1-GlobalsVariables.j ---
 
-//Constant : A constant value does not change, and you use it to set fixed parameters in the game. 
+//Constant : A constant value does not change, and you use it to set fixed parameters in the game.    
 globals 
-    //We will define bj_ as a type of variable that is used and processed at a specific moment, 
-    // is always redefined when it starts being used, and is assigned a null value when finished. 
-    //Number  
-    integer bj_int = 0 // Typically used for a single loop or assigning a random value. 
-    real bj_real = 0.00 //Typically used for a single loop or assigning a random value. 
-    //Objective  
-    item bj_item = null // instead of bj_lastCreatedItem   
-    unit bj_unit = null // instead of bj_lastCreatedUnit   
-    effect bj_eff = null // instead of bj_lastCreatedEffect   
-    //Storage  
-    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.    
-    //Timer  
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.   
-    constant real P32 = 0.03125 // Explore this number; it truly has significance. 
-    constant real P64 = 0.03125*2 // Explore this number; it truly has significance. 
-    //Utils  
-    constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
-    constant boolean ENV_DEV = true // Are u on a testing mode ?
+    //We will define bj_ as a type of variable that is used and processed at a specific moment,    
+    // is always redefined when it starts being used, and is assigned a null value when finished.    
+    //Number     
+    integer bj_int = 0 // Typically used for a single loop or assigning a random value.    
+    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.    
+    //Objective     
+    item bj_item = null // instead of bj_lastCreatedItem      
+    unit bj_unit = null // instead of bj_lastCreatedUnit      
+    effect bj_eff = null // instead of bj_lastCreatedEffect     
+    
+    //Storage     
+    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.       
+    //Timer     
+    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.      
+    constant real P32 = 0.03125 // Explore this number; it truly has significance.    
+    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.  
+    //Environment Dev 
+    constant boolean ENV_DEV = true // Are u on a testing mode ?   
 
-    //Setting Game 
-    constant boolean CREEP_SLEEP = false
-    constant boolean LOCK_RESOURCE_TRADING = true
-    constant boolean SHARED_ADVANCED_CONTROL = false
-    constant real GAME_PRELOAD_TIME = 0.01
-    constant real GAME_STATUS_TIME = 1.00
-    constant real GAME_SETTING_TIME = 3.00
-    constant real GAME_START_TIME = 5.00
+    //Utils     
+    constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
+
+    //Constant text  
+    //===Example: set str = str + N  
+    constant string N = "|n" 
+    //===Example: set str = color + str + R  
+    constant string R = "|r" 
+    //===Example: set str = color + str + RN  
+    constant string RN = "|r|n" 
+
+    //Setting Game    
+    constant boolean CREEP_SLEEP = false 
+    constant boolean LOCK_RESOURCE_TRADING = true 
+    constant boolean SHARED_ADVANCED_CONTROL = false 
+    constant real GAME_PRELOAD_TIME = 0.01 
+    constant real GAME_STATUS_TIME = 1.00 
+    constant real GAME_SETTING_TIME = 3.00 
+    constant real GAME_START_TIME = 5.00 
 
     
 endglobals 
@@ -128,6 +139,18 @@ function GetUID takes unit u returns integer
     return GetPlayerId(GetOwningPlayer(u))
 endfunction
 
+// Convert to string by Real to Int
+function RI2S takes real r returns string 
+    return I2S(R2I(r)) 
+endfunction 
+//Boolean to String
+function B2S takes boolean b returns string 
+    if b then 
+        return "True" 
+    endif 
+    return "False" 
+endfunction 
+
 //--- Content from folder: ./2-Objective/1-PLAYER.j ---
 struct PLAYER 
     static boolean array IsDisconect 
@@ -138,37 +161,37 @@ struct PLAYER
         return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
     endmethod 
     //=============GOLD=================== 
-    static method GetGold takes integer id returns integer 
+    static method gold takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
-    static method SetGold takes integer id, integer value returns nothing 
+    static method setgold takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_GOLD, value) 
     endmethod 
-    static method AddGold takes integer id, integer value returns nothing 
+    static method addgold takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
     //=============LUMBER=================== 
-    static method GetLumber takes integer id returns integer 
+    static method lumber takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
-    static method SetLumber takes integer id, integer value returns nothing 
+    static method setlumber takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_LUMBER, value) 
     endmethod 
-    static method AddLumber takes integer id, integer value returns nothing 
+    static method addlumber takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
     endmethod 
     //=============FOODCAP=================== 
-    static method GetFoodCap takes integer id returns integer 
+    static method foodcap takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
-    static method SetFoodCap takes integer id, integer value returns nothing 
+    static method setfoodcap takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP, value) 
     endmethod 
-    static method AddFoodCap takes integer id, integer value returns nothing 
+    static method addfoodcap takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
     //=============FLAG=================== 
-    static method BountyFlag takes integer id, boolean flag returns nothing 
+    static method bountyflag takes integer id, boolean flag returns nothing 
         call SetPlayerFlagBJ(PLAYER_STATE_GIVES_BOUNTY, flag, Player(id)) 
     endmethod 
     //=============RESEARCH=================== 
@@ -195,7 +218,7 @@ struct PLAYER
     endmethod 
     //=============CHAT=================== 
     // You want to notify a specific player in the form of a system message. Use this:          
-    static method SystemChat takes player ForPlayer, string message returns nothing 
+    static method systemchat takes player ForPlayer, string message returns nothing 
         local string msg = "" 
         set msg = SYSTEM_CHAT + message + "|r" 
         if(GetLocalPlayer() == ForPlayer) then 
@@ -244,11 +267,199 @@ struct DESTRUCTABLE //Destructable
 endstruct 
 
 
+//--- Content from folder: ./2-Objective/3-UNIT.j ---
+struct Unit 
+    //=================Position================================  
+    static method x takes unit u returns real 
+        return GetUnitX(u) 
+    endmethod 
+    static method y takes unit u returns real 
+        return GetUnitY(u) 
+    endmethod 
+    static method z takes unit u returns real 
+        return GetUnitFlyHeight(u) 
+    endmethod 
+    static method setx takes unit u, real x returns nothing 
+        call SetUnitX(u, x) 
+    endmethod 
+    static method sety takes unit u, real y returns nothing 
+        call SetUnitY(u, y) 
+    endmethod 
+    // Set Flying Height (Required unit have crow form or fly)     
+    // Use: Unit.setz(u,height)     
+    static method setz takes unit u, real height returns nothing 
+        call SetUnitFlyHeight(u, height, 0.) 
+    endmethod 
+
+    
+    //==================Movespeed=========================  
+    // Reset MoveSpeed of unit to default  
+    static method resetms takes unit whichUnit returns nothing 
+        call SetUnitMoveSpeed(whichUnit, GetUnitDefaultMoveSpeed(whichUnit)) 
+    endmethod 
+    // Get MoveSpeed of unit  
+    // Use: Unit.ms(u)    
+    static method ms takes unit whichUnit returns real 
+        return GetUnitMoveSpeed(whichUnit) 
+    endmethod 
+
+    //==================Vertex Color=========================  
+    //Reset Vertex Color [Change Color and Alpha of Unit]  
+    //Use:  Unit.resetvertexcolor(u)   
+    static method resetvertexcolor takes unit u returns nothing 
+        call SetUnitVertexColor(u, 255, 255, 255, 255) 
+    endmethod 
+
+    //Set Vertex Color [Change Color and Alpha of Unit]  
+    //Use:  Unit.vertexcolor(u)   
+    static method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
+        call SetUnitVertexColor(u, red, green, blue, alpha) 
+    endmethod 
+
+    //==================Misc=========================  
+    // Get Collision of unit u     
+    // Use: Unit.collision(u)     
+    static method collision takes unit u returns real 
+        local real l = 0 
+        local real h = 300 
+        local real m = 150 
+        local real nm = 0 
+        local real x = GetUnitX(u) 
+        local real y = GetUnitY(u) 
+        loop 
+            if(IsUnitInRangeXY(u, x + m, y, 0)) then 
+                set l = m 
+            else 
+                set h = m 
+            endif 
+            set nm = (l + h) / 2 
+            exitwhen nm + .001 > m and nm - .001 < m 
+            set m = nm 
+        endloop 
+        return R2I(m * 10) / 10. 
+    endmethod 
+
+endstruct
+
+//--- Content from folder: ./2-Objective/4-HERO.j ---
+
+
+
+//--- Content from folder: ./2-Objective/5-EFFECT.j ---
+
+
+//--- Content from folder: ./2-Objective/6-DUMMY.j ---
+
+
+//--- Content from folder: ./2-Objective/7.MATH.j ---
+struct Math 
+    static location SetUnitZLoc = Location(0, 0) 
+    // Percent to real :               
+    // Use: Math.p2r(100,60) = 60% of 100 = 60               
+    static method p2r takes real CurrentNumber, real Percent returns real 
+        return CurrentNumber * (Percent / 100) 
+    endmethod 
+
+    //Calculates the terrain height (Z-coordinate) at a specified (x, y) location in the game               
+    //Use: Math.pz(x,y)              
+    static method pz takes real x, real y returns real 
+        call MoveLocation(.SetUnitZLoc, x, y) 
+        return GetLocationZ(.SetUnitZLoc) 
+    endmethod 
+
+    //Calculate the angle between two points. Facing (x1,y1) to (x2,y2)               
+    //Use: Math.ab(x1,y1,x2,y2)              
+    static method ab takes real x1, real y1, real x2, real y2 returns real 
+        return bj_RADTODEG * Atan2(y2 - y1, x2 - x1) 
+    endmethod 
+
+    //Calculate the angle between two units. Facing u to u2               
+    //Use: Math.abu(u,u2)              
+    static method abu takes unit u, unit u2 returns real 
+        local real x1 = GetUnitX(u) 
+        local real y1 = GetUnitY(u) 
+        local real x2 = GetUnitX(u2) 
+        local real y2 = GetUnitY(u2) 
+        return bj_RADTODEG * Atan2(y2 - y1, x2 - x1) 
+    endmethod 
+
+    //Calculate the distance between two points         
+    //Use: Math.db(x1,y1,x2,y2)            
+    static method db takes real x1, real y1, real x2, real y2 returns real 
+        local real dx = x2 - x1 
+        local real dy = y2 - y1 
+        return SquareRoot(dx * dx + dy * dy) 
+    endmethod 
+    
+    //Calculate the distance between two units         
+    //Use: Math.dbu(u,u2)         
+    static method dbu takes unit u, unit u2 returns real 
+        local real dx = GetUnitX(u2) -GetUnitX(u) 
+        local real dy = GetUnitY(u2) -GetUnitY(u) 
+        return SquareRoot(dx * dx + dy * dy) 
+    endmethod 
+    
+    //calculates the new X-coordinate when moving a certain distance in a specified direction (angle) from a starting point    
+    //Use: Math.ppx(currentX,distance,angle)       
+    static method ppx takes real x, real dist, real angle returns real 
+        return x + dist * Cos(angle * bj_DEGTORAD) 
+    endmethod 
+
+    //calculates the new Y-coordinate when moving a certain distance in a specified direction (angle) from a starting point       
+    //Use: Math.ppy(currentY,distance,angle)       
+    static method ppy takes real y, real dist, real angle returns real 
+        return y + dist * Sin(angle * bj_DEGTORAD) 
+    endmethod 
+
+    //calculates the combined height of a unit in the game, which consists of the terrain height at the unit's location and the unit's flying height above the ground.     
+    //Use: Math.uz(u)       
+    static method uz takes unit u returns real 
+        call MoveLocation(.SetUnitZLoc, GetUnitX(u), GetUnitY(u)) 
+        return GetLocationZ(.SetUnitZLoc) + GetUnitFlyHeight(u) 
+    endmethod 
+
+    //calculates the height (Z-coordinate) at a given horizontal position current_d along a parabolic path that spans a total distance d and reaches a maximum height of h. This is often used in games to simulate the motion of projectiles or objects following a curved path.    
+    //Use: Math.parabolaz(current_d,d,h)       
+    static method parabolaz takes real current_d, real d, real h returns real 
+		return 4 * h * current_d * (d - current_d) / (d * d) 
+	endmethod 
+
+endstruct
+
+//--- Content from folder: ./2-Objective/8-STRING.j ---
+struct STR
+    //Use:  STR.repeated(1234567,",",3,0) -> 123,456,7 
+    static method repeated takes string s, string str, integer spacing, integer start returns string 
+        local integer i = StringLength(s) 
+        local integer p = 1 
+        loop 
+            exitwhen p * spacing + start >= i 
+            set s = SubString(s, 0, p * spacing + p + start - 1) + str + SubString(s, p * spacing + p + start - 1, StringLength(s)) 
+            set p = p + 1 
+        endloop 
+        return s 
+    endmethod 
+    //Use: STR.reverse("1234") -> 4321
+    static method reverse takes string s returns string
+        local integer i = StringLength(s)
+        local string rs = ""
+        loop
+            set i = i - 1
+            set rs = rs + SubString(s, i, i + 1)
+            exitwhen i == 0
+        endloop
+        return rs
+    endmethod
+endstruct 
+
+//--- Content from folder: ./2-Objective/9-HASHTABLE.j ---
+
+
 //--- Content from folder: ./3-Skill/1-SampleSkill.j ---
 
 
 //--- Content from folder: ./4-Event/1 - Unit - BeginConstruction.j ---
-struct EVENT_BEGIN_STRUCTION 
+struct EV_BEGIN_STRUCTION 
     static method f_Checking takes nothing returns boolean 
         local unit builder = GetTriggerUnit() 
         local unit constructing = GetConstructingStructure() 
@@ -278,7 +489,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/2a - Unit - AcquiresAnItem.j ---
 //
-struct EVENT_UNIT_ACQUIRES_ITEM 
+struct EV_UNIT_ACQUIRES_ITEM 
     static method f_Checking takes nothing returns boolean 
         local item acquire_item = GetManipulatedItem() 
         local integer ItemID = GetItemTypeId(acquire_item) 
@@ -301,7 +512,7 @@ struct EVENT_UNIT_ACQUIRES_ITEM
 endstruct
 
 //--- Content from folder: ./4-Event/2b - Unit - LoseAnItem.j ---
-struct EVENT_UNIT_DROP_ITEM 
+struct EV_UNIT_DROP_ITEM 
     static method f_Checking takes nothing returns boolean 
         local unit u = GetTriggerUnit() 
         local integer dropitem_id = GetItemTypeId(GetManipulatedItem()) 
@@ -312,7 +523,7 @@ struct EVENT_UNIT_DROP_ITEM
         //commonly used sample trick :When you lose a fake item (power-up) and use it to increase resources 
         //that are not available in the game's UI or to craft equipment.
         if dropitem_id == '0000' and false then 
-            call PLAYER.SystemChat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
+            call PLAYER.systemchat(Player(pid), "=>[Loot] " + GetItemName(dropitem) + " x" + I2S(charge)) 
             return false
         endif
         //===========================================================================
@@ -331,7 +542,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/3a - Unit - TargetOrder.j ---
 
-struct EVENT_TARGET_ORDER 
+struct EV_TARGET_ORDER 
     static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local item i = GetOrderTargetItem() 
@@ -368,7 +579,7 @@ endstruct
 
 
 //--- Content from folder: ./4-Event/3b - Unit - TargetPoint.j ---
-struct EVENT_POINT_ORDER 
+struct EV_POINT_ORDER 
     static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
         local real x = GetOrderPointX() 
@@ -388,7 +599,7 @@ endstruct
 
 
 //--- Content from folder: ./4-Event/3c - Unit - NoTargetOrder.j ---
-struct EVENT_NO_TARGET_ORDER 
+struct EV_NO_TARGET_ORDER 
     static method f_Checking takes nothing returns nothing 
         local unit u = GetTriggerUnit() 
           
@@ -406,7 +617,7 @@ endstruct
 //--- Content from folder: ./4-Event/4 - Unit - Die.j ---
 
 
-struct EVENT_UNIT_DEATH 
+struct EV_UNIT_DEATH 
     static method f_Checking takes nothing returns boolean 
         local unit killer = GetKillingUnit() 
         local unit dying = GetDyingUnit() 
@@ -433,7 +644,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/5a - Unit - BeginCastingSpell.j ---
 
-struct EVENT_CASTING_SPELL 
+struct EV_CASTING_SPELL 
     static method f_Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 
@@ -460,7 +671,7 @@ endstruct
 
 
 //--- Content from folder: ./4-Event/5b - Unit - StartEffectSpell.j ---
-struct EVENT_START_SPELL_EFFECT 
+struct EV_START_SPELL_EFFECT 
     static method f_Checking takes nothing returns boolean 
         local unit caster = GetTriggerUnit() 
         local integer idc = GetUnitTypeId(caster) 
@@ -494,7 +705,7 @@ endstruct
 
 
 //--- Content from folder: ./4-Event/6 - Hero - LearnSpell.j ---
-struct EVENT_LEARN_SKILL 
+struct EV_LEARN_SKILL 
     static method f_Checking takes nothing returns boolean 
         local unit caster = GetLearningUnit() 
         local integer id = GetLearnedSkill()  //Ability ID learning spell
@@ -513,7 +724,7 @@ endstruct
 
 //--- Content from folder: ./4-Event/7 - Unit - SoldUnit.j ---
 
-struct EVENT_UNIT_SELL 
+struct EV_UNIT_SELL 
     static method f_Checking takes nothing returns boolean 
         local unit u = GetSoldUnit() 
         local unit caster = GetTriggerUnit() 
@@ -532,7 +743,7 @@ endstruct
 
 
 //--- Content from folder: ./4-Event/8 - Player- Leave.j ---
-struct EVENT_PLAYER_LEAVES 
+struct EV_PLAYER_LEAVES 
     static method f_Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         
@@ -559,7 +770,7 @@ endstruct
 
 
 
-struct EVENT_UNIT_ATTACK
+struct EV_UNIT_ATTACK
     static method f_Checking takes nothing returns boolean 
         local unit attacker = GetAttacker() 
         local unit attacked = GetTriggerUnit() 
@@ -583,22 +794,22 @@ endstruct
 struct REGISTER_EVENT 
     private static method SetupAllEvent takes nothing returns nothing 
         //Comment if u don't use the event 
-        call EVENT_BEGIN_STRUCTION.f_SetupEvent()
+        call EV_BEGIN_STRUCTION.f_SetupEvent()
         // ITEM
-        call EVENT_UNIT_ACQUIRES_ITEM.f_SetupEvent()
-        call EVENT_UNIT_DROP_ITEM.f_SetupEvent()
+        call EV_UNIT_ACQUIRES_ITEM.f_SetupEvent()
+        call EV_UNIT_DROP_ITEM.f_SetupEvent()
         // ORDER
-        call EVENT_TARGET_ORDER.f_SetupEvent()
-        call EVENT_POINT_ORDER.f_SetupEvent()
-        call EVENT_NO_TARGET_ORDER.f_SetupEvent()
+        call EV_TARGET_ORDER.f_SetupEvent()
+        call EV_POINT_ORDER.f_SetupEvent()
+        call EV_NO_TARGET_ORDER.f_SetupEvent()
         // SPELL
-        call EVENT_CASTING_SPELL.f_SetupEvent()
-        call EVENT_START_SPELL_EFFECT.f_SetupEvent()
-        call EVENT_LEARN_SKILL.f_SetupEvent()
+        call EV_CASTING_SPELL.f_SetupEvent()
+        call EV_START_SPELL_EFFECT.f_SetupEvent()
+        call EV_LEARN_SKILL.f_SetupEvent()
         // MISC
-        call EVENT_UNIT_DEATH.f_SetupEvent()
-        call EVENT_UNIT_ATTACK.f_SetupEvent()
-        call EVENT_UNIT_SELL.f_SetupEvent()
+        call EV_UNIT_DEATH.f_SetupEvent()
+        call EV_UNIT_ATTACK.f_SetupEvent()
+        call EV_UNIT_SELL.f_SetupEvent()
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
     private static method onInit takes nothing returns nothing 

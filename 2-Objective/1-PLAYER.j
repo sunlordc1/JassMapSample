@@ -7,37 +7,37 @@ struct PLAYER
         return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER 
     endmethod 
     //=============GOLD=================== 
-    static method GetGold takes integer id returns integer 
+    static method gold takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
-    static method SetGold takes integer id, integer value returns nothing 
+    static method setgold takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_GOLD, value) 
     endmethod 
-    static method AddGold takes integer id, integer value returns nothing 
+    static method addgold takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
     //=============LUMBER=================== 
-    static method GetLumber takes integer id returns integer 
+    static method lumber takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
     endmethod 
-    static method SetLumber takes integer id, integer value returns nothing 
+    static method setlumber takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_LUMBER, value) 
     endmethod 
-    static method AddLumber takes integer id, integer value returns nothing 
+    static method addlumber takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
     endmethod 
     //=============FOODCAP=================== 
-    static method GetFoodCap takes integer id returns integer 
+    static method foodcap takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
-    static method SetFoodCap takes integer id, integer value returns nothing 
+    static method setfoodcap takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP, value) 
     endmethod 
-    static method AddFoodCap takes integer id, integer value returns nothing 
+    static method addfoodcap takes integer id, integer value returns nothing 
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
     //=============FLAG=================== 
-    static method BountyFlag takes integer id, boolean flag returns nothing 
+    static method bountyflag takes integer id, boolean flag returns nothing 
         call SetPlayerFlagBJ(PLAYER_STATE_GIVES_BOUNTY, flag, Player(id)) 
     endmethod 
     //=============RESEARCH=================== 
@@ -64,7 +64,7 @@ struct PLAYER
     endmethod 
     //=============CHAT=================== 
     // You want to notify a specific player in the form of a system message. Use this:          
-    static method SystemChat takes player ForPlayer, string message returns nothing 
+    static method systemchat takes player ForPlayer, string message returns nothing 
         local string msg = "" 
         set msg = SYSTEM_CHAT + message + "|r" 
         if(GetLocalPlayer() == ForPlayer) then 
