@@ -182,21 +182,6 @@ struct Frame
         call BlzFrameSetEnable(txt, false) 
         return txt 
     endmethod 
-    static method tooltip2 takes framehandle btn, real size, string desc returns framehandle 
-        //local framehandle bg = frame.texture("UI_BACKGROUND.tga")     
-        //local framehandle bg = BlzCreateFrame("QuestButtonBaseTemplate", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0, 0)     
-        local framehandle bg = BlzCreateFrame("BoxedTextVH", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0, 0) 
-        local framehandle txt = BlzCreateFrameByType("TEXT", "MyScriptDialogButtonTooltip", bg, "", 0) 
-        //call BlzFrameSetText(BlzGetFrameByName("BoxedTextTitle", 0), "title")     
-        call BlzFrameSetSize(txt, size, 0) 
-        call BlzFrameSetPoint(bg, FRAMEPOINT_BOTTOMLEFT, txt, FRAMEPOINT_BOTTOMLEFT, -0.01, -0.01) 
-        call BlzFrameSetPoint(bg, FRAMEPOINT_TOPRIGHT, txt, FRAMEPOINT_TOPRIGHT, 0.01, 0.01) 
-        call BlzFrameSetTooltip(btn, bg) 
-        call BlzFrameSetPoint(txt, FRAMEPOINT_BOTTOM, btn, FRAMEPOINT_BOTTOM, 0, -0.02) 
-        call BlzFrameSetText(txt, desc) 
-        call BlzFrameSetEnable(txt, false) 
-        return txt 
-    endmethod 
     static method click takes framehandle ff, code youfunc returns trigger 
         local trigger t = CreateTrigger() 
         call BlzTriggerRegisterFrameEvent(t, ff, FRAMEEVENT_CONTROL_CLICK) 
