@@ -1,10 +1,17 @@
 
 //Use :    
-// Make new dummy : call DUMMY.new(x,y,duration,p )   
-// Add Ability need cast and set level it : call DUMMY.abi(abi_id,level)  
-// Order : call DUMMY.target("thunderbolt",target) [Search order name of spell u add] 
-// Reset variable after order : call DUMMY.reset()
-struct DUMMY 
+// Make new dummy :
+//==> call DUMMY.new(x,y,duration,p )   
+
+// Add Ability need cast and set level it : 
+//==> call DUMMY.abi(abi_id,level)  
+
+// Order :
+//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add] 
+
+// Reset variable after order :
+//==>  call DUMMY.reset()
+struct Dummy 
     static integer dummy_id = 'dumy' //Set your id dummy      
     static method new takes real x, real y, real duration, player p returns nothing 
         set bj_unit = CreateUnit(p,.dummy_id, x, y, bj_UNIT_FACING) 

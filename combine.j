@@ -1,38 +1,37 @@
 //--- Content from folder: ./1-Variables Library System Func/1-GlobalsVariables.j ---
 
-//Constant : A constant value does not change, and you use it to set fixed parameters in the game.    
+//Constant : A constant value does not change, and you use it to set fixed parameters in the game.     
 globals 
-    //We will define bj_ as a type of variable that is used and processed at a specific moment,    
-    // is always redefined when it starts being used, and is assigned a null value when finished.    
-    //Number     
-    integer bj_int = 0 // Typically used for a single loop or assigning a random value.    
-    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.    
-    //Objective     
-    item bj_item = null // instead of bj_lastCreatedItem      
-    unit bj_unit = null // instead of bj_lastCreatedUnit      
-    effect bj_eff = null // instead of bj_lastCreatedEffect     
+    //We will define bj_ as a type of variable that is used and processed at a specific moment,     
+    // is always redefined when it starts being used, and is assigned a null value when finished.     
+    //Number      
+    integer bj_int = 0 // Typically used for a single loop or assigning a random value.     
+    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.     
+    //Objective      
+    item bj_item = null // instead of bj_lastCreatedItem       
+    unit bj_unit = null // instead of bj_lastCreatedUnit       
+    effect bj_eff = null // instead of bj_lastCreatedEffect      
     
-    //Storage     
-    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.       
-    //Timer     
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.      
-    constant real P32 = 0.03125 // Explore this number; it truly has significance.    
-    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.  
-    //Environment Dev 
-    constant boolean ENV_DEV = true // Are u on a testing mode ?   
+    //Storage      
+    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.        
+    //Timer      
+    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.       
+    constant real P32 = 0.03125 // Explore this number; it truly has significance.     
+    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.   
+    //Environment Dev  
+    constant boolean ENV_DEV = true // Are u on a testing mode ?    
 
-    //Utils     
+    //Utils      
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
 
-    //Constant text  
-    //===Example: set str = str + N  
+    //Constant text   
+    //===Example: set str = str + N   
     constant string N = "|n" 
-    //===Example: set str = color + str + R  
+    //===Example: set str = color + str + R   
     constant string R = "|r" 
-    //===Example: set str = color + str + RN  
+    //===Example: set str = color + str + RN   
     constant string RN = "|r|n" 
-
-    //Setting Game    
+    //Setting Game     
     constant boolean CREEP_SLEEP = false 
     constant boolean LOCK_RESOURCE_TRADING = true 
     constant boolean SHARED_ADVANCED_CONTROL = false 
@@ -245,6 +244,12 @@ struct PLAYER
     endmethod 
 endstruct
 
+//--- Content from folder: ./2-Objective/10-GROUP.j ---
+
+
+//--- Content from folder: ./2-Objective/11-SKILL.j ---
+
+
 //--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
 struct DESTRUCTABLE //Destructable  
     static method OpenGate takes destructable d returns nothing 
@@ -268,58 +273,59 @@ endstruct
 
 
 //--- Content from folder: ./2-Objective/3-UNIT.j ---
+//Call struct then Unit instead UNIT 
 struct Unit 
-    //=================Position================================  
-    static method x takes unit u returns real 
+    //=================Position================================    
+    method x takes unit u returns real 
         return GetUnitX(u) 
     endmethod 
-    static method y takes unit u returns real 
+    method y takes unit u returns real 
         return GetUnitY(u) 
     endmethod 
-    static method z takes unit u returns real 
+    method z takes unit u returns real 
         return GetUnitFlyHeight(u) 
     endmethod 
-    static method setx takes unit u, real x returns nothing 
+    method setx takes unit u, real x returns nothing 
         call SetUnitX(u, x) 
     endmethod 
-    static method sety takes unit u, real y returns nothing 
+    method sety takes unit u, real y returns nothing 
         call SetUnitY(u, y) 
     endmethod 
-    // Set Flying Height (Required unit have crow form or fly)     
-    // Use: Unit.setz(u,height)     
-    static method setz takes unit u, real height returns nothing 
+    // Set Flying Height (Required unit have crow form or fly)       
+    // Use: Unit.setz(u,height)       
+    method setz takes unit u, real height returns nothing 
         call SetUnitFlyHeight(u, height, 0.) 
     endmethod 
 
     
-    //==================Movespeed=========================  
-    // Reset MoveSpeed of unit to default  
-    static method resetms takes unit whichUnit returns nothing 
+    //==================Movespeed=========================    
+    // Reset MoveSpeed of unit to default    
+    method resetms takes unit whichUnit returns nothing 
         call SetUnitMoveSpeed(whichUnit, GetUnitDefaultMoveSpeed(whichUnit)) 
     endmethod 
-    // Get MoveSpeed of unit  
-    // Use: Unit.ms(u)    
-    static method ms takes unit whichUnit returns real 
+    // Get MoveSpeed of unit    
+    // Use: Unit.ms(u)      
+    method ms takes unit whichUnit returns real 
         return GetUnitMoveSpeed(whichUnit) 
     endmethod 
 
-    //==================Vertex Color=========================  
-    //Reset Vertex Color [Change Color and Alpha of Unit]  
-    //Use:  Unit.resetvertexcolor(u)   
-    static method resetvertexcolor takes unit u returns nothing 
+    //==================Vertex Color=========================    
+    //Reset Vertex Color [Change Color and Alpha of Unit]    
+    //Use:  Unit.resetvertexcolor(u)     
+    method resetvertexcolor takes unit u returns nothing 
         call SetUnitVertexColor(u, 255, 255, 255, 255) 
     endmethod 
 
-    //Set Vertex Color [Change Color and Alpha of Unit]  
-    //Use:  Unit.vertexcolor(u)   
-    static method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
+    //Set Vertex Color [Change Color and Alpha of Unit]    
+    //Use:  Unit.vertexcolor(u)     
+    method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
         call SetUnitVertexColor(u, red, green, blue, alpha) 
     endmethod 
 
-    //==================Misc=========================  
-    // Get Collision of unit u     
-    // Use: Unit.collision(u)     
-    static method collision takes unit u returns real 
+    //==================Misc=========================    
+    // Get Collision of unit u       
+    // Use: Unit.collision(u)       
+    method collision takes unit u returns real 
         local real l = 0 
         local real h = 300 
         local real m = 150 
@@ -338,18 +344,65 @@ struct Unit
         endloop 
         return R2I(m * 10) / 10. 
     endmethod 
-
+    private static method onInit takes nothing returns nothing 
+        local thistype this = thistype.create() 
+    endmethod
 endstruct
 
 //--- Content from folder: ./2-Objective/4-HERO.j ---
 
+struct Hero extends Unit
 
+endstruct
 
 //--- Content from folder: ./2-Objective/5-EFFECT.j ---
 
 
 //--- Content from folder: ./2-Objective/6-DUMMY.j ---
 
+//Use :    
+// Make new dummy :
+//==> call DUMMY.new(x,y,duration,p )   
+
+// Add Ability need cast and set level it : 
+//==> call DUMMY.abi(abi_id,level)  
+
+// Order :
+//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add] 
+
+// Reset variable after order :
+//==>  call DUMMY.reset()
+struct Dummy 
+    static integer dummy_id = 'dumy' //Set your id dummy      
+    static method new takes real x, real y, real duration, player p returns nothing 
+        set bj_unit = CreateUnit(p,.dummy_id, x, y, bj_UNIT_FACING) 
+        call UnitAddAbility(bj_unit, 'Avul') 
+        call UnitAddAbility(bj_unit, 'Aloc') 
+        call UnitApplyTimedLifeBJ(duration, 'BTLF', bj_unit) 
+    endmethod 
+    static method abi takes integer abi_id, integer level returns nothing 
+        call UnitAddAbility(bj_unit, abi_id) 
+        call BlzUnitHideAbility(bj_unit, abi_id, false) 
+        call BlzEndUnitAbilityCooldown(bj_unit, abi_id) 
+        call SetUnitAbilityLevel(bj_unit, abi_id, level) 
+        call IssueImmediateOrder(bj_unit, "stop") 
+        call BlzUnitHideAbility(bj_unit, abi_id, true) 
+    endmethod 
+    static method target takes string ordername, unit target returns nothing 
+        call IssueTargetOrder(bj_unit, ordername, target) 
+    endmethod 
+    static method aoe takes string ordername, real x, real y returns nothing 
+        local location loc = Location(x, y) 
+        call IssuePointOrderLoc(bj_unit, ordername, loc) 
+        call RemoveLocation(loc) 
+    endmethod 
+    static method notarget takes string ordername returns nothing 
+        call IssueImmediateOrder(bj_unit, ordername) 
+    endmethod 
+    static method reset takes string ordername returns nothing 
+        set bj_unit = null 
+    endmethod 
+endstruct 
 
 //--- Content from folder: ./2-Objective/7.MATH.j ---
 struct Math 

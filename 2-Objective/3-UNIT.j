@@ -1,55 +1,56 @@
+//Call struct then Unit instead UNIT   
 struct Unit 
-    //=================Position================================  
-    static method x takes unit u returns real 
+    //=================Position================================      
+    method x takes unit u returns real 
         return GetUnitX(u) 
     endmethod 
-    static method y takes unit u returns real 
+    method y takes unit u returns real 
         return GetUnitY(u) 
     endmethod 
-    static method z takes unit u returns real 
+    method z takes unit u returns real 
         return GetUnitFlyHeight(u) 
     endmethod 
-    static method setx takes unit u, real x returns nothing 
+    method setx takes unit u, real x returns nothing 
         call SetUnitX(u, x) 
     endmethod 
-    static method sety takes unit u, real y returns nothing 
+    method sety takes unit u, real y returns nothing 
         call SetUnitY(u, y) 
     endmethod 
-    // Set Flying Height (Required unit have crow form or fly)     
-    // Use: Unit.setz(u,height)     
-    static method setz takes unit u, real height returns nothing 
+    // Set Flying Height (Required unit have crow form or fly)         
+    // Use: Unit.setz(u,height)         
+    method setz takes unit u, real height returns nothing 
         call SetUnitFlyHeight(u, height, 0.) 
     endmethod 
 
     
-    //==================Movespeed=========================  
-    // Reset MoveSpeed of unit to default  
-    static method resetms takes unit whichUnit returns nothing 
+    //==================Movespeed=========================      
+    // Reset MoveSpeed of unit to default      
+    method resetms takes unit whichUnit returns nothing 
         call SetUnitMoveSpeed(whichUnit, GetUnitDefaultMoveSpeed(whichUnit)) 
     endmethod 
-    // Get MoveSpeed of unit  
-    // Use: Unit.ms(u)    
-    static method ms takes unit whichUnit returns real 
+    // Get MoveSpeed of unit      
+    // Use: Unit.ms(u)        
+    method ms takes unit whichUnit returns real 
         return GetUnitMoveSpeed(whichUnit) 
     endmethod 
 
-    //==================Vertex Color=========================  
-    //Reset Vertex Color [Change Color and Alpha of Unit]  
-    //Use:  Unit.resetvertexcolor(u)   
-    static method resetvertexcolor takes unit u returns nothing 
+    //==================Vertex Color=========================      
+    //Reset Vertex Color [Change Color and Alpha of Unit]      
+    //Use:  Unit.resetvertexcolor(u)       
+    method resetvertexcolor takes unit u returns nothing 
         call SetUnitVertexColor(u, 255, 255, 255, 255) 
     endmethod 
 
-    //Set Vertex Color [Change Color and Alpha of Unit]  
-    //Use:  Unit.vertexcolor(u)   
-    static method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
+    //Set Vertex Color [Change Color and Alpha of Unit]      
+    //Use:  Unit.vertexcolor(u)       
+    method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
         call SetUnitVertexColor(u, red, green, blue, alpha) 
     endmethod 
 
-    //==================Misc=========================  
-    // Get Collision of unit u     
-    // Use: Unit.collision(u)     
-    static method collision takes unit u returns real 
+    //==================Misc=========================      
+    // Get Collision of unit u         
+    // Use: Unit.collision(u)         
+    method collision takes unit u returns real 
         local real l = 0 
         local real h = 300 
         local real m = 150 
@@ -68,5 +69,39 @@ struct Unit
         endloop 
         return R2I(m * 10) / 10. 
     endmethod 
+    //==================== Ability =======================  
+    static method abilv takes unit u, integer a returns integer 
+        local integer i = 0 
+        set i = GetUnitAbilityLevel(u, a) 
+        return i 
+    endmethod 
+    static method setabilv takes unit u, integer a, integer lv returns nothing 
+        call SetUnitAbilityLevel(u, a, lv) 
+    endmethod 
+    static method removeabi takes unit u, integer a returns nothing 
+        call UnitRemoveAbility(u, a) 
+    endmethod 
+    static method haveabi takes unit u, integer a returns boolean 
+        return GetUnitAbilityLevel(u, i) > 0 
+    endmethod 
+    static method addabi takes unit u, integer a returns nothing 
+        call UnitAddAbility(u, a) 
+        call UnitMakeAbilityPermanent(u, true, a) 
+    endmethod 
+    static method hideabi takes unit u, integer a returns nothing 
+        call BlzUnitHideAbility(u, a, true) 
+    endmethod 
+    static method showabi takes unit u, integer a returns nothing 
+        call BlzUnitDisableAbility(u, a, false, false) 
+    endmethod 
+    static method disabledabi takes unit u, integer a returns nothing 
+        call BlzUnitDisableAbility(u, a, true, false) 
+    endmethod 
 
+
+
+
+    private static method onInit takes nothing returns nothing 
+        local thistype this = thistype.create() 
+    endmethod 
 endstruct
