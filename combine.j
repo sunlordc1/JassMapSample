@@ -636,6 +636,8 @@ struct Group
 endstruct 
 
 //--- Content from folder: ./2-Objective/11-FRAMEHANDLE.j ---
+
+//Frame is in a higher category of map editing; I only provide a simple solution for this section.
 struct Frame 
     static key KEY_FF 
     static method init takes nothing returns nothing 
@@ -1027,7 +1029,7 @@ struct Hero extends Unit
 endstruct
 
 //--- Content from folder: ./2-Objective/5-EFFECT.j ---
-struct Effect
+struct Eff
     static method new takes string path, real x, real y, real z returns effect 
         set bj_eff = AddSpecialEffect(path, x, y) 
         call BlzSetSpecialEffectZ(bj_eff, z) 
@@ -1095,7 +1097,7 @@ endstruct
 // Reset variable after order :
 //==>  call DUMMY.reset()
 struct Dummy 
-    static integer dummy_id = 'dumy' //Set your id dummy      
+    static integer dummy_id = 'e000' //Set your id dummy      
     static method new takes real x, real y, real duration, player p returns nothing 
         set bj_unit = CreateUnit(p,.dummy_id, x, y, bj_UNIT_FACING) 
         call UnitAddAbility(bj_unit, 'Avul') 
@@ -1238,7 +1240,115 @@ endstruct
 
 
 //--- Content from folder: ./3-Skill/1-SampleSkill.j ---
+struct SKILL 
+    unit caster = null 
+    unit target = null 
+    unit u = null 
+    group g = null 
+    damagetype DMG_TYPE = null 
+    attacktype ATK_TYPE = null 
+    integer time = 0 
+    real speed = 0.00 
+    real dmg = 0.00 
+    real aoe = 0.00 
+    real a = 0.00 
+    real x = 0.00 
+    real y = 0.00 
+    real z = 0.00 
 
+    effect missle = null 
+    string missle_path = "" 
+    real missle_size = 0.00 
+    boolean is_touch = false 
+
+    boolean ALLOW_GROUND = true 
+    boolean ALLOW_FLYING = true 
+
+    boolean ALLOW_HERO = true 
+    boolean ALLOW_STRUCTURE = true 
+    boolean ALLOW_MECHANICAL = true 
+    boolean ALLOW_ENEMY = true 
+    boolean ALLOW_ALLY = true 
+    boolean ALLOW_MAGIC_IMMUNE = true 
+
+    boolean ALLOW_ALIVE = true 
+    method FilterCompare takes boolean is, boolean yes, boolean no returns boolean 
+        return(is and yes) or((not is) and no) 
+    endmethod 
+    method FilterUnit takes unit u, unit caster returns boolean 
+        if not.FilterCompare(IsUnitAlly(u, GetOwningPlayer(caster)),.ALLOW_ALLY,.ALLOW_ENEMY) then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_HERO) and not.ALLOW_HERO then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_STRUCTURE) and not.ALLOW_STRUCTURE then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_FLYING) and not.ALLOW_FLYING then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_GROUND) and not.ALLOW_GROUND then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_MECHANICAL) and not.ALLOW_MECHANICAL then 
+            return false 
+        endif 
+        if IsUnitType(u, UNIT_TYPE_MAGIC_IMMUNE) and not.ALLOW_MAGIC_IMMUNE then 
+            return false 
+        endif 
+        if GetUnitState(u, UNIT_STATE_LIFE) > 0 and not.ALLOW_ALIVE then 
+            return false 
+        endif 
+        return true 
+    endmethod 
+endstruct 
+
+struct SKILL_MISSLE extends SKILL 
+    private static method FireTouchUpdate takes nothing returns nothing 
+        local thistype this = runtime.get() 
+        local timer t = GetExpiredTimer() 
+        local group g = null 
+        local unit e = null 
+        set.x = Math.ppx(.x,.speed,.a) 
+        set.y = Math.ppy(.y,.speed,.a) 
+        call Eff.angle(.missle,.a) 
+        call Eff.pos(.missle,.x,.y, Math.pz(.x,.y) +.z) 
+
+        set g = CreateGroup() 
+        call Group.enum(g,.x,.y,.aoe) 
+        loop 
+            set e = FirstOfGroup(g) 
+            exitwhen e == null 
+            if not.is_touch and.FilterUnit(e,.caster) and e !=.caster then 
+                set.is_touch = true 
+                call UnitDamageTargetBJ(.caster, e,.dmg,.ATK_TYPE,.DMG_TYPE) 
+            endif 
+            call Group.remove(e, g) 
+        endloop 
+        call Group.release(g) 
+        set e = null 
+
+        set.time =.time - 1 
+        if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
+            call DestroyEffect(.missle) 
+            call runtime.endx(t) // End the timer                                                                                                                                                            
+            call.destroy() // Destroy the instance                        
+        endif 
+    endmethod 
+    method FireTouch takes nothing returns boolean 
+        // local thistype this = thistype.create()    
+        set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
+        call Eff.size(.missle,.missle_size) 
+        call Eff.angle(.missle,.a) 
+        if ENV_DEV then 
+            call PLAYER.systemchat(Player(0), "[SKILL] Fire Touch") 
+            call PLAYER.systemchat(Player(0), missle_path) 
+        endif 
+        call runtime.new(this, P32, true, function thistype.FireTouchUpdate) 
+        return false 
+    endmethod 
+endstruct
 
 //--- Content from folder: ./4-Event/1 - Unit - BeginConstruction.j ---
 struct EV_BEGIN_STRUCTION 
@@ -1461,16 +1571,49 @@ struct EV_START_SPELL_EFFECT
         local integer idt = GetUnitTypeId(target) 
         local integer abicode = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local real targetX = GetSpellTargetX() //Point X of skill  
-        local real targetY = GetSpellTargetY() //Point T of skill  
+        local real targetX = GetSpellTargetX() //Point X of skill               
+        local real targetY = GetSpellTargetY() //Point T of skill               
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
         local real yc = GetUnitY(caster) 
-        local real xt = GetUnitX(target) //Position X of target unit 
-        local real yt = GetUnitY(target) //Position T of target unit 
-      
-
+        local real xt = GetUnitX(target) //Position X of target unit              
+        local real yt = GetUnitY(target) //Position T of target unit              
+        local SKILL_MISSLE Missle 
+        local integer n = 1 
+        if abicode == 'A000' then 
+            loop 
+                exitwhen n > 5 
+                set Missle = SKILL_MISSLE.create() 
+                set Missle.caster = caster 
+                set Missle.x = xc 
+                set Missle.y = yc 
+                set Missle.z = 100 
+                //Angle  
+                set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 15)) + (n * 15) 
+                //Speed per tick (1 second = speed *32)  
+                set Missle.speed = 15 
+                set Missle.aoe = 90 
+                set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
+                set Missle.missle_size = 1.5 
+                set Missle.dmg = 60 
+                set Missle.time = 32 * 2 // 32 tick per 1 seconds       
+    
+                set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
+                set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
+    
+                set Missle.ALLOW_ALIVE = true 
+                set Missle.ALLOW_FLYING = false 
+                set Missle.ALLOW_GROUND = true 
+                set Missle.ALLOW_ENEMY = true 
+                set Missle.ALLOW_ALLY = false 
+                set Missle.ALLOW_STRUCTURE = false 
+                set Missle.ALLOW_MECHANICAL = false 
+                call Missle.FireTouch() 
+                set n = n + 1 
+            endloop 
+        
+        endif 
 
         set target = null 
         set caster = null 
@@ -1616,25 +1759,25 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
-        set test1 = Frame.button("war3mapImported\\tooltipBG.blp") 
-        call Frame.hide(test1) 
-        call Frame.showx(0, test1) 
-        call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301) 
-        call Frame.click(test1, function thistype.ClickTest1) 
-        call DestroyTimer(GetExpiredTimer()) 
+        // set test1 = Frame.button("war3mapImported\\tooltipBG.blp") 
+        // call Frame.hide(test1) 
+        // call Frame.showx(0, test1) 
+        // call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301) 
+        // call Frame.click(test1, function thistype.ClickTest1) 
+        // call DestroyTimer(GetExpiredTimer()) 
     endmethod 
-    private static method ClickTest1 takes nothing returns nothing 
-        local player p = GetTriggerPlayer() 
-        local integer id = GetPlayerId(GetTriggerPlayer()) 
-        local framehandle f = BlzGetTriggerFrame() 
-        if f != null then 
-            call PLAYER.systemchat(Player(id), "Select 1") 
-            call Frame.hidex(id, f) 
-            call Frame.fixed(id) 
-        endif 
-        set p = null 
-        set f = null 
-    endmethod 
+    // private static method ClickTest1 takes nothing returns nothing 
+    //     local player p = GetTriggerPlayer() 
+    //     local integer id = GetPlayerId(GetTriggerPlayer()) 
+    //     local framehandle f = BlzGetTriggerFrame() 
+    //     if f != null then 
+    //         call PLAYER.systemchat(Player(id), "Select 1") 
+    //         call Frame.hidex(id, f) 
+    //         call Frame.fixed(id) 
+    //     endif 
+    //     set p = null 
+    //     set f = null 
+    // endmethod 
     private static method GameSetting takes nothing returns nothing 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Setting Game ...") 

@@ -1,4 +1,4 @@
-struct Effect
+struct Eff
     static method new takes string path, real x, real y, real z returns effect 
         set bj_eff = AddSpecialEffect(path, x, y) 
         call BlzSetSpecialEffectZ(bj_eff, z) 

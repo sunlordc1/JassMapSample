@@ -12,7 +12,7 @@
 // Reset variable after order :
 //==>  call DUMMY.reset()
 struct Dummy 
-    static integer dummy_id = 'dumy' //Set your id dummy      
+    static integer dummy_id = 'e000' //Set your id dummy      
     static method new takes real x, real y, real duration, player p returns nothing 
         set bj_unit = CreateUnit(p,.dummy_id, x, y, bj_UNIT_FACING) 
         call UnitAddAbility(bj_unit, 'Avul') 
