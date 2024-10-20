@@ -14,6 +14,9 @@ struct SKILL
     real y = 0.00 
     real z = 0.00 
 
+    integer buff_id
+    integer buff_lv
+
     effect missle = null 
     string missle_path = "" 
     real missle_size = 0.00 
@@ -97,6 +100,7 @@ struct SKILL_MISSLE extends SKILL
             if not.is_touch and.FilterUnit(e,.caster) and e !=.caster then 
                 set.is_touch = true 
                 call UnitDamageTargetBJ(.caster, e,.dmg,.ATK_TYPE,.DMG_TYPE) 
+                call Buff.effect(.caster, e,.buff_id,.x,.y,.buff_lv) 
             endif 
             call Group.remove(e, g) 
         endloop 
@@ -106,12 +110,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                   
-            call.destroy() // Destroy the instance                               
+            call runtime.endx(t) // End the timer                                                                                                                                                                    
+            call.destroy() // Destroy the instance                                
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()           
+        // local thistype this = thistype.create()            
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 

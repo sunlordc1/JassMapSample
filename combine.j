@@ -1,39 +1,39 @@
 //--- Content from folder: ./1-Variables Library System Func/1-GlobalsVariables.j ---
 
-//Constant : A constant value does not change, and you use it to set fixed parameters in the game.      
+//Constant : A constant value does not change, and you use it to set fixed parameters in the game.       
 globals 
-    //We will define bj_ as a type of variable that is used and processed at a specific moment,      
-    // is always redefined when it starts being used, and is assigned a null value when finished.      
-    //Number       
-    integer bj_int = 0 // Typically used for a single loop or assigning a random value.      
-    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.      
-    //Objective       
-    item bj_item = null // instead of bj_lastCreatedItem        
-    unit bj_unit = null // instead of bj_lastCreatedUnit        
-    effect bj_eff = null // instead of bj_lastCreatedEffect       
-    
-    //Storage       
-    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.         
-    hashtable stats = InitHashtable() // For damage system 
-    //Timer       
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.        
-    constant real P32 = 0.03125 // Explore this number; it truly has significance.      
-    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.    
-    //Environment Dev   
-    constant boolean ENV_DEV = true // Are u on a testing mode ?     
+    //We will define bj_ as a type of variable that is used and processed at a specific moment,       
+    // is always redefined when it starts being used, and is assigned a null value when finished.       
+    //Number        
+    integer bj_int = 0 // Typically used for a single loop or assigning a random value.       
+    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.       
+    //Objective        
+    item bj_item = null // instead of bj_lastCreatedItem         
+    unit bj_unit = null // instead of bj_lastCreatedUnit         
+    effect bj_eff = null // instead of bj_lastCreatedEffect        
+    location bj_loc = Location(0, 0) 
+    //Storage        
+    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.          
+    hashtable stats = InitHashtable() // For damage system  
+    //Timer        
+    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.         
+    constant real P32 = 0.03125 // Explore this number; it truly has significance.       
+    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.     
+    //Environment Dev    
+    constant boolean ENV_DEV = true // Are u on a testing mode ?      
 
-    //Utils       
+    //Utils        
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
 
-    //Constant text    
-    //===Example: set str = str + N    
+    //Constant text     
+    //===Example: set str = str + N     
     constant string N = "|n" 
-    //===Example: set str = color + str + R    
+    //===Example: set str = color + str + R     
     constant string R = "|r" 
-    //===Example: set str = color + str + RN    
+    //===Example: set str = color + str + RN     
     constant string RN = "|r|n" 
-    //Setting Game     
-    constant real ARMOR_CONSTANT = 0.03 // Assign it with the value you set in the gameplay constant. 
+    //Setting Game      
+    constant real ARMOR_CONSTANT = 0.03 // Assign it with the value you set in the gameplay constant.  
     constant boolean CREEP_SLEEP = false 
     constant boolean LOCK_RESOURCE_TRADING = true 
     constant boolean SHARED_ADVANCED_CONTROL = false 
@@ -698,20 +698,7 @@ struct Frame
         call BlzFrameSetText(ff, s) 
         return ff 
     endmethod 
-    static method text9 takes string s returns framehandle 
-        local framehandle ff = BlzCreateSimpleFrame("TextUnitLevelYY", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
-        call BlzFrameSetLevel(ff, 9) 
-        set ff = BlzGetFrameByName("TextUnitLevelValueYY", 0) 
-        call BlzFrameSetText(ff, s) 
-        return ff 
-    endmethod 
-    static method text2 takes string s returns framehandle 
-        local framehandle ff = BlzCreateSimpleFrame("TextUnitLevel", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
-        call BlzFrameSetLevel(ff, 9) 
-        set ff = BlzGetFrameByName("TextUnitLevelValue", 0) 
-        call BlzFrameSetText(ff, s) 
-        return ff 
-    endmethod 
+
     static method imagex takes string s, integer level returns framehandle 
         local framehandle ff 
         local framehandle f_goc = BlzCreateSimpleFrame("TestTexture", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
@@ -832,6 +819,57 @@ struct Frame
         call BlzFrameSetPoint(bg, FRAMEPOINT_TOPRIGHT, txt, FRAMEPOINT_TOPRIGHT, 0.01, 0.01) 
         call BlzFrameSetTooltip(fparent, bg) 
         call BlzFrameSetPoint(txt, FRAMEPOINT_TOP, fparent, FRAMEPOINT_BOTTOM, 0.010, -0.02) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/12-DEBUFF.j ---
+struct Buff 
+    static boolean array is_target 
+    static boolean array is_point 
+    static boolean array is_notarget 
+    static string array order_name 
+    static integer array ability_id 
+    static integer id = -1 
+    static integer STUN = 0 
+    static integer SLOW = 0 
+    private static method newbuff takes boolean is_target, boolean is_point, boolean is_notarget, string order_name, integer ability_id returns nothing 
+        set.id =.id + 1 
+        set.is_target[.id] = is_target 
+        set.is_point[.id] = is_point 
+        set.is_notarget[.id] = is_notarget 
+        set.order_name[.id] = order_name 
+        set.ability_id[.id] = ability_id 
+        call Preload_Ability(ability_id) 
+    endmethod 
+    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer level returns boolean 
+        if ENV_DEV then 
+            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(level)) 
+        endif 
+        //You can custom buff your rule, here is example                     
+        if buff_id > -1 and buff_id <= id then 
+            if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
+                call Dummy.target(.order_name[buff_id], target, level,.ability_id[buff_id]) 
+                if ENV_DEV then 
+                    call PLAYER.systemchat(Player(0), "[] Target") 
+                endif 
+                return false 
+            endif 
+            if.is_point[buff_id] then 
+                call Dummy.point(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                return false 
+            endif 
+            if.is_notarget[buff_id] then 
+                call Dummy.notarget(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                return false 
+            endif 
+        endif 
+        return false 
+    endmethod 
+    private static method onInit takes nothing returns nothing 
+        call.newbuff(true, false, false, "creepthunderbolt", 'A001') 
+        set.STUN =.id 
+        call.newbuff(true, false, false, "slow", 'A002') 
+        set.SLOW =.id 
     endmethod 
 endstruct
 
@@ -1084,47 +1122,61 @@ endstruct
 
 //--- Content from folder: ./2-Objective/6-DUMMY.j ---
 
-//Use :    
-// Make new dummy :
-//==> call DUMMY.new(x,y,duration,p )   
+//Use :                        
+// Make new dummy :                    
+//==> call DUMMY.new(x,y,duration,p )                       
 
-// Add Ability need cast and set level it : 
-//==> call DUMMY.abi(abi_id,level)  
+// Add Ability need cast and set level it :                     
+//==> call DUMMY.abi(abi_id,level)                      
 
-// Order :
-//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add] 
+// Order :                    
+//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add]                     
 
-// Reset variable after order :
-//==>  call DUMMY.reset()
+// Reset variable after order :                    
+//==>  call DUMMY.reset()                    
 struct Dummy 
-    static integer dummy_id = 'e000' //Set your id dummy      
-    static method new takes real x, real y, real duration, player p returns nothing 
-        set bj_unit = CreateUnit(p,.dummy_id, x, y, bj_UNIT_FACING) 
-        call UnitAddAbility(bj_unit, 'Avul') 
-        call UnitAddAbility(bj_unit, 'Aloc') 
-        call UnitApplyTimedLifeBJ(duration, 'BTLF', bj_unit) 
+    static integer dummy_id = 'e000' //Set your id dummy                          
+    static unit load = null 
+    static method new takes nothing returns nothing 
+        set.load = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE),.dummy_id, 0, 0, 0) 
+        call SetUnitPathing(.load, false) 
+        call UnitAddAbility(.load, 'Avul') 
+        call UnitAddAbility(.load, 'Aloc') 
+        call DestroyTimer(GetExpiredTimer()) 
     endmethod 
-    static method abi takes integer abi_id, integer level returns nothing 
-        call UnitAddAbility(bj_unit, abi_id) 
-        call BlzUnitHideAbility(bj_unit, abi_id, false) 
-        call BlzEndUnitAbilityCooldown(bj_unit, abi_id) 
-        call SetUnitAbilityLevel(bj_unit, abi_id, level) 
-        call IssueImmediateOrder(bj_unit, "stop") 
-        call BlzUnitHideAbility(bj_unit, abi_id, true) 
+    static method target takes string ordername, unit u, integer level, integer spell_id returns nothing 
+        call SetUnitX(.load, GetUnitX(u)) 
+        call SetUnitY(.load, GetUnitY(u)) 
+        call UnitAddAbility(.load, spell_id) 
+        call SetUnitAbilityLevel(.load, spell_id, level) 
+
+        call IssueTargetOrder(.load, ordername, u) 
+        
+        call UnitRemoveAbility(.load, spell_id) 
     endmethod 
-    static method target takes string ordername, unit target returns nothing 
-        call IssueTargetOrder(bj_unit, ordername, target) 
+    static method point takes string ordername, real x, real y, integer level, integer spell_id returns nothing 
+        call SetUnitX(.load, x) 
+        call SetUnitY(.load, y) 
+        call UnitAddAbility(.load, spell_id) 
+        call SetUnitAbilityLevel(.load, spell_id, level) 
+        call MoveLocation(bj_loc, x, y) 
+
+        call IssuePointOrderLoc(.load, ordername, bj_loc) 
+
+        call UnitRemoveAbility(.load, spell_id) 
     endmethod 
-    static method aoe takes string ordername, real x, real y returns nothing 
-        local location loc = Location(x, y) 
-        call IssuePointOrderLoc(bj_unit, ordername, loc) 
-        call RemoveLocation(loc) 
-    endmethod 
-    static method notarget takes string ordername returns nothing 
+    static method notarget takes string ordername, real x, real y, integer level, integer spell_id returns nothing 
+        call SetUnitX(.load, x) 
+        call SetUnitY(.load, y) 
+        call UnitAddAbility(.load, spell_id) 
+        call SetUnitAbilityLevel(.load, spell_id, level) 
+
         call IssueImmediateOrder(bj_unit, ordername) 
+
+        call UnitRemoveAbility(.load, spell_id) 
     endmethod 
-    static method reset takes string ordername returns nothing 
-        set bj_unit = null 
+    private static method OnInit takes nothing returns nothing 
+        call TimerStart(CreateTimer(), 0.01, false, function thistype.new) 
     endmethod 
 endstruct 
 
@@ -1256,6 +1308,9 @@ struct SKILL
     real y = 0.00 
     real z = 0.00 
 
+    integer buff_id
+    integer buff_lv
+
     effect missle = null 
     string missle_path = "" 
     real missle_size = 0.00 
@@ -1339,6 +1394,7 @@ struct SKILL_MISSLE extends SKILL
             if not.is_touch and.FilterUnit(e,.caster) and e !=.caster then 
                 set.is_touch = true 
                 call UnitDamageTargetBJ(.caster, e,.dmg,.ATK_TYPE,.DMG_TYPE) 
+                call Buff.effect(.caster, e,.buff_id,.x,.y,.buff_lv) 
             endif 
             call Group.remove(e, g) 
         endloop 
@@ -1348,12 +1404,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                   
-            call.destroy() // Destroy the instance                               
+            call runtime.endx(t) // End the timer                                                                                                                                                                    
+            call.destroy() // Destroy the instance                                
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()           
+        // local thistype this = thistype.create()            
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -1587,32 +1643,40 @@ struct EV_START_SPELL_EFFECT
         local integer idt = GetUnitTypeId(target) 
         local integer abicode = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local real targetX = GetSpellTargetX() //Point X of skill                 
-        local real targetY = GetSpellTargetY() //Point T of skill                 
+        local real targetX = GetSpellTargetX() //Point X of skill                  
+        local real targetY = GetSpellTargetY() //Point T of skill                  
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
         local real yc = GetUnitY(caster) 
-        local real xt = GetUnitX(target) //Position X of target unit                
-        local real yt = GetUnitY(target) //Position T of target unit                
+        local real xt = GetUnitX(target) //Position X of target unit                 
+        local real yt = GetUnitY(target) //Position T of target unit                 
         local SKILL_MISSLE Missle 
         local integer n = 1 
+
         if abicode == 'A000' then 
             loop 
                 exitwhen n > 5 
                 set Missle = SKILL_MISSLE.create() 
                 set Missle.caster = caster 
-                call Missle.setxyz(xc,yc,100)
-                //Angle    
-                set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 15)) + (n * 15) 
-                //Speed per tick (1 second = speed *32)    
+                call Missle.setxyz(xc, yc, 100) 
+                //Angle     
+                set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 20)) + (n * 20) 
+                //Speed per tick (1 second = speed *32)     
                 set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
                 set Missle.missle_size = 1.5 
                 set Missle.speed = 15 
-                set Missle.aoe = 90 
-                set Missle.dmg = 60 
-                set Missle.time = 32 * 2 // 32 tick per 1 seconds         
-                
+                set Missle.aoe = 50 
+                set Missle.dmg = 35 
+                set Missle.time = 32 * 2 // 32 tick per 1 seconds   
+
+                if GetRandomInt(0, 1) == 0 then 
+                    set Missle.buff_id = Buff.STUN 
+                else 
+                    set Missle.buff_id = Buff.SLOW 
+                endif 
+                set Missle.buff_lv = 1 
+
                 set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
                 set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
                 call Missle.setallow(true, false, true, true, false, true, false) 
@@ -1764,28 +1828,32 @@ struct GAME
     private static method GameStart takes nothing returns nothing 
         local framehandle test1 = null 
         call FogMaskEnable(false) 
+        call FogEnable(true)
+
+        // call PauseGame(false) 
+        call CinematicModeBJ(false, GetPlayersAll()) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
-        // set test1 = Frame.button("war3mapImported\\tooltipBG.blp") 
-        // call Frame.hide(test1) 
-        // call Frame.showx(0, test1) 
-        // call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301) 
-        // call Frame.click(test1, function thistype.ClickTest1) 
-        // call DestroyTimer(GetExpiredTimer()) 
+        // set test1 = Frame.button("war3mapImported\\tooltipBG.blp")  
+        // call Frame.hide(test1)  
+        // call Frame.showx(0, test1)  
+        // call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301)  
+        // call Frame.click(test1, function thistype.ClickTest1)  
+        // call DestroyTimer(GetExpiredTimer())  
     endmethod 
-    // private static method ClickTest1 takes nothing returns nothing 
-    //     local player p = GetTriggerPlayer() 
-    //     local integer id = GetPlayerId(GetTriggerPlayer()) 
-    //     local framehandle f = BlzGetTriggerFrame() 
-    //     if f != null then 
-    //         call PLAYER.systemchat(Player(id), "Select 1") 
-    //         call Frame.hidex(id, f) 
-    //         call Frame.fixed(id) 
-    //     endif 
-    //     set p = null 
-    //     set f = null 
-    // endmethod 
+    // private static method ClickTest1 takes nothing returns nothing  
+    //     local player p = GetTriggerPlayer()  
+    //     local integer id = GetPlayerId(GetTriggerPlayer())  
+    //     local framehandle f = BlzGetTriggerFrame()  
+    //     if f != null then  
+    //         call PLAYER.systemchat(Player(id), "Select 1")  
+    //         call Frame.hidex(id, f)  
+    //         call Frame.fixed(id)  
+    //     endif  
+    //     set p = null  
+    //     set f = null  
+    // endmethod  
     private static method GameSetting takes nothing returns nothing 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Setting Game ...") 
@@ -1804,7 +1872,7 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Checking Status ...") 
         endif 
-        // Check player is online in game       
+        // Check player is online in game        
         set n = 0 
         loop 
             exitwhen n > bj_MAX_PLAYER_SLOTS 
@@ -1821,13 +1889,17 @@ struct GAME
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
         call FogMaskEnable(true) 
+        call FogEnable(false)
+        // call PauseGame(true) 
+        call CinematicModeBJ(true, GetPlayersAll()) 
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 
         endif 
         call Frame.init() 
-        call Preload_Ability('Amls') // Preload skill                    
-        call Preload_Unit('uloc') // Preload unit                   
+        call Preload_Ability('Amls') // Preload skill                     
+        call Preload_Unit('uloc') // Preload unit                    
+        call Preload_Unit('e000') // Preload dummy                    
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
