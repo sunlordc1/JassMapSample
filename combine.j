@@ -1,37 +1,39 @@
 //--- Content from folder: ./1-Variables Library System Func/1-GlobalsVariables.j ---
 
-//Constant : A constant value does not change, and you use it to set fixed parameters in the game.     
+//Constant : A constant value does not change, and you use it to set fixed parameters in the game.      
 globals 
-    //We will define bj_ as a type of variable that is used and processed at a specific moment,     
-    // is always redefined when it starts being used, and is assigned a null value when finished.     
-    //Number      
-    integer bj_int = 0 // Typically used for a single loop or assigning a random value.     
-    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.     
-    //Objective      
-    item bj_item = null // instead of bj_lastCreatedItem       
-    unit bj_unit = null // instead of bj_lastCreatedUnit       
-    effect bj_eff = null // instead of bj_lastCreatedEffect      
+    //We will define bj_ as a type of variable that is used and processed at a specific moment,      
+    // is always redefined when it starts being used, and is assigned a null value when finished.      
+    //Number       
+    integer bj_int = 0 // Typically used for a single loop or assigning a random value.      
+    real bj_real = 0.00 //Typically used for a single loop or assigning a random value.      
+    //Objective       
+    item bj_item = null // instead of bj_lastCreatedItem        
+    unit bj_unit = null // instead of bj_lastCreatedUnit        
+    effect bj_eff = null // instead of bj_lastCreatedEffect       
     
-    //Storage      
-    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.        
-    //Timer      
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.       
-    constant real P32 = 0.03125 // Explore this number; it truly has significance.     
-    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.   
-    //Environment Dev  
-    constant boolean ENV_DEV = true // Are u on a testing mode ?    
+    //Storage       
+    hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.         
+    hashtable stats = InitHashtable() // For damage system 
+    //Timer       
+    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.        
+    constant real P32 = 0.03125 // Explore this number; it truly has significance.      
+    constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.    
+    //Environment Dev   
+    constant boolean ENV_DEV = true // Are u on a testing mode ?     
 
-    //Utils      
+    //Utils       
     constant string SYSTEM_CHAT = "[SYSTEM]: |cffffcc00" 
 
-    //Constant text   
-    //===Example: set str = str + N   
+    //Constant text    
+    //===Example: set str = str + N    
     constant string N = "|n" 
-    //===Example: set str = color + str + R   
+    //===Example: set str = color + str + R    
     constant string R = "|r" 
-    //===Example: set str = color + str + RN   
+    //===Example: set str = color + str + RN    
     constant string RN = "|r|n" 
     //Setting Game     
+    constant real ARMOR_CONSTANT = 0.03 // Assign it with the value you set in the gameplay constant. 
     constant boolean CREEP_SLEEP = false 
     constant boolean LOCK_RESOURCE_TRADING = true 
     constant boolean SHARED_ADVANCED_CONTROL = false 
@@ -39,7 +41,6 @@ globals
     constant real GAME_STATUS_TIME = 1.00 
     constant real GAME_SETTING_TIME = 3.00 
     constant real GAME_START_TIME = 5.00 
-
     
 endglobals 
 
@@ -150,6 +151,364 @@ function B2S takes boolean b returns string
     return "False" 
 endfunction 
 
+//--- Content from folder: ./1-Variables Library System Func/4a-DamageTextTag.j ---
+function settingTextTag takes texttag text returns nothing 
+    call SetTextTagVelocityBJ(text, 96.00, 60.00) 
+    call SetTextTagPermanentBJ(text, false) 
+    call SetTextTagFadepointBJ(text, 1.00) 
+    call SetTextTagLifespanBJ(text, 0.725) 
+endfunction 
+function settingTextTag2 takes texttag text returns nothing 
+    call SetTextTagVelocityBJ(text, 96.00, 120.00) 
+    call SetTextTagPermanentBJ(text, false) 
+    call SetTextTagFadepointBJ(text, 1.00) 
+    call SetTextTagLifespanBJ(text, 0.725) 
+endfunction 
+// function block takes real damage, real blockdamage returns real         
+//     set damage = damage - blockdamage        
+//     return damage        
+// endfunction        
+
+function createTextTagDamage takes string colorName, real dmg, unit victim, unit caster returns boolean 
+    local texttag text 
+    local integer id = GetPID(GetOwningPlayer(caster)) 
+    local real textsize = 10 
+    if GetUID(caster) != GetPlayerNeutralAggressive() then 
+        if GetLocalPlayer() == GetOwningPlayer(victim) then 
+            if(colorName == "Gold") then 
+                set text = CreateTextTagUnitBJ(("+ " + I2S(R2I(dmg))), victim, 0, textsize, 93.00, 79, 0, 0) 
+                call settingTextTag(text) 
+                return false 
+            endif 
+        endif 
+        if GetLocalPlayer() == GetOwningPlayer(caster) then 
+      
+            if dmg > 1 then 
+                // if dmg > 1  and IsHero2(caster) then        
+            
+                if(colorName == "Physical") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 100.00, 100, 100, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+   
+                if(colorName == "Spell") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 10.00, 50, 80, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Cold") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 0.00, 60.00, 80.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Poison") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 10.00, 100, 10.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Sonic") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 29.00, 91.00, 74.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Dark") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 36.00, 14.00, 43.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Fire") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 100.00, 20.00, 0.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Lightning") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 93.00, 93.00, 0, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Crit") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg)) + "!"), victim, 0, textsize + 1.5, 89.00, 51.00, 6.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Crit Spell") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 97.00, 46.00, 19.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+                if(colorName == "Chao") then 
+                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 80.00, 0.00, 80.00, 0) 
+                    call settingTextTag(text) 
+                    return false 
+                endif 
+            endif 
+            
+        endif 
+        
+    endif 
+    if GetLocalPlayer() == GetOwningPlayer(caster) or GetLocalPlayer() == GetOwningPlayer(victim) then 
+        if(colorName == "Miss") then 
+            set text = CreateTextTagUnitBJ(("Miss"), victim, 0, 7.50, 30.00, 74.00, 20.00, 0) 
+            call settingTextTag(text) 
+            return false 
+        endif 
+        if(colorName == "Block") then 
+            set text = CreateTextTagUnitBJ(("Block !"), victim, 0, 6.00, 70.00, 70.00, 70.00, 0) 
+            call settingTextTag2(text) 
+        endif 
+    endif 
+    if(colorName == "Heal") then 
+        set text = CreateTextTagUnitBJ(("+" + I2S(R2I(dmg))), victim, 0, textsize - 1, 0, 60, 0, 0) 
+        call settingTextTag(text) 
+        return false 
+    endif 
+    if(colorName == "HealMana") then 
+        set text = CreateTextTagUnitBJ(("+" + I2S(R2I(dmg))), victim, 0, textsize - 1, 0, 0, 153, 0) 
+        call settingTextTag(text) 
+        return false 
+    endif 
+    return false 
+endfunction 
+
+//--- Content from folder: ./1-Variables Library System Func/4b-Damage.j ---
+struct BSTAT 
+    static integer crit_chance = StringHash("CritChance") 
+    static integer crit_dmg = StringHash("CritDmg") 
+    static real crit_dmg_default = 135 
+    static real crit_chance_default = 0 
+
+    static integer evasion = StringHash("Evasion") 
+    static integer resist_spell = StringHash("ResistSpell") 
+    static integer pierce_spell = StringHash("PierceSpell") 
+endstruct 
+struct DMGSTAT 
+    static real dmg = 0.00 
+    static unit victim 
+    static unit caster 
+    static attacktype ATK_TYPE 
+    static damagetype DMG_TYPE 
+    static integer uidc = 0 
+    static integer uidv = 0 
+    static integer idv = 0 
+    static integer idc = 0 
+    static real armor = 0.00 
+    static real crit_dmg = 0.00 
+    static real crit_chance = 0.00 
+    static real evasion = 0.00 
+    static real resist_spell = 0.00 
+    static real pierce_spell = 0.00 
+
+    static method f_Get_DMGSTAT takes nothing returns nothing 
+        set.armor = BlzGetUnitArmor(DMGSTAT.victim) 
+        set.uidc = GetUnitTypeId(DMGSTAT.caster) 
+        set.uidv = GetUnitTypeId(DMGSTAT.victim) 
+        set.idv = GetHandleId(DMGSTAT.victim) 
+        set.idc = GetHandleId(DMGSTAT.caster) 
+        set.crit_dmg = BSTAT.crit_dmg_default + (LoadReal(stats,.idc, BSTAT.crit_dmg)) 
+        set.crit_chance = BSTAT.crit_chance_default + LoadReal(stats,.idc, BSTAT.crit_chance) 
+        set.evasion = 0 + LoadReal(stats,.idv, BSTAT.evasion) 
+        set.resist_spell = 0 + LoadReal(stats,.idv, BSTAT.resist_spell) 
+        set.pierce_spell = 0 + LoadReal(stats,.idc, BSTAT.pierce_spell) 
+
+    endmethod 
+    static method f_Reset_DMGSTAT takes nothing returns nothing 
+        set.uidc = 0 
+        set.uidv = 0 
+        set.idv = 0 
+        set.idc = 0 
+        set.armor = 0.00 
+        set.crit_dmg = 0.00 
+        set.crit_chance = 0.00 
+        set.evasion = 0.00 
+      
+    endmethod 
+endstruct 
+struct DMGEVENT 
+    static trigger t = CreateTrigger() 
+    private static method DamageEvent takes nothing returns nothing 
+        call DisableTrigger(GetTriggeringTrigger()) 
+        set DMGSTAT.caster = GetEventDamageSource() 
+        set DMGSTAT.victim = BlzGetEventDamageTarget() 
+        set DMGSTAT.dmg = GetEventDamage() 
+        
+        call TriggerExecute(.t) 
+        set DMGSTAT.caster = null 
+        set DMGSTAT.victim = null 
+        call EnableTrigger(GetTriggeringTrigger()) 
+    endmethod 
+    static method Damaged takes nothing returns nothing 
+        local string color_dmg_type 
+        local real chance_hit = 0 
+        // local boolean IsBoss = LoadBoolean(road, DMGSTAT.idv, StringHash("Boss")) 
+        call DMGSTAT.f_Reset_DMGSTAT() 
+        call DMGSTAT.f_Get_DMGSTAT() 
+        set DMGSTAT.ATK_TYPE = BlzGetEventAttackType() 
+        set DMGSTAT.DMG_TYPE = BlzGetEventDamageType() 
+        if DMGSTAT.dmg > 0.00 then 
+            //Text Damage                                        
+            call Proc.BSTAT() 
+            // if Math.rate(RMaxBJ(0, DMGSTAT.evasion - DMGSTAT.attack_rating)) then        
+            if Math.rate(RMaxBJ(0, DMGSTAT.evasion)) then 
+                // call BJDebugMsg("miss")                                        
+                set chance_hit = 0 
+            else 
+                set chance_hit = 1 
+            endif 
+
+            if BlzGetEventAttackType() != ATTACK_TYPE_NORMAL then 
+                set color_dmg_type = "Physical" 
+                if BlzGetEventAttackType() == ATTACK_TYPE_CHAOS then 
+                    set color_dmg_type = "Chao" 
+                endif 
+                if BlzGetEventAttackType() == ATTACK_TYPE_HERO then 
+
+                endif 
+                if BlzGetEventDamageType() == DAMAGE_TYPE_NORMAL then 
+                
+
+                    if(chance_hit > 0 and DMGSTAT.dmg > 0) then 
+                      
+                        call Proc.onHit() 
+
+                        ///                                        
+                        // call BJDebugMsg(R2S(DMGSTAT.crit_chance))                                        
+                        if Math.rate(DMGSTAT.crit_chance) then 
+                            // call BJDebugMsg(R2S(DMGSTAT.crit_dmg))                                        
+                            set DMGSTAT.dmg = DMGSTAT.dmg * (DMGSTAT.crit_dmg / 100) 
+                            set color_dmg_type = "Crit" 
+                        endif 
+                        call Proc.onStuck() 
+                    else 
+                        if(chance_hit == 0) then 
+                            set DMGSTAT.dmg = 0 
+                            set color_dmg_type = "Miss" 
+                        endif 
+                    endif 
+
+                
+
+                    if BlzGetEventAttackType() == ATTACK_TYPE_CHAOS then 
+              
+                    endif 
+                    // if DMGSTAT.life_steal > 0 then   
+                    //     // call BJDebugMsg("heal" + R2S(DMGSTAT.dmg * DMGSTAT.v_LifeSteal_DMGSTAT))                                        
+                    //     // call EFFECT.Heal(DMGSTAT.dmg * DMGSTAT.v_LifeSteal_DMGSTAT, DMGSTAT.caster, DMGSTAT.caster)                                        
+                    // endif   
+                    if DMGSTAT.dmg <= 0 and color_dmg_type != "Miss" then 
+                        set color_dmg_type = "Block" 
+                    endif 
+                endif 
+               
+            endif 
+            // ATTACK TYPE : SPELL                                        
+            if BlzGetEventAttackType() == ATTACK_TYPE_NORMAL then 
+                //Calc Damage & Text                                        
+                call Proc.SpellStat() 
+                set color_dmg_type = "Spell" 
+                // DAMAGE TYPE : COLD                                        
+                if BlzGetEventDamageType() == DAMAGE_TYPE_COLD then 
+                    set color_dmg_type = "Cold" 
+                endif 
+                // DAMAGE TYPE : POISON                                        
+                if BlzGetEventDamageType() == DAMAGE_TYPE_POISON then 
+                    set color_dmg_type = "Poison" 
+                endif 
+                if BlzGetEventDamageType() == DAMAGE_TYPE_SHADOW_STRIKE then 
+                    set color_dmg_type = "Poison" 
+                endif 
+                if BlzGetEventDamageType() == DAMAGE_TYPE_DEATH then 
+                    set color_dmg_type = "" 
+                endif 
+                if BlzGetEventDamageType() == DAMAGE_TYPE_DEMOLITION then 
+                    set color_dmg_type = "" 
+                endif 
+                // DAMAGE TYPE : FIRE                                        
+                if BlzGetEventDamageType() == DAMAGE_TYPE_FIRE then 
+                    set color_dmg_type = "Fire" 
+                endif 
+                // DAMAGE TYPE: CHAIN OF LIGHNING                                        
+                if BlzGetEventDamageType() == DAMAGE_TYPE_LIGHTNING then 
+                    set color_dmg_type = "Lightning" 
+                    //Healing Wave                        
+                    if GetOwningPlayer(DMGSTAT.caster) == GetOwningPlayer(DMGSTAT.victim) then 
+                        set color_dmg_type = "Heal" 
+                        // Trick healing wave set - damage on ally then detect healing wave now 
+                        // set DMGSTAT.dmg = 0  
+                    endif 
+                endif 
+                // DAMAGE TYPE: Unknown                                        
+                if BlzGetEventDamageType() == DAMAGE_TYPE_MAGIC then 
+                    // Mana burn                                        
+                endif 
+                set DMGSTAT.resist_spell = DMGSTAT.resist_spell - DMGSTAT.pierce_spell 
+                set DMGSTAT.dmg = RMaxBJ(0, DMGSTAT.dmg - (DMGSTAT.dmg * (DMGSTAT.resist_spell / 100))) 
+            endif 
+            
+            if DMGSTAT.dmg <= 0 then 
+                if color_dmg_type != "Miss" then 
+                    set color_dmg_type = "Block" 
+                endif 
+            endif 
+            // call BJDebugMsg(R2S(DMGSTAT.dmg))                                        
+        endif 
+       
+
+        if Unit.life(DMGSTAT.victim) <= DMGSTAT.dmg + 1 or Unit.life(DMGSTAT.victim) <= DMGSTAT.dmg then 
+            call Proc.onLastHit() 
+        endif 
+       
+        call BlzSetEventDamage(DMGSTAT.dmg) 
+        call createTextTagDamage(color_dmg_type, DMGSTAT.dmg, DMGSTAT.victim, DMGSTAT.caster)     
+    endmethod 
+    private static method onInit takes nothing returns nothing 
+        local trigger t = CreateTrigger() 
+        call TriggerRegisterAnyUnitEventBJ(t, ConvertPlayerUnitEvent(308)) 
+        call TriggerAddAction(t, function thistype.DamageEvent) 
+        set t = null 
+        call DisableTrigger(.t) 
+        call TriggerAddAction(.t, function thistype.Damaged) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./1-Variables Library System Func/4c-DamageProc.j ---
+struct Proc 
+    static method BSTAT takes nothing returns nothing 
+        // call ItemStat.BonusRequire() //Item Stat          
+        // call PassiveSkill.BSTATCalc()   
+        // call BuffSkill.BSTATCalc()   
+          
+        if DMGSTAT.ATK_TYPE == ATTACK_TYPE_NORMAL then 
+               
+        endif 
+    endmethod 
+    static method SpellStat takes nothing returns nothing 
+        if IsUnitType(DMGSTAT.caster, UNIT_TYPE_HERO) then 
+            // set DMGSTAT.dmg = DMGSTAT.dmg + 100  
+        endif 
+    endmethod 
+     
+    static method onHit takes nothing returns nothing 
+        local real d = 0 
+        local real d2 = 0 
+        local integer m = 0 
+        // call HeroSkill.onHit()    
+          
+            
+    endmethod 
+    static method onStuck takes nothing returns nothing 
+        local real r = 0 
+        local string p = "" 
+            
+    endmethod 
+    static method onLastHit takes nothing returns nothing 
+        local real d = 0 
+        local real x = 0 
+        local real y = 0 
+        
+    endmethod 
+endstruct 
+
 //--- Content from folder: ./2-Objective/1-PLAYER.j ---
 struct PLAYER 
     static boolean array IsDisconect 
@@ -245,10 +604,36 @@ struct PLAYER
 endstruct
 
 //--- Content from folder: ./2-Objective/10-GROUP.j ---
-
-
-//--- Content from folder: ./2-Objective/11-SKILL.j ---
-
+struct Group 
+    static method pick takes group g returns unit 
+        return FirstOfGroup(g) 
+    endmethod 
+    static method get takes group whichGroup, integer index returns unit 
+        return BlzGroupUnitAt(whichGroup, index) 
+    endmethod 
+    static method size takes group whichGroup returns integer 
+        return BlzGroupGetSize(whichGroup) 
+    endmethod 
+    static method add takes unit whichUnit, group whichGroup returns boolean 
+        return GroupAddUnit(whichGroup, whichUnit) 
+    endmethod 
+    static method remove takes unit whichUnit, group whichGroup returns boolean 
+        return GroupRemoveUnit(whichGroup, whichUnit) 
+    endmethod 
+    static method have takes unit whichUnit, group whichGroup returns boolean 
+        return IsUnitInGroup(whichUnit, whichGroup) 
+    endmethod 
+    static method release takes group whichGroup returns nothing 
+        call GroupClear(whichGroup) 
+        call DestroyGroup(whichGroup) 
+    endmethod 
+    static method enum takes group whichGroup, real x, real y, real radius returns nothing 
+        call GroupEnumUnitsInRange(whichGroup, x, y, radius, null) 
+    endmethod 
+    static method new takes nothing returns group 
+        return CreateGroup() 
+    endmethod 
+endstruct 
 
 //--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
 struct DESTRUCTABLE //Destructable  
@@ -273,9 +658,9 @@ endstruct
 
 
 //--- Content from folder: ./2-Objective/3-UNIT.j ---
-//Call struct then Unit instead UNIT 
+//Call struct then Unit instead UNIT      
 struct Unit 
-    //=================Position================================    
+    //=================Position================================         
     method x takes unit u returns real 
         return GetUnitX(u) 
     endmethod 
@@ -291,40 +676,58 @@ struct Unit
     method sety takes unit u, real y returns nothing 
         call SetUnitY(u, y) 
     endmethod 
-    // Set Flying Height (Required unit have crow form or fly)       
-    // Use: Unit.setz(u,height)       
+    // Set Flying Height (Required unit have crow form or fly)            
+    // Use: Unit.setz(u,height)            
     method setz takes unit u, real height returns nothing 
         call SetUnitFlyHeight(u, height, 0.) 
     endmethod 
 
     
-    //==================Movespeed=========================    
-    // Reset MoveSpeed of unit to default    
+    //==================Movespeed=========================         
+    // Reset MoveSpeed of unit to default         
     method resetms takes unit whichUnit returns nothing 
         call SetUnitMoveSpeed(whichUnit, GetUnitDefaultMoveSpeed(whichUnit)) 
     endmethod 
-    // Get MoveSpeed of unit    
-    // Use: Unit.ms(u)      
+    // Get MoveSpeed of unit         
+    // Use: Unit.ms(u)           
     method ms takes unit whichUnit returns real 
         return GetUnitMoveSpeed(whichUnit) 
     endmethod 
 
-    //==================Vertex Color=========================    
-    //Reset Vertex Color [Change Color and Alpha of Unit]    
-    //Use:  Unit.resetvertexcolor(u)     
+    //==================Vertex Color=========================         
+    //Reset Vertex Color [Change Color and Alpha of Unit]         
+    //Use:  Unit.resetvertexcolor(u)          
     method resetvertexcolor takes unit u returns nothing 
         call SetUnitVertexColor(u, 255, 255, 255, 255) 
     endmethod 
 
-    //Set Vertex Color [Change Color and Alpha of Unit]    
-    //Use:  Unit.vertexcolor(u)     
+    //Set Vertex Color [Change Color and Alpha of Unit]         
+    //Use:  Unit.vertexcolor(u)          
     method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
         call SetUnitVertexColor(u, red, green, blue, alpha) 
     endmethod 
 
-    //==================Misc=========================    
-    // Get Collision of unit u       
-    // Use: Unit.collision(u)       
+    //==================Misc=========================       
+    //Get scaling value of unit    
+    static method size takes unit u returns real 
+        return BlzGetUnitRealField(u, UNIT_RF_SCALING_VALUE) 
+    endmethod 
+    //Set scaling value of unit    
+    static method setsize takes unit u, real r returns nothing 
+        call BlzSetUnitRealField(u, UNIT_RF_SCALING_VALUE, r) 
+        call SetUnitScale(u, r, r, r) 
+    endmethod 
+    //Get level unit or hero     
+    static method lv takes unit u returns integer 
+        local integer i = GetHeroLevel(u) 
+        if i < 0 then 
+            return GetUnitLevel(u) 
+        endif 
+        return i 
+    endmethod 
+
+    // Get Collision of unit u            
+    // Use: Unit.collision(u)            
     method collision takes unit u returns real 
         local real l = 0 
         local real h = 300 
@@ -344,19 +747,140 @@ struct Unit
         endloop 
         return R2I(m * 10) / 10. 
     endmethod 
+    //==================== Ability =======================     
+    static method abilv takes unit u, integer a returns integer 
+        local integer i = 0 
+        set i = GetUnitAbilityLevel(u, a) 
+        return i 
+    endmethod 
+    static method setabilv takes unit u, integer a, integer lv returns nothing 
+        call SetUnitAbilityLevel(u, a, lv) 
+    endmethod 
+    static method removeabi takes unit u, integer a returns nothing 
+        call UnitRemoveAbility(u, a) 
+    endmethod 
+    static method haveabi takes unit u, integer a returns boolean 
+        return GetUnitAbilityLevel(u, a) > 0 
+    endmethod 
+    static method addabi takes unit u, integer a returns nothing 
+        call UnitAddAbility(u, a) 
+        call UnitMakeAbilityPermanent(u, true, a) 
+    endmethod 
+    static method hideabi takes unit u, integer a returns nothing 
+        call BlzUnitHideAbility(u, a, true) 
+    endmethod 
+    static method showabi takes unit u, integer a returns nothing 
+        call BlzUnitDisableAbility(u, a, false, false) 
+    endmethod 
+    static method disabledabi takes unit u, integer a returns nothing 
+        call BlzUnitDisableAbility(u, a, true, false) 
+    endmethod 
+    //===========================STATS========================  
+    static method damage_reduce takes unit u returns real 
+        return(BlzGetUnitArmor(u) * ARMOR_CONSTANT) / (1 + ARMOR_CONSTANT * BlzGetUnitArmor(u)) 
+    endmethod 
+    static method mana takes unit u returns real 
+        return GetUnitState(u, UNIT_STATE_MANA) 
+    endmethod 
+    static method life takes unit u returns real 
+        return GetUnitState(u, UNIT_STATE_LIFE) 
+    endmethod 
+    static method maxlife takes unit u returns real 
+        return GetUnitState(u, UNIT_STATE_MAX_LIFE) 
+    endmethod 
+    static method maxmana takes unit u returns real 
+        return GetUnitState(u, UNIT_STATE_MAX_MANA) 
+    endmethod 
+    static method setlife takes unit v, real newVal returns nothing 
+        call SetUnitState(v, UNIT_STATE_LIFE, newVal) 
+    endmethod 
+    static method addlife takes unit v, real newVal returns nothing 
+        call SetUnitState(v, UNIT_STATE_LIFE, GetUnitState(v, UNIT_STATE_LIFE) + newVal) 
+    endmethod 
+    static method setmana takes unit v, real newVal returns nothing 
+        call SetUnitState(v, UNIT_STATE_MANA, newVal) 
+    endmethod 
+    static method addmana takes unit v, real newVal returns nothing 
+        call SetUnitState(v, UNIT_STATE_MANA, GetUnitState(v, UNIT_STATE_MANA) + newVal) 
+    endmethod 
+
+
+
     private static method onInit takes nothing returns nothing 
         local thistype this = thistype.create() 
-    endmethod
+    endmethod 
 endstruct
 
 //--- Content from folder: ./2-Objective/4-HERO.j ---
 
 struct Hero extends Unit
-
+    static method str takes unit u returns integer 
+        return GetHeroStr(u, true) 
+    endmethod 
+    static method int takes unit u returns integer 
+        return GetHeroInt(u, true) 
+    endmethod 
+    static method agi takes unit u returns integer 
+        return GetHeroAgi(u, true) 
+    endmethod 
+    static method all takes unit u returns integer 
+        return GetHeroAgi(u, true) + GetHeroInt(u, true) + GetHeroStr(u, true) 
+    endmethod 
 endstruct
 
 //--- Content from folder: ./2-Objective/5-EFFECT.j ---
-
+struct Effect
+    static method new takes string path, real x, real y, real z returns effect 
+        set bj_eff = AddSpecialEffect(path, x, y) 
+        call BlzSetSpecialEffectZ(bj_eff, z) 
+        return bj_eff 
+    endmethod
+    static method add takes unit u, string s returns effect //su dung attach effect vao unit        
+        return AddSpecialEffectTarget(s, u, "chest") 
+    endmethod
+    static method nova takes string s, real x, real y returns nothing //nova effect of XY        
+        call DestroyEffect(AddSpecialEffect(s, x, y)) 
+    endmethod
+    static method attach takes string s, unit u , string attach returns nothing //nova effect attach unit chest        
+        call DestroyEffect(AddSpecialEffectTarget(s, u, attach)) 
+    endmethod
+    static method pos takes effect e, real x, real y, real z returns nothing //move XYZ        
+        call BlzSetSpecialEffectPosition(e, x, y, z) 
+    endmethod
+    static method angle takes effect e, real angle returns nothing //set goc'        
+        call BlzSetSpecialEffectYaw(e, angle * bj_DEGTORAD) 
+    endmethod
+    static method pitch takes effect e, real angle returns nothing //set do ngieng        
+        call BlzSetSpecialEffectPitch(e, angle * bj_DEGTORAD) 
+    endmethod
+    static method roll takes effect e, real angle returns nothing //set do lang        
+        call BlzSetSpecialEffectRoll(e, angle * bj_DEGTORAD) 
+    endmethod
+    static method size takes effect e, real size returns nothing //set size        
+        call BlzSetSpecialEffectScale(e, size) 
+    endmethod
+    static method height takes effect e, real height returns nothing //255        
+        call BlzSetSpecialEffectHeight(e, height) 
+    endmethod
+    static method speed takes effect e, real speed returns nothing //animation speed        
+        call BlzSetSpecialEffectTimeScale(e, speed) 
+    endmethod
+    static method alpha takes effect e, integer alpha returns nothing //255        
+        call BlzSetSpecialEffectAlpha(e, alpha) 
+    endmethod
+    static method pc takes effect e, player p returns nothing //color player        
+        call BlzSetSpecialEffectColorByPlayer(e, p) 
+    endmethod
+    static method color takes effect e, integer r, integer g, integer b returns nothing //color R G B        
+        call BlzSetSpecialEffectColor(e, r, g, b) //color        
+    endmethod
+    static method remove takes effect e returns nothing //destroy        
+        call DestroyEffect(e) 
+    endmethod
+    static method time takes effect e, real time returns nothing //destroy        
+        call BlzSetSpecialEffectTime(e, time / 32) 
+    endmethod
+endstruct
 
 //--- Content from folder: ./2-Objective/6-DUMMY.j ---
 
@@ -412,7 +936,14 @@ struct Math
     static method p2r takes real CurrentNumber, real Percent returns real 
         return CurrentNumber * (Percent / 100) 
     endmethod 
-
+    static method rate takes real r returns boolean
+        local real rand = 0 
+        set rand = GetRandomReal(0,100) 
+        if rand != 0 and rand <= r then 
+            return true 
+        endif  
+        return false 
+    endmethod
     //Calculates the terrain height (Z-coordinate) at a specified (x, y) location in the game               
     //Use: Math.pz(x,y)              
     static method pz takes real x, real y returns real 

@@ -5,7 +5,14 @@ struct Math
     static method p2r takes real CurrentNumber, real Percent returns real 
         return CurrentNumber * (Percent / 100) 
     endmethod 
-
+    static method rate takes real r returns boolean
+        local real rand = 0 
+        set rand = GetRandomReal(0,100) 
+        if rand != 0 and rand <= r then 
+            return true 
+        endif  
+        return false 
+    endmethod
     //Calculates the terrain height (Z-coordinate) at a specified (x, y) location in the game               
     //Use: Math.pz(x,y)              
     static method pz takes real x, real y returns real 

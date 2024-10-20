@@ -22,7 +22,7 @@ struct Group
         call DestroyGroup(whichGroup) 
     endmethod 
     static method enum takes group whichGroup, real x, real y, real radius returns nothing 
-        call GroupEnumUnitsInRange(whichGroup, x, y, radius, True) 
+        call GroupEnumUnitsInRange(whichGroup, x, y, radius, null) 
     endmethod 
     static method new takes nothing returns group 
         return CreateGroup() 
