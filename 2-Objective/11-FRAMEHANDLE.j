@@ -1,3 +1,5 @@
+
+//Frame is in a higher category of map editing; I only provide a simple solution for this section.
 struct Frame 
     static key KEY_FF 
     static method init takes nothing returns nothing 

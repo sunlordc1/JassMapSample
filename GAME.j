@@ -7,25 +7,25 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
-        set test1 = Frame.button("war3mapImported\\tooltipBG.blp") 
-        call Frame.hide(test1) 
-        call Frame.showx(0, test1) 
-        call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301) 
-        call Frame.click(test1, function thistype.ClickTest1) 
-        call DestroyTimer(GetExpiredTimer()) 
+        // set test1 = Frame.button("war3mapImported\\tooltipBG.blp") 
+        // call Frame.hide(test1) 
+        // call Frame.showx(0, test1) 
+        // call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301) 
+        // call Frame.click(test1, function thistype.ClickTest1) 
+        // call DestroyTimer(GetExpiredTimer()) 
     endmethod 
-    private static method ClickTest1 takes nothing returns nothing 
-        local player p = GetTriggerPlayer() 
-        local integer id = GetPlayerId(GetTriggerPlayer()) 
-        local framehandle f = BlzGetTriggerFrame() 
-        if f != null then 
-            call PLAYER.systemchat(Player(id), "Select 1") 
-            call Frame.hidex(id, f) 
-            call Frame.fixed(id) 
-        endif 
-        set p = null 
-        set f = null 
-    endmethod 
+    // private static method ClickTest1 takes nothing returns nothing 
+    //     local player p = GetTriggerPlayer() 
+    //     local integer id = GetPlayerId(GetTriggerPlayer()) 
+    //     local framehandle f = BlzGetTriggerFrame() 
+    //     if f != null then 
+    //         call PLAYER.systemchat(Player(id), "Select 1") 
+    //         call Frame.hidex(id, f) 
+    //         call Frame.fixed(id) 
+    //     endif 
+    //     set p = null 
+    //     set f = null 
+    // endmethod 
     private static method GameSetting takes nothing returns nothing 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Setting Game ...") 
