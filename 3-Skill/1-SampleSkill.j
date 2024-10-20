@@ -33,6 +33,22 @@ struct SKILL
     method FilterCompare takes boolean is, boolean yes, boolean no returns boolean 
         return(is and yes) or((not is) and no) 
     endmethod 
+    method setxyz takes real x, real y, real z returns nothing 
+        set.x = x 
+        set.y = y 
+        set.z = z 
+    endmethod 
+    method setallow takes boolean ALLOW_HERO, boolean ALLOW_STRUCTURE, boolean ALLOW_FLYING, boolean ALLOW_GROUND, boolean ALLOW_MECHANICAL, boolean ALLOW_ALIVE, boolean ALLOW_MAGIC_IMMUNE returns nothing 
+        set.ALLOW_GROUND = ALLOW_GROUND 
+        set.ALLOW_FLYING = ALLOW_FLYING 
+        set.ALLOW_HERO = ALLOW_HERO 
+        set.ALLOW_STRUCTURE = ALLOW_STRUCTURE 
+        set.ALLOW_MECHANICAL = ALLOW_MECHANICAL 
+        set.ALLOW_ENEMY = ALLOW_ENEMY 
+        set.ALLOW_ALLY = ALLOW_ALLY 
+        set.ALLOW_MAGIC_IMMUNE = ALLOW_MAGIC_IMMUNE 
+        set.ALLOW_ALIVE = ALLOW_ALIVE 
+    endmethod 
     method FilterUnit takes unit u, unit caster returns boolean 
         if not.FilterCompare(IsUnitAlly(u, GetOwningPlayer(caster)),.ALLOW_ALLY,.ALLOW_ENEMY) then 
             return false 
@@ -90,12 +106,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                            
-            call.destroy() // Destroy the instance                        
+            call runtime.endx(t) // End the timer                                                                                                                                                                   
+            call.destroy() // Destroy the instance                               
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()    
+        // local thistype this = thistype.create()           
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 

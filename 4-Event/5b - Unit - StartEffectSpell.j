@@ -6,14 +6,14 @@ struct EV_START_SPELL_EFFECT
         local integer idt = GetUnitTypeId(target) 
         local integer abicode = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local real targetX = GetSpellTargetX() //Point X of skill               
-        local real targetY = GetSpellTargetY() //Point T of skill               
+        local real targetX = GetSpellTargetX() //Point X of skill                 
+        local real targetY = GetSpellTargetY() //Point T of skill                 
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
         local real yc = GetUnitY(caster) 
-        local real xt = GetUnitX(target) //Position X of target unit              
-        local real yt = GetUnitY(target) //Position T of target unit              
+        local real xt = GetUnitX(target) //Position X of target unit                
+        local real yt = GetUnitY(target) //Position T of target unit                
         local SKILL_MISSLE Missle 
         local integer n = 1 
         if abicode == 'A000' then 
@@ -21,29 +21,21 @@ struct EV_START_SPELL_EFFECT
                 exitwhen n > 5 
                 set Missle = SKILL_MISSLE.create() 
                 set Missle.caster = caster 
-                set Missle.x = xc 
-                set Missle.y = yc 
-                set Missle.z = 100 
-                //Angle  
+                call Missle.setxyz(xc,yc,100)
+                //Angle    
                 set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 15)) + (n * 15) 
-                //Speed per tick (1 second = speed *32)  
-                set Missle.speed = 15 
-                set Missle.aoe = 90 
+                //Speed per tick (1 second = speed *32)    
                 set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
                 set Missle.missle_size = 1.5 
+                set Missle.speed = 15 
+                set Missle.aoe = 90 
                 set Missle.dmg = 60 
-                set Missle.time = 32 * 2 // 32 tick per 1 seconds       
-    
+                set Missle.time = 32 * 2 // 32 tick per 1 seconds         
+                
                 set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
                 set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
-    
-                set Missle.ALLOW_ALIVE = true 
-                set Missle.ALLOW_FLYING = false 
-                set Missle.ALLOW_GROUND = true 
-                set Missle.ALLOW_ENEMY = true 
-                set Missle.ALLOW_ALLY = false 
-                set Missle.ALLOW_STRUCTURE = false 
-                set Missle.ALLOW_MECHANICAL = false 
+                call Missle.setallow(true, false, true, true, false, true, false) 
+          
                 call Missle.FireTouch() 
                 set n = n + 1 
             endloop 

@@ -1275,6 +1275,22 @@ struct SKILL
     method FilterCompare takes boolean is, boolean yes, boolean no returns boolean 
         return(is and yes) or((not is) and no) 
     endmethod 
+    method setxyz takes real x, real y, real z returns nothing 
+        set.x = x 
+        set.y = y 
+        set.z = z 
+    endmethod 
+    method setallow takes boolean ALLOW_HERO, boolean ALLOW_STRUCTURE, boolean ALLOW_FLYING, boolean ALLOW_GROUND, boolean ALLOW_MECHANICAL, boolean ALLOW_ALIVE, boolean ALLOW_MAGIC_IMMUNE returns nothing 
+        set.ALLOW_GROUND = ALLOW_GROUND 
+        set.ALLOW_FLYING = ALLOW_FLYING 
+        set.ALLOW_HERO = ALLOW_HERO 
+        set.ALLOW_STRUCTURE = ALLOW_STRUCTURE 
+        set.ALLOW_MECHANICAL = ALLOW_MECHANICAL 
+        set.ALLOW_ENEMY = ALLOW_ENEMY 
+        set.ALLOW_ALLY = ALLOW_ALLY 
+        set.ALLOW_MAGIC_IMMUNE = ALLOW_MAGIC_IMMUNE 
+        set.ALLOW_ALIVE = ALLOW_ALIVE 
+    endmethod 
     method FilterUnit takes unit u, unit caster returns boolean 
         if not.FilterCompare(IsUnitAlly(u, GetOwningPlayer(caster)),.ALLOW_ALLY,.ALLOW_ENEMY) then 
             return false 
@@ -1332,12 +1348,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                            
-            call.destroy() // Destroy the instance                        
+            call runtime.endx(t) // End the timer                                                                                                                                                                   
+            call.destroy() // Destroy the instance                               
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()    
+        // local thistype this = thistype.create()           
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -1571,14 +1587,14 @@ struct EV_START_SPELL_EFFECT
         local integer idt = GetUnitTypeId(target) 
         local integer abicode = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local real targetX = GetSpellTargetX() //Point X of skill               
-        local real targetY = GetSpellTargetY() //Point T of skill               
+        local real targetX = GetSpellTargetX() //Point X of skill                 
+        local real targetY = GetSpellTargetY() //Point T of skill                 
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
         local real yc = GetUnitY(caster) 
-        local real xt = GetUnitX(target) //Position X of target unit              
-        local real yt = GetUnitY(target) //Position T of target unit              
+        local real xt = GetUnitX(target) //Position X of target unit                
+        local real yt = GetUnitY(target) //Position T of target unit                
         local SKILL_MISSLE Missle 
         local integer n = 1 
         if abicode == 'A000' then 
@@ -1586,29 +1602,21 @@ struct EV_START_SPELL_EFFECT
                 exitwhen n > 5 
                 set Missle = SKILL_MISSLE.create() 
                 set Missle.caster = caster 
-                set Missle.x = xc 
-                set Missle.y = yc 
-                set Missle.z = 100 
-                //Angle  
+                call Missle.setxyz(xc,yc,100)
+                //Angle    
                 set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 15)) + (n * 15) 
-                //Speed per tick (1 second = speed *32)  
-                set Missle.speed = 15 
-                set Missle.aoe = 90 
+                //Speed per tick (1 second = speed *32)    
                 set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
                 set Missle.missle_size = 1.5 
+                set Missle.speed = 15 
+                set Missle.aoe = 90 
                 set Missle.dmg = 60 
-                set Missle.time = 32 * 2 // 32 tick per 1 seconds       
-    
+                set Missle.time = 32 * 2 // 32 tick per 1 seconds         
+                
                 set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
                 set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
-    
-                set Missle.ALLOW_ALIVE = true 
-                set Missle.ALLOW_FLYING = false 
-                set Missle.ALLOW_GROUND = true 
-                set Missle.ALLOW_ENEMY = true 
-                set Missle.ALLOW_ALLY = false 
-                set Missle.ALLOW_STRUCTURE = false 
-                set Missle.ALLOW_MECHANICAL = false 
+                call Missle.setallow(true, false, true, true, false, true, false) 
+          
                 call Missle.FireTouch() 
                 set n = n + 1 
             endloop 

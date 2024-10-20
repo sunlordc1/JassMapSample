@@ -60,20 +60,7 @@ struct Frame
         call BlzFrameSetText(ff, s) 
         return ff 
     endmethod 
-    static method text9 takes string s returns framehandle 
-        local framehandle ff = BlzCreateSimpleFrame("TextUnitLevelYY", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
-        call BlzFrameSetLevel(ff, 9) 
-        set ff = BlzGetFrameByName("TextUnitLevelValueYY", 0) 
-        call BlzFrameSetText(ff, s) 
-        return ff 
-    endmethod 
-    static method text2 takes string s returns framehandle 
-        local framehandle ff = BlzCreateSimpleFrame("TextUnitLevel", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
-        call BlzFrameSetLevel(ff, 9) 
-        set ff = BlzGetFrameByName("TextUnitLevelValue", 0) 
-        call BlzFrameSetText(ff, s) 
-        return ff 
-    endmethod 
+
     static method imagex takes string s, integer level returns framehandle 
         local framehandle ff 
         local framehandle f_goc = BlzCreateSimpleFrame("TestTexture", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0) 
