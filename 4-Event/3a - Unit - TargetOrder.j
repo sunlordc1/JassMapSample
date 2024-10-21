@@ -8,7 +8,7 @@ struct EV_TARGET_ORDER
         local integer d = GetUnitTypeId(u) 
         local integer id = GetUID(u) 
         local integer orderid = GetIssuedOrderId() 
-        //commonly used sample trick : Use item target spell 
+        //commonly used sample trick : Use item target spell  
         if i != null then 
             if orderid >= 852008 and orderid <= 852013 then 
                 if ENV_DEV then 
@@ -18,7 +18,7 @@ struct EV_TARGET_ORDER
             endif 
         endif 
 
-        //commonly used sample trick :   
+        //commonly used sample trick :  smart (right click event) 
         if GetIssuedOrderId() == 851971 then 
               
         endif 

@@ -841,25 +841,37 @@ struct Buff
         set.ability_id[.id] = ability_id 
         call Preload_Ability(ability_id) 
     endmethod 
-    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer level returns boolean 
+    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer buff_lv, integer buff_dur returns boolean 
         if ENV_DEV then 
-            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(level)) 
+            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(buff_lv)) 
         endif 
-        //You can custom buff your rule, here is example                     
+        //You can custom buff your rule, here is example                             
         if buff_id > -1 and buff_id <= id then 
             if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
-                call Dummy.target(.order_name[buff_id], target, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.target(.order_name[buff_id], target)    
+                // call Dummy.reset()    
+                call Dummy.target(.order_name[buff_id], target,.ability_id[buff_id], buff_lv) 
+
                 if ENV_DEV then 
                     call PLAYER.systemchat(Player(0), "[] Target") 
                 endif 
                 return false 
             endif 
             if.is_point[buff_id] then 
-                call Dummy.point(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.point(.order_name[buff_id], x, y)    
+                // call Dummy.reset()    
+
                 return false 
             endif 
             if.is_notarget[buff_id] then 
-                call Dummy.notarget(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.notarget(.order_name[buff_id])    
+                // call Dummy.reset()    
                 return false 
             endif 
         endif 
@@ -893,6 +905,9 @@ struct DESTRUCTABLE //Destructable
         set d = null 
     endmethod 
 endstruct 
+
+
+//--- Content from folder: ./2-Objective/2-TIMERDIALOG.j ---
 
 
 //--- Content from folder: ./2-Objective/3-UNIT.j ---
@@ -1122,31 +1137,59 @@ endstruct
 
 //--- Content from folder: ./2-Objective/6-DUMMY.j ---
 
-//Use :                        
-// Make new dummy :                    
-//==> call DUMMY.new(x,y,duration,p )                       
+//Use :                           
+// Make new dummy :                       
+//==> call DUMMY.new(x,y,duration,p )                          
 
-// Add Ability need cast and set level it :                     
-//==> call DUMMY.abi(abi_id,level)                      
+// Add Ability need cast and set level it :                        
+//==> call DUMMY.abi(abi_id,level)                         
 
-// Order :                    
-//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add]                     
+// Order :                       
+//==> call DUMMY.target("thunderbolt",target) [Search order name of spell u add]                        
 
-// Reset variable after order :                    
-//==>  call DUMMY.reset()                    
+// Reset variable after order :                       
+//==>  call DUMMY.reset()                       
 struct Dummy 
-    static integer dummy_id = 'e000' //Set your id dummy                          
+    static integer dummy_id = 'e000' //Set your id dummy                             
     static unit load = null 
+    // static method new takes real x, real y, real dur, player p returns nothing  
+    //     set bj_unit = CreateUnit(p, .dummy_id, x, y, bj_UNIT_FACING)  
+    //     call UnitAddAbility(bj_unit, 'Avul')  
+    //     call UnitAddAbility(bj_unit, 'Aloc')  
+    //     call UnitApplyTimedLifeBJ(dur, 'BTLF', bj_unit)  
+    // endmethod  
+    // static method abi takes integer abi_id, integer level returns nothing  
+    //     call UnitAddAbility(bj_unit, abi_id)  
+    //     call BlzUnitHideAbility(bj_unit, abi_id, false)  
+    //     call BlzEndUnitAbilityCooldown(bj_unit, abi_id)  
+    //     call SetUnitAbilityLevel(bj_unit, abi_id, level)  
+    //     call IssueImmediateOrder(bj_unit, "stop")  
+    //     call BlzUnitHideAbility(bj_unit, abi_id, true)  
+    // endmethod  
+    // static method target takes string ordername, unit target returns nothing  
+    //     call IssueTargetOrder(bj_unit, ordername, target)  
+    // endmethod  
+    // static method point takes string ordername, real x, real y returns nothing  
+    //     call MoveLocation(bj_loc, x, y)  
+    //     call IssuePointOrderLoc(bj_unit, ordername, bj_loc)  
+    // endmethod  
+    // static method notarget takes string ordername returns nothing  
+    //     call IssueImmediateOrder(bj_unit, ordername)  
+    // endmethod  
+    // static method reset takes nothing returns nothing  
+    //     set bj_unit = null  
+    // endmethod  
     static method new takes nothing returns nothing 
         set.load = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE),.dummy_id, 0, 0, 0) 
-        call SetUnitPathing(.load, false) 
         call UnitAddAbility(.load, 'Avul') 
         call UnitAddAbility(.load, 'Aloc') 
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
-    static method target takes string ordername, unit u, integer level, integer spell_id returns nothing 
+    static method target takes string ordername, unit u, integer spell_id, integer level returns nothing 
         call SetUnitX(.load, GetUnitX(u)) 
         call SetUnitY(.load, GetUnitY(u)) 
+        call BJDebugMsg(GetUnitName(.load) + "[]" + R2S(GetUnitX(.load)) + "[]" + R2S(GetUnitY(.load))) 
+
         call UnitAddAbility(.load, spell_id) 
         call SetUnitAbilityLevel(.load, spell_id, level) 
 
@@ -1175,8 +1218,8 @@ struct Dummy
 
         call UnitRemoveAbility(.load, spell_id) 
     endmethod 
-    private static method OnInit takes nothing returns nothing 
-        call TimerStart(CreateTimer(), 0.01, false, function thistype.new) 
+    private static method onInit takes nothing returns nothing 
+        call TimerStart(CreateTimer(), 1, false, function thistype.new) 
     endmethod 
 endstruct 
 
@@ -1308,8 +1351,9 @@ struct SKILL
     real y = 0.00 
     real z = 0.00 
 
-    integer buff_id
-    integer buff_lv
+    integer buff_id 
+    integer buff_lv 
+    integer buff_dur 
 
     effect missle = null 
     string missle_path = "" 
@@ -1394,7 +1438,7 @@ struct SKILL_MISSLE extends SKILL
             if not.is_touch and.FilterUnit(e,.caster) and e !=.caster then 
                 set.is_touch = true 
                 call UnitDamageTargetBJ(.caster, e,.dmg,.ATK_TYPE,.DMG_TYPE) 
-                call Buff.effect(.caster, e,.buff_id,.x,.y,.buff_lv) 
+                call Buff.effect(.caster, e,.buff_id,.x,.y,.buff_lv,.buff_dur) 
             endif 
             call Group.remove(e, g) 
         endloop 
@@ -1404,12 +1448,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                    
-            call.destroy() // Destroy the instance                                
+            call runtime.endx(t) // End the timer                                                                                                                                                                         
+            call.destroy() // Destroy the instance                                     
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()            
+        // local thistype this = thistype.create()                 
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -1418,6 +1462,52 @@ struct SKILL_MISSLE extends SKILL
             call PLAYER.systemchat(Player(0), missle_path) 
         endif 
         call runtime.new(this, P32, true, function thistype.FireTouchUpdate) 
+        return false 
+    endmethod 
+    private static method FirePierceUpdate takes nothing returns nothing 
+        local thistype this = runtime.get() 
+        local timer t = GetExpiredTimer() 
+        local group g = null 
+        local unit e = null 
+        set.x = Math.ppx(.x,.speed,.a) 
+        set.y = Math.ppy(.y,.speed,.a) 
+        call Eff.angle(.missle,.a) 
+        call Eff.pos(.missle,.x,.y, Math.pz(.x,.y) +.z) 
+
+        set g = CreateGroup() 
+        call Group.enum(g,.x,.y,.aoe) 
+        loop 
+            set e = FirstOfGroup(g) 
+            exitwhen e == null 
+            if not IsUnitInGroup(e,.g) and.FilterUnit(e,.caster) and e !=.caster then 
+                call Group.add(e,.g) 
+                call UnitDamageTargetBJ(.caster, e,.dmg,.ATK_TYPE,.DMG_TYPE) 
+                call Buff.effect(.caster, e,.buff_id,.x,.y,.buff_lv,.buff_dur) 
+            endif 
+            call Group.remove(e, g) 
+        endloop 
+        call Group.release(g) 
+        set e = null 
+
+        set.time =.time - 1 
+        if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 then 
+            call Group.release(.g) 
+            call DestroyEffect(.missle) 
+            call runtime.endx(t) // End the timer                                                                                                                                                                         
+            call.destroy() // Destroy the instance                                     
+        endif 
+    endmethod 
+    method FirePierce takes nothing returns boolean 
+        // local thistype this = thistype.create()                 
+        set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
+        call Eff.size(.missle,.missle_size) 
+        call Eff.angle(.missle,.a) 
+        set.g = CreateGroup() 
+        if ENV_DEV then 
+            call PLAYER.systemchat(Player(0), "[SKILL] Fire Touch") 
+            call PLAYER.systemchat(Player(0), missle_path) 
+        endif 
+        call runtime.new(this, P32, true, function thistype.FirePierceUpdate) 
         return false 
     endmethod 
 endstruct
@@ -1643,32 +1733,33 @@ struct EV_START_SPELL_EFFECT
         local integer idt = GetUnitTypeId(target) 
         local integer abicode = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local real targetX = GetSpellTargetX() //Point X of skill                  
-        local real targetY = GetSpellTargetY() //Point T of skill                  
+        local real targetX = GetSpellTargetX() //Point X of skill                    
+        local real targetY = GetSpellTargetY() //Point T of skill                    
         local integer pid = GetPlayerId(GetOwningPlayer(caster)) 
         local integer tpid = GetPlayerId(GetOwningPlayer(target)) 
         local real xc = GetUnitX(caster) 
         local real yc = GetUnitY(caster) 
-        local real xt = GetUnitX(target) //Position X of target unit                 
-        local real yt = GetUnitY(target) //Position T of target unit                 
+        local real xt = GetUnitX(target) //Position X of target unit                   
+        local real yt = GetUnitY(target) //Position T of target unit                   
         local SKILL_MISSLE Missle 
         local integer n = 1 
 
         if abicode == 'A000' then 
+            set n = 1 
             loop 
                 exitwhen n > 5 
                 set Missle = SKILL_MISSLE.create() 
                 set Missle.caster = caster 
                 call Missle.setxyz(xc, yc, 100) 
-                //Angle     
+                //Angle       
                 set Missle.a = (Math.ab(xc, yc, targetX, targetY) -(3 * 20)) + (n * 20) 
-                //Speed per tick (1 second = speed *32)     
+                //Speed per tick (1 second = speed *32)       
                 set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
                 set Missle.missle_size = 1.5 
                 set Missle.speed = 15 
                 set Missle.aoe = 50 
                 set Missle.dmg = 35 
-                set Missle.time = 32 * 2 // 32 tick per 1 seconds   
+                set Missle.time = 32 * 2 // 32 tick per 1 seconds     
 
                 if GetRandomInt(0, 1) == 0 then 
                     set Missle.buff_id = Buff.STUN 
@@ -1676,6 +1767,7 @@ struct EV_START_SPELL_EFFECT
                     set Missle.buff_id = Buff.SLOW 
                 endif 
                 set Missle.buff_lv = 1 
+                set Missle.buff_dur = 3 
 
                 set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
                 set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
@@ -1687,6 +1779,33 @@ struct EV_START_SPELL_EFFECT
         
         endif 
 
+        if abicode == 'A004' then //Fire pierce  
+            set Missle = SKILL_MISSLE.create() 
+            set Missle.caster = caster 
+            call Missle.setxyz(xc, yc, 100) 
+            //Angle       
+            set Missle.a = Math.ab(xc, yc, targetX, targetY) 
+            //Speed per tick (1 second = speed *32)       
+            set Missle.missle_path = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl" 
+            set Missle.missle_size = 2.5 
+            set Missle.speed = 15 
+            set Missle.aoe = 150 
+            set Missle.dmg = 35 
+            set Missle.time = 32 * 2 // 32 tick per 1 seconds     
+            if GetRandomInt(0, 1) == 0 then 
+                set Missle.buff_id = Buff.STUN 
+            else 
+                set Missle.buff_id = Buff.SLOW 
+            endif 
+            set Missle.buff_lv = 1 
+            set Missle.buff_dur = 3 
+
+            set Missle.ATK_TYPE = ATTACK_TYPE_NORMAL 
+            set Missle.DMG_TYPE = DAMAGE_TYPE_FIRE 
+            call Missle.setallow(true, false, true, true, false, true, false) 
+          
+            call Missle.FirePierce() 
+        endif 
         set target = null 
         set caster = null 
         set it = null 

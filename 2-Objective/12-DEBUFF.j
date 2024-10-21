@@ -16,25 +16,37 @@ struct Buff
         set.ability_id[.id] = ability_id 
         call Preload_Ability(ability_id) 
     endmethod 
-    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer level returns boolean 
+    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer buff_lv, integer buff_dur returns boolean 
         if ENV_DEV then 
-            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(level)) 
+            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(buff_lv)) 
         endif 
-        //You can custom buff your rule, here is example                     
+        //You can custom buff your rule, here is example                             
         if buff_id > -1 and buff_id <= id then 
             if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
-                call Dummy.target(.order_name[buff_id], target, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.target(.order_name[buff_id], target)    
+                // call Dummy.reset()    
+                call Dummy.target(.order_name[buff_id], target,.ability_id[buff_id], buff_lv) 
+
                 if ENV_DEV then 
                     call PLAYER.systemchat(Player(0), "[] Target") 
                 endif 
                 return false 
             endif 
             if.is_point[buff_id] then 
-                call Dummy.point(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.point(.order_name[buff_id], x, y)    
+                // call Dummy.reset()    
+
                 return false 
             endif 
             if.is_notarget[buff_id] then 
-                call Dummy.notarget(.order_name[buff_id], x, y, level,.ability_id[buff_id]) 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.notarget(.order_name[buff_id])    
+                // call Dummy.reset()    
                 return false 
             endif 
         endif 
