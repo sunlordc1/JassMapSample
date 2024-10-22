@@ -5,6 +5,7 @@ struct SKILL
     group g = null 
     damagetype DMG_TYPE = null 
     attacktype ATK_TYPE = null 
+    integer time = 0 
 
     real speed = 0.00 
     real dmg = 0.00 
@@ -84,7 +85,7 @@ endstruct
 
 struct SKILL_MISSLE extends SKILL 
     
-    //=====================FireTouch==========================================
+    //=====================FireTouch========================================== 
     private static method FireTouchUpdate takes nothing returns nothing 
         local thistype this = runtime.get() 
         local timer t = GetExpiredTimer() 
@@ -113,12 +114,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                         
-            call.destroy() // Destroy the instance                                     
+            call runtime.endx(t) // End the timer                                                                                                                                                                          
+            call.destroy() // Destroy the instance                                      
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()                 
+        // local thistype this = thistype.create()                  
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -129,10 +130,10 @@ struct SKILL_MISSLE extends SKILL
         call runtime.new(this, P32, true, function thistype.FireTouchUpdate) 
         return false 
     endmethod 
-    //===================================================================================
+    //=================================================================================== 
 
 
-    //=====================FirePierce==========================================
+    //=====================FirePierce========================================== 
     private static method FirePierceUpdate takes nothing returns nothing 
         local thistype this = runtime.get() 
         local timer t = GetExpiredTimer() 
@@ -162,12 +163,12 @@ struct SKILL_MISSLE extends SKILL
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 then 
             call Group.release(.g) 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                         
-            call.destroy() // Destroy the instance                                     
+            call runtime.endx(t) // End the timer                                                                                                                                                                          
+            call.destroy() // Destroy the instance                                      
         endif 
     endmethod 
     method FirePierce takes nothing returns boolean 
-        // local thistype this = thistype.create()                 
+        // local thistype this = thistype.create()                  
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -179,6 +180,6 @@ struct SKILL_MISSLE extends SKILL
         call runtime.new(this, P32, true, function thistype.FirePierceUpdate) 
         return false 
     endmethod 
-    //===================================================================================
+    //=================================================================================== 
 
 endstruct

@@ -885,6 +885,95 @@ struct Buff
     endmethod 
 endstruct
 
+//--- Content from folder: ./2-Objective/13-Quest.j ---
+
+
+//--- Content from folder: ./2-Objective/14-RANDOM.j ---
+
+//Set size array 10 to higher if u have more value           
+struct RANDOM_POOL 
+    integer array value[10] //Use for raw or number or id item                               
+    real array rate_default[10] //Constant rate default                               
+    real array rate[10] // Rate now of item                               
+    real array increase[10] //When drop call a time, rate = rate + increase                               
+    integer times //When the drop call a time, it increase 1                                
+    integer size = -1 
+    method new_value takes integer value, integer rate_default, integer rate, integer increase returns nothing 
+        set.size =.size + 1 
+        set.value[.size] = value 
+        set.rate_default[.size] = rate_default 
+        set.rate[.size] = rate + rate_default 
+        set.increase[.size] = increase 
+    endmethod 
+    method update_rate takes nothing returns nothing 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set.rate[bj_int] =.rate[bj_int] +.increase[bj_int] 
+            set bj_int = bj_int + 1 
+        endloop 
+    endmethod 
+    method total takes nothing returns real 
+        local real total = 0 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set total = total +.rate[bj_int] 
+            set bj_int = bj_int + 1 
+        endloop 
+        return total 
+    endmethod 
+    method random takes nothing returns integer 
+        local integer v = -1 
+        local real total = 0 
+        local real random_val = 0 
+        local real accumulated = 0 
+        set total =.total() 
+  
+        set random_val = GetRandomReal(0, total) 
+        if ENV_DEV then 
+            call BJDebugMsg("random_val: " + R2S(random_val) + " / " + "Total: " + R2S(total)) 
+            call BJDebugMsg("Number of Value Random: " + I2S(.size + 1)) 
+        endif 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set accumulated = accumulated +.rate[bj_int] 
+            if random_val <= accumulated then 
+                set v =.value[bj_int] 
+                call.action(bj_int) // Make some stupid code              
+                call.update_rate() 
+                set.times =.times + 1 
+                exitwhen true 
+            endif 
+            set bj_int = bj_int + 1 
+        endloop 
+        if ENV_DEV then 
+            call BJDebugMsg(".accumulated: " + R2S(accumulated) + " [] Values: " + R2S(v) + "[] Times: " + R2S(times)) 
+        endif 
+
+        return v 
+    endmethod 
+    method action takes integer index returns nothing 
+        //Code for example                
+        if.times == 5 then 
+            call BJDebugMsg("Critical DROP! 10 times") 
+
+        endif 
+        if index == 2 then 
+            call BJDebugMsg("Critical DROP! reset rate to default") 
+            //Reset when the value [9] drop               
+            set bj_int = 0 
+            loop 
+                exitwhen bj_int >.size 
+                set.rate[bj_int] =.rate_default[bj_int] 
+                set bj_int = bj_int + 1 
+            endloop 
+        endif 
+    endmethod 
+endstruct 
+
+
 //--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
 struct DESTRUCTABLE //Destructable  
     static method OpenGate takes destructable d returns nothing 
@@ -1343,6 +1432,7 @@ struct SKILL
     damagetype DMG_TYPE = null 
     attacktype ATK_TYPE = null 
     integer time = 0 
+
     real speed = 0.00 
     real dmg = 0.00 
     real aoe = 0.00 
@@ -1420,6 +1510,8 @@ struct SKILL
 endstruct 
 
 struct SKILL_MISSLE extends SKILL 
+    
+    //=====================FireTouch========================================== 
     private static method FireTouchUpdate takes nothing returns nothing 
         local thistype this = runtime.get() 
         local timer t = GetExpiredTimer() 
@@ -1448,12 +1540,12 @@ struct SKILL_MISSLE extends SKILL
         set.time =.time - 1 
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 or.is_touch then 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                         
-            call.destroy() // Destroy the instance                                     
+            call runtime.endx(t) // End the timer                                                                                                                                                                          
+            call.destroy() // Destroy the instance                                      
         endif 
     endmethod 
     method FireTouch takes nothing returns boolean 
-        // local thistype this = thistype.create()                 
+        // local thistype this = thistype.create()                  
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -1464,6 +1556,10 @@ struct SKILL_MISSLE extends SKILL
         call runtime.new(this, P32, true, function thistype.FireTouchUpdate) 
         return false 
     endmethod 
+    //=================================================================================== 
+
+
+    //=====================FirePierce========================================== 
     private static method FirePierceUpdate takes nothing returns nothing 
         local thistype this = runtime.get() 
         local timer t = GetExpiredTimer() 
@@ -1493,12 +1589,12 @@ struct SKILL_MISSLE extends SKILL
         if.time <= 0 or GetUnitState(.caster, UNIT_STATE_LIFE) <= 0 then 
             call Group.release(.g) 
             call DestroyEffect(.missle) 
-            call runtime.endx(t) // End the timer                                                                                                                                                                         
-            call.destroy() // Destroy the instance                                     
+            call runtime.endx(t) // End the timer                                                                                                                                                                          
+            call.destroy() // Destroy the instance                                      
         endif 
     endmethod 
     method FirePierce takes nothing returns boolean 
-        // local thistype this = thistype.create()                 
+        // local thistype this = thistype.create()                  
         set.missle = Eff.new(.missle_path,.x,.y, Math.pz(.x,.y) +.z) 
         call Eff.size(.missle,.missle_size) 
         call Eff.angle(.missle,.a) 
@@ -1510,6 +1606,8 @@ struct SKILL_MISSLE extends SKILL
         call runtime.new(this, P32, true, function thistype.FirePierceUpdate) 
         return false 
     endmethod 
+    //=================================================================================== 
+
 endstruct
 
 //--- Content from folder: ./4-Event/1 - Unit - BeginConstruction.j ---
@@ -1540,6 +1638,57 @@ struct EV_BEGIN_STRUCTION
     endmethod 
 endstruct 
 
+
+//--- Content from folder: ./4-Event/10- Player - Chat.j ---
+
+struct EV_PLAYER_CHAT 
+    static RANDOM_POOL pool1 //if u have more pool then add more line variables or set it array   
+    static method f_Checking takes nothing returns boolean 
+        local string s = GetEventPlayerChatString() 
+        local player p = GetTriggerPlayer() 
+        local string n = SubString(s, 0, 3) 
+        local string i = SubString(s, 3, 5) 
+        
+        if SubString(s, 0, 1) == "-" and n == "-cl" then 
+            if ENV_DEV then 
+                call BJDebugMsg("Command: Clear Chat") 
+                call BJDebugMsg("Type: " + n) 
+            endif 
+            if(GetLocalPlayer() == p) then 
+                call ClearTextMessages() 
+            endif 
+        endif 
+        if SubString(s, 0, 1) == "-" and n == "-rd" then 
+            if ENV_DEV then 
+                call BJDebugMsg("Command: Random Pool") 
+                call BJDebugMsg("Type: " + n) 
+            endif 
+        endif 
+        set p = null 
+        return false 
+    endmethod 
+    static method f_SetupEvent takes nothing returns nothing 
+        set.pool1 = RANDOM_POOL.create() 
+        call.pool1.new_value(1, 50, 0, 0) 
+        call.pool1.new_value(2, 30, 0, 5) 
+        call.pool1.new_value(3, 20, 0, 2) 
+        //This action everytime player chat, careful for use it.       
+        call.add_chat("", true, function thistype.f_Checking) 
+    endmethod 
+    //You can use it for make more command in game instead my .add_chat("",true,function thistype.f_Checking)       
+    static method add_chat takes string phase, boolean b, code actionfunc returns nothing 
+        local integer index 
+        local trigger trig = CreateTrigger() 
+        set index = 0 
+        loop 
+            call TriggerRegisterPlayerChatEvent(trig, Player(index), phase, b) 
+            set index = index + 1 
+            exitwhen index == GetBJMaxPlayerSlots() 
+        endloop 
+        call TriggerAddAction(trig, actionfunc) 
+        set trig = null 
+    endmethod 
+endstruct
 
 //--- Content from folder: ./4-Event/2a - Unit - AcquiresAnItem.j ---
 //
@@ -1605,7 +1754,7 @@ struct EV_TARGET_ORDER
         local integer d = GetUnitTypeId(u) 
         local integer id = GetUID(u) 
         local integer orderid = GetIssuedOrderId() 
-        //commonly used sample trick : Use item target spell 
+        //commonly used sample trick : Use item target spell  
         if i != null then 
             if orderid >= 852008 and orderid <= 852013 then 
                 if ENV_DEV then 
@@ -1615,7 +1764,7 @@ struct EV_TARGET_ORDER
             endif 
         endif 
 
-        //commonly used sample trick :   
+        //commonly used sample trick :  smart (right click event) 
         if GetIssuedOrderId() == 851971 then 
               
         endif 
@@ -1870,8 +2019,8 @@ struct EV_PLAYER_LEAVES
         set p = null 
         return false 
     endmethod 
-    private static method f_SetupEvent takes nothing returns nothing 
-        local trigger t = CreateTrigger() // Create a trigger                                                                                                                          
+    static method f_SetupEvent takes nothing returns nothing 
+        local trigger t = CreateTrigger() // Create a trigger                                                                                                                           
         local integer n = 0 
         loop 
             exitwhen n > bj_MAX_PLAYER_SLOTS 
@@ -1926,6 +2075,10 @@ struct REGISTER_EVENT
         call EV_UNIT_DEATH.f_SetupEvent()
         call EV_UNIT_ATTACK.f_SetupEvent()
         call EV_UNIT_SELL.f_SetupEvent()
+
+        call EV_PLAYER_LEAVES.f_SetupEvent()
+        call EV_PLAYER_CHAT.f_SetupEvent()
+
         call DestroyTimer(GetExpiredTimer()) 
     endmethod
     private static method onInit takes nothing returns nothing 
