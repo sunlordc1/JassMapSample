@@ -1,35 +1,37 @@
 struct GAME 
     static boolean IsSinglePlay = false 
     static integer CountPlayer = 0 
+    static CountdownTimer StartEvent 
+    static integer TimesStartEvent = 0 
     private static method GameStart takes nothing returns nothing 
         local framehandle test1 = null 
         call FogMaskEnable(false) 
-        call FogEnable(true)
+        call FogEnable(true) 
 
-        // call PauseGame(false) 
+        // call PauseGame(false)         
         call CinematicModeBJ(false, GetPlayersAll()) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
-        // set test1 = Frame.button("war3mapImported\\tooltipBG.blp")  
-        // call Frame.hide(test1)  
-        // call Frame.showx(0, test1)  
-        // call Frame.movex(test1, 0.16304, 0.29219, 0.12194, 0.21301)  
-        // call Frame.click(test1, function thistype.ClickTest1)  
-        // call DestroyTimer(GetExpiredTimer())  
+
+        set GAME.StartEvent = CountdownTimer.create() 
+        call GAME.StartEvent.newdialog("10 secs event", 10, true, function thistype.tensec) 
+        call GAME.StartEvent.title("10 secs event") 
     endmethod 
-    // private static method ClickTest1 takes nothing returns nothing  
-    //     local player p = GetTriggerPlayer()  
-    //     local integer id = GetPlayerId(GetTriggerPlayer())  
-    //     local framehandle f = BlzGetTriggerFrame()  
-    //     if f != null then  
-    //         call PLAYER.systemchat(Player(id), "Select 1")  
-    //         call Frame.hidex(id, f)  
-    //         call Frame.fixed(id)  
-    //     endif  
-    //     set p = null  
-    //     set f = null  
-    // endmethod  
+    private static method tensec takes nothing returns nothing 
+        set GAME.TimesStartEvent = GAME.TimesStartEvent + 1 
+        if ENV_DEV then 
+            call BJDebugMsg("Times:" + I2S(GAME.TimesStartEvent)) 
+        endif 
+        if GAME.TimesStartEvent == 1 then 
+            call GAME.StartEvent.titlecolor(255, 0, 0, 255) 
+            call GAME.StartEvent.timercolor(255, 0, 0, 255) 
+        endif 
+        if GAME.TimesStartEvent == 2 then 
+            call GAME.StartEvent.destroytd() 
+        endif 
+      
+    endmethod 
     private static method GameSetting takes nothing returns nothing 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Setting Game ...") 
@@ -48,7 +50,7 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Checking Status ...") 
         endif 
-        // Check player is online in game        
+        // Check player is online in game                
         set n = 0 
         loop 
             exitwhen n > bj_MAX_PLAYER_SLOTS 
@@ -65,17 +67,17 @@ struct GAME
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
         call FogMaskEnable(true) 
-        call FogEnable(false)
-        // call PauseGame(true) 
+        call FogEnable(false) 
+        // call PauseGame(true)         
         call CinematicModeBJ(true, GetPlayersAll()) 
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 
         endif 
         call Frame.init() 
-        call Preload_Ability('Amls') // Preload skill                     
-        call Preload_Unit('uloc') // Preload unit                    
-        call Preload_Unit('e000') // Preload dummy                    
+        call Preload_Ability('Amls') // Preload skill                             
+        call Preload_Unit('uloc') // Preload unit                            
+        call Preload_Unit('e000') // Preload dummy                            
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 

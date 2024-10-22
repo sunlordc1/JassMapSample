@@ -9,7 +9,7 @@ struct CountdownTimer
         call TimerDialogSetTitle(.td, title) 
         call TimerDialogDisplay(.td, true) 
     endmethod 
-    method pause takes string status returns nothing 
+    method pause takes boolean status returns nothing 
         if status then 
             call PauseTimer(.t) 
         else 
@@ -34,8 +34,8 @@ struct CountdownTimer
             call TimerDialogDisplay(.td, status) 
         endif 
     endmethod 
-    method detroytd takes nothing returns nothing 
-        call DestroyTimer(.t) 
+    method destroytd takes nothing returns nothing 
         call DestroyTimerDialog(.td) 
+        call DestroyTimer(.t) 
     endmethod 
 endstruct
