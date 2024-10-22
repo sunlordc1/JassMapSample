@@ -892,7 +892,7 @@ endstruct
 
 //About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing 
 //Uses check example in 4-Event/10- Player - Chat.j
-//====Variables in struct
+//====Variables in struct 
 //  static RANDOM_POOL pool1 
 //====Setting 
 // set.pool1 = RANDOM_POOL.create() 
