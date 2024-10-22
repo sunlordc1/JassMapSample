@@ -969,7 +969,7 @@ struct RANDOM_POOL
     method action takes integer index returns nothing 
         //Code for example                 
         if.times == 5 then 
-            call BJDebugMsg("Critical DROP! 10 times") 
+            call BJDebugMsg("Critical DROP! 5 times") 
 
         endif 
         if index == 2 then 
