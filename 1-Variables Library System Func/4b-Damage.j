@@ -47,6 +47,8 @@ struct DMGSTAT
         set.crit_dmg = 0.00 
         set.crit_chance = 0.00 
         set.evasion = 0.00 
+        set.resist_spell = 0.00 
+        set.pierce_spell = 0.00 
       
     endmethod 
 endstruct 

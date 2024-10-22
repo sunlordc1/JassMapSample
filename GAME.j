@@ -8,7 +8,7 @@ struct GAME
         call FogMaskEnable(false) 
         call FogEnable(true) 
 
-        // call PauseGame(false)         
+        // call PauseGame(false)          
         call CinematicModeBJ(false, GetPlayersAll()) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
@@ -16,7 +16,7 @@ struct GAME
 
         set GAME.StartEvent = CountdownTimer.create() 
         call GAME.StartEvent.newdialog("10 secs event", 10, true, function thistype.tensec) 
-        call GAME.StartEvent.title("10 secs event") 
+
     endmethod 
     private static method tensec takes nothing returns nothing 
         set GAME.TimesStartEvent = GAME.TimesStartEvent + 1 
@@ -24,11 +24,13 @@ struct GAME
             call BJDebugMsg("Times:" + I2S(GAME.TimesStartEvent)) 
         endif 
         if GAME.TimesStartEvent == 1 then 
+            call GAME.StartEvent.title("Last time") 
             call GAME.StartEvent.titlecolor(255, 0, 0, 255) 
             call GAME.StartEvent.timercolor(255, 0, 0, 255) 
         endif 
         if GAME.TimesStartEvent == 2 then 
             call GAME.StartEvent.destroytd() 
+            call GAME.StartEvent.destroy() 
         endif 
       
     endmethod 
@@ -50,7 +52,7 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Checking Status ...") 
         endif 
-        // Check player is online in game                
+        // Check player is online in game                 
         set n = 0 
         loop 
             exitwhen n > bj_MAX_PLAYER_SLOTS 
@@ -68,16 +70,20 @@ struct GAME
     private static method PreloadMap takes nothing returns nothing 
         call FogMaskEnable(true) 
         call FogEnable(false) 
-        // call PauseGame(true)         
+        // call PauseGame(true)          
         call CinematicModeBJ(true, GetPlayersAll()) 
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 
         endif 
+        //For setup framhandle setting, if u not use my code UI then delete it 
         call Frame.init() 
-        call Preload_Ability('Amls') // Preload skill                             
-        call Preload_Unit('uloc') // Preload unit                            
-        call Preload_Unit('e000') // Preload dummy                            
+        //From to: https://www.hiveworkshop.com/threads/ui-showing-3-multiboards.316610/ 
+        //Will add more multilboard 
+        call BlzLoadTOCFile("war3mapImported\\multiboard.toc") 
+        call Preload_Ability('Amls') // Preload skill                              
+        call Preload_Unit('uloc') // Preload unit                             
+        call Preload_Unit('e000') // Preload dummy                             
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
