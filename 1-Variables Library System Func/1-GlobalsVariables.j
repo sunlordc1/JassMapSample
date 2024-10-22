@@ -12,6 +12,7 @@ globals
     effect bj_eff = null // instead of bj_lastCreatedEffect        
     location bj_loc = Location(0, 0) 
     texttag bj_texttag = null
+    timer bj_timer = null
     //Storage        
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.          
     hashtable stats = InitHashtable() // For damage system  

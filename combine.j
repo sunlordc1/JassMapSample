@@ -13,6 +13,7 @@ globals
     effect bj_eff = null // instead of bj_lastCreatedEffect        
     location bj_loc = Location(0, 0) 
     texttag bj_texttag = null
+    timer bj_timer = null
     //Storage        
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.          
     hashtable stats = InitHashtable() // For damage system  
@@ -937,9 +938,9 @@ endstruct
 //--- Content from folder: ./2-Objective/15-TEXTTAG.j ---
 
 struct Texttag 
-    //Use:                   
-    //set bj_loc = MoveLocation(x,y)                   
-    //call TEXTTAG.newloc(str, bj_loc, z , size)                     
+    //Use:                    
+    //set bj_loc = MoveLocation(x,y)                    
+    //call TEXTTAG.newloc(str, bj_loc, z , size)                      
     static method new takes string str, location loc, real zoffset, real size returns texttag 
         set bj_texttag = CreateTextTag() 
         call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
@@ -957,7 +958,7 @@ struct Texttag
     static method last takes nothing returns texttag 
         return bj_texttag 
     endmethod 
-    //Use: call TEXTTAG.color(tt,0-255,0-255,0-255,0-255,0-255)                     
+    //Use: call TEXTTAG.color(tt,0-255,0-255,0-255,0-255,0-255)                      
     static method color takes texttag tt, integer red, integer green, integer blue, integer transparency returns nothing 
         call SetTextTagColor(tt, red, green, blue, transparency) 
     endmethod 
@@ -988,18 +989,19 @@ struct Texttag
     static method text takes texttag tt, string str, real size returns nothing 
         call SetTextTagText(tt, str, (size * 0.023) / 10) 
     endmethod 
+    //Uses: Move texttag to point of unit           
     static method posunit takes texttag tt, unit u, real zoffset returns nothing 
         call SetTextTagPosUnit(tt, u, zoffset) 
     endmethod 
-    //Uses:              
-    //set bj_loc = MoveLocation(x,y)                   
-    //call TEXTTAG.posloc(str, bj_loc, z , size)               
+    //Uses: Move texttag to point x ,y           
+    //set bj_loc = MoveLocation(x,y)                    
+    //call TEXTTAG.posloc(str, bj_loc, z , size)                
     static method posloc takes texttag tt, location loc, real zoffset returns nothing 
         call SetTextTagPos(tt, GetLocationX(loc), GetLocationY(loc), zoffset) 
     endmethod 
     static method showforce takes texttag tt, force whichForce, boolean show returns nothing 
         if(IsPlayerInForce(GetLocalPlayer(), whichForce)) then 
-            // Use only local code (no net traffic) within this block to avoid desyncs.        
+            // Use only local code (no net traffic) within this block to avoid desyncs.         
             call SetTextTagVisibility(tt, show) 
         endif 
     endmethod 
@@ -1023,6 +1025,49 @@ struct Num
     endmethod 
     static method ri2s takes real r returns string 
         return I2S(R2I(r)) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/17-TIMERDIALOG.j ---
+  
+struct CountdownTimer 
+    timer t = null 
+    timerdialog td = null 
+    method newdialog takes string title, real timeout, boolean periodic, code func returns nothing 
+        set.t = CreateTimer() 
+        call TimerStart(.t, timeout, periodic, func) 
+        set.td = CreateTimerDialog(.t) 
+        call TimerDialogSetTitle(.td, title) 
+        call TimerDialogDisplay(.td, true) 
+    endmethod 
+    method pause takes string status returns nothing 
+        if status then 
+            call PauseTimer(.t) 
+        else 
+            call ResumeTimer(.t) 
+        endif 
+    endmethod 
+    method title takes string title returns nothing 
+        call TimerDialogSetTitle(.td, title) 
+    endmethod 
+    method titlecolor takes integer red, integer green, integer blue, integer transparency returns nothing 
+        call TimerDialogSetTitleColor(.td, red, green, blue, transparency) 
+    endmethod 
+    method timercolor takes integer red, integer green, integer blue, integer transparency returns nothing 
+        call TimerDialogSetTimeColor(.td, red, green, blue, transparency) 
+    endmethod 
+    method display takes boolean status returns nothing 
+        call TimerDialogDisplay(.td, status) 
+    endmethod 
+    method displayx takes boolean status, player p returns nothing 
+        if(GetLocalPlayer() == p) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.       
+            call TimerDialogDisplay(.td, status) 
+        endif 
+    endmethod 
+    method detroytd takes nothing returns nothing 
+        call DestroyTimer(.t) 
+        call DestroyTimerDialog(.td) 
     endmethod 
 endstruct
 
