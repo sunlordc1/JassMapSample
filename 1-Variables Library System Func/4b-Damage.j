@@ -185,7 +185,7 @@ struct DMGEVENT
         endif 
        
         call BlzSetEventDamage(DMGSTAT.dmg) 
-        call createTextTagDamage(color_dmg_type, DMGSTAT.dmg, DMGSTAT.victim, DMGSTAT.caster)     
+        call TextDmg.run(color_dmg_type, DMGSTAT.dmg, DMGSTAT.victim, DMGSTAT.caster)     
     endmethod 
     private static method onInit takes nothing returns nothing 
         local trigger t = CreateTrigger() 

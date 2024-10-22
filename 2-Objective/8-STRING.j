@@ -1,5 +1,5 @@
-struct STR
-    //Use:  STR.repeated(1234567,",",3,0) -> 123,456,7 
+struct Str
+    //Use:  Str.repeated(1234567,",",3,0) -> 123,456,7 
     static method repeated takes string s, string str, integer spacing, integer start returns string 
         local integer i = StringLength(s) 
         local integer p = 1 
@@ -10,7 +10,7 @@ struct STR
         endloop 
         return s 
     endmethod 
-    //Use: STR.reverse("1234") -> 4321
+    //Use: Str.reverse("1234") -> 4321
     static method reverse takes string s returns string
         local integer i = StringLength(s)
         local string rs = ""

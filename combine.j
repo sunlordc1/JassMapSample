@@ -12,6 +12,7 @@ globals
     unit bj_unit = null // instead of bj_lastCreatedUnit         
     effect bj_eff = null // instead of bj_lastCreatedEffect        
     location bj_loc = Location(0, 0) 
+    texttag bj_texttag = null
     //Storage        
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.          
     hashtable stats = InitHashtable() // For damage system  
@@ -152,124 +153,97 @@ function B2S takes boolean b returns string
 endfunction 
 
 //--- Content from folder: ./1-Variables Library System Func/4a-DamageTextTag.j ---
-function settingTextTag takes texttag text returns nothing 
-    call SetTextTagVelocityBJ(text, 96.00, 60.00) 
-    call SetTextTagPermanentBJ(text, false) 
-    call SetTextTagFadepointBJ(text, 1.00) 
-    call SetTextTagLifespanBJ(text, 0.725) 
-endfunction 
-function settingTextTag2 takes texttag text returns nothing 
-    call SetTextTagVelocityBJ(text, 96.00, 120.00) 
-    call SetTextTagPermanentBJ(text, false) 
-    call SetTextTagFadepointBJ(text, 1.00) 
-    call SetTextTagLifespanBJ(text, 0.725) 
-endfunction 
-// function block takes real damage, real blockdamage returns real         
-//     set damage = damage - blockdamage        
-//     return damage        
-// endfunction        
 
-function createTextTagDamage takes string colorName, real dmg, unit victim, unit caster returns boolean 
-    local texttag text 
-    local integer id = GetPID(GetOwningPlayer(caster)) 
-    local real textsize = 10 
-    if GetUID(caster) != GetPlayerNeutralAggressive() then 
-        if GetLocalPlayer() == GetOwningPlayer(victim) then 
-            if(colorName == "Gold") then 
-                set text = CreateTextTagUnitBJ(("+ " + I2S(R2I(dmg))), victim, 0, textsize, 93.00, 79, 0, 0) 
-                call settingTextTag(text) 
-                return false 
-            endif 
+struct TextDmg 
+    static real text_size = 10 
+    static real zOffset = 0 
+    static real lifespan = 0.725 
+    static real speed = 96 
+    static real angle = 120 
+    static boolean permanent = false 
+    static real fadepoint = 1.00 
+    static method setting takes texttag tt returns nothing 
+        call Texttag.velocity(tt,.speed,.angle) 
+        call Texttag.permanent(tt,.permanent) 
+        call Texttag.fadepoint(tt,.fadepoint) 
+        call Texttag.lifespan(tt,.lifespan) 
+    endmethod 
+    static method run takes string colorName, real dmg, unit victim, unit caster returns boolean 
+        local integer cid = GetPlayerId(GetOwningPlayer(caster)) 
+        local integer vid = GetPlayerId(GetOwningPlayer(victim)) 
+        local texttag tt = null 
+
+        if(colorName == "Physical") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 100.00, 100, 100, 0) 
+            return false 
         endif 
-        if GetLocalPlayer() == GetOwningPlayer(caster) then 
-      
-            if dmg > 1 then 
-                // if dmg > 1  and IsHero2(caster) then        
-            
-                if(colorName == "Physical") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 100.00, 100, 100, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-   
-                if(colorName == "Spell") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 10.00, 50, 80, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Cold") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 0.00, 60.00, 80.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Poison") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 10.00, 100, 10.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Sonic") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 29.00, 91.00, 74.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Dark") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 36.00, 14.00, 43.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Fire") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 100.00, 20.00, 0.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Lightning") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 93.00, 93.00, 0, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Crit") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg)) + "!"), victim, 0, textsize + 1.5, 89.00, 51.00, 6.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Crit Spell") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 97.00, 46.00, 19.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-                if(colorName == "Chao") then 
-                    set text = CreateTextTagUnitBJ(("- " + I2S(R2I(dmg))), victim, 0, textsize, 80.00, 0.00, 80.00, 0) 
-                    call settingTextTag(text) 
-                    return false 
-                endif 
-            endif 
-            
+        if(colorName == "Spell") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 10.00, 50, 80, 0) 
+            return false 
         endif 
-        
-    endif 
-    if GetLocalPlayer() == GetOwningPlayer(caster) or GetLocalPlayer() == GetOwningPlayer(victim) then 
+        if(colorName == "Cold") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 0.00, 60.00, 80.00, 0) 
+            return false 
+        endif 
+        if(colorName == "Poison") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 10.00, 100, 10.00, 0) 
+            return false 
+        endif 
+        if(colorName == "Fire") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 100.00, 20.00, 0.00, 0) 
+            return false 
+        endif 
+        if(colorName == "Lightning") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 93.00, 93.00, 0, 0) 
+            return false 
+        endif 
+        if(colorName == "Crit") then 
+            set tt = Texttag.unit("-" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.text(tt, Num.ri2s(dmg),.text_size + 3) 
+            call Texttag.colorpercent(tt, 89.00, 51.00, 6.00, 0) 
+            return false 
+        endif 
         if(colorName == "Miss") then 
-            set text = CreateTextTagUnitBJ(("Miss"), victim, 0, 7.50, 30.00, 74.00, 20.00, 0) 
-            call settingTextTag(text) 
+            set tt = Texttag.unit("Miss !", victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 30.00, 74.00, 20.00, 0) 
             return false 
         endif 
         if(colorName == "Block") then 
-            set text = CreateTextTagUnitBJ(("Block !"), victim, 0, 6.00, 70.00, 70.00, 70.00, 0) 
-            call settingTextTag2(text) 
+            set tt = Texttag.unit("Block !", victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 70.00, 70.00, 70.00, 0) 
         endif 
-    endif 
-    if(colorName == "Heal") then 
-        set text = CreateTextTagUnitBJ(("+" + I2S(R2I(dmg))), victim, 0, textsize - 1, 0, 60, 0, 0) 
-        call settingTextTag(text) 
+        if(colorName == "Heal") then 
+            set tt = Texttag.unit("+" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 0, 60, 0, 0) 
+         
+            return false 
+        endif 
+        if(colorName == "HealMana") then 
+            set tt = Texttag.unit("+" + Num.ri2s(dmg), victim,.zOffset,.text_size) 
+            call.setting(tt) 
+            call Texttag.colorpercent(tt, 0, 0, 153, 0) 
+            return false 
+        endif 
         return false 
-    endif 
-    if(colorName == "HealMana") then 
-        set text = CreateTextTagUnitBJ(("+" + I2S(R2I(dmg))), victim, 0, textsize - 1, 0, 0, 153, 0) 
-        call settingTextTag(text) 
-        return false 
-    endif 
-    return false 
-endfunction 
+    endmethod 
+endstruct 
+
 
 //--- Content from folder: ./1-Variables Library System Func/4b-Damage.j ---
 struct BSTAT 
@@ -459,7 +433,7 @@ struct DMGEVENT
         endif 
        
         call BlzSetEventDamage(DMGSTAT.dmg) 
-        call createTextTagDamage(color_dmg_type, DMGSTAT.dmg, DMGSTAT.victim, DMGSTAT.caster)     
+        call TextDmg.run(color_dmg_type, DMGSTAT.dmg, DMGSTAT.victim, DMGSTAT.caster)     
     endmethod 
     private static method onInit takes nothing returns nothing 
         local trigger t = CreateTrigger() 
@@ -890,25 +864,27 @@ endstruct
 
 //--- Content from folder: ./2-Objective/14-RANDOM.j ---
 
-//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing 
-//Uses check example in 4-Event/10- Player - Chat.j
-//====Variables in struct 
-//  static RANDOM_POOL pool1 
-//====Setting 
-// set.pool1 = RANDOM_POOL.create() 
-// call.pool1.new_value(1, 50, 0, 0) 
-// call.pool1.new_value(2, 30, 0, 5) 
-// call.pool1.new_value(3, 20, 0, 2) 
-//====Call when want random
-// set random_value = .pool1.random() 
+//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing  
+//Uses check example in 4-Event/10- Player - Chat.j 
+//====Variables in struct  
+//  static Randompool pool1  
+//====Setting  
+// set.pool1 = Randompool.create()  
+// call.pool1.new_value(1, 50, 0, 0)  
+// call.pool1.new_value(2, 30, 0, 5)  
+// call.pool1.new_value(3, 20, 0, 2)  
+//====Call when want random 
+// set random_value = .pool1.random()  
+//====Destroy => use one time 
+// call .pool1.destroy()  
 
-//Set size array 10 to higher if u have more value            
-struct RANDOM_POOL 
-    integer array value[10] //Use for raw or number or id item                                
-    real array rate_default[10] //Constant rate default                                
-    real array rate[10] // Rate now of item                                
-    real array increase[10] //When drop call a time, rate = rate + increase                                
-    integer times //When the drop call a time, it increase 1                                 
+//Set size array 10 to higher if u have more value             
+struct Randompool 
+    integer array value[10] //Use for raw or number or id item                                 
+    real array rate_default[10] //Constant rate default                                 
+    real array rate[10] // Rate now of item                                 
+    real array increase[10] //When drop call a time, rate = rate + increase                                 
+    integer times //When the drop call a time, it increase 1                                  
     integer size = -1 
     method new_value takes integer value, integer rate_default, integer rate, integer increase returns nothing 
         set.size =.size + 1 
@@ -953,7 +929,7 @@ struct RANDOM_POOL
             set accumulated = accumulated +.rate[bj_int] 
             if random_val <= accumulated then 
                 set v =.value[bj_int] 
-                call.action(bj_int) // Make some stupid code               
+                call.action(bj_int) // Make some stupid code                
                 call.update_rate() 
                 set.times =.times + 1 
                 exitwhen true 
@@ -967,14 +943,14 @@ struct RANDOM_POOL
         return v 
     endmethod 
     method action takes integer index returns nothing 
-        //Code for example                 
+        //Code for example                  
         if.times == 5 then 
             call BJDebugMsg("Critical DROP! 5 times") 
 
         endif 
         if index == 2 then 
             call BJDebugMsg("Critical DROP! reset rate to default") 
-            //Reset when the value [9] drop                
+            //Reset when the value [9] drop                 
             set bj_int = 0 
             loop 
                 exitwhen bj_int >.size 
@@ -985,6 +961,98 @@ struct RANDOM_POOL
     endmethod 
 endstruct 
 
+
+//--- Content from folder: ./2-Objective/15-TEXTTAG.j ---
+
+struct Texttag 
+    //Use:                   
+    //set bj_loc = MoveLocation(x,y)                   
+    //call TEXTTAG.newloc(str, bj_loc, z , size)                     
+    static method new takes string str, location loc, real zoffset, real size returns texttag 
+        set bj_texttag = CreateTextTag() 
+        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
+        call SetTextTagPos(bj_texttag, GetLocationX(loc), GetLocationY(loc), zoffset) 
+        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
+        return bj_texttag 
+    endmethod 
+    static method unit takes string str, unit u, real zoffset, real size returns texttag 
+        set bj_texttag = CreateTextTag() 
+        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
+        call SetTextTagPosUnit(bj_texttag, u, zoffset) 
+        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
+        return bj_texttag 
+    endmethod 
+    static method last takes nothing returns texttag 
+        return bj_texttag 
+    endmethod 
+    //Use: call TEXTTAG.color(tt,0-255,0-255,0-255,0-255,0-255)                     
+    static method color takes texttag tt, integer red, integer green, integer blue, integer transparency returns nothing 
+        call SetTextTagColor(tt, red, green, blue, transparency) 
+    endmethod 
+    static method colorpercent takes texttag tt, real red, real green, real blue, real transparency returns nothing 
+        call SetTextTagColor(tt, PercentToInt(red, 255), PercentToInt(green, 255), PercentToInt(blue, 255), PercentToInt((100.0 - transparency), 255)) 
+    endmethod 
+    static method age takes texttag tt, real age returns nothing 
+        call SetTextTagAge(tt, age) 
+    endmethod 
+    static method lifespan takes texttag tt, real lifespan returns nothing 
+        call SetTextTagLifespan(tt, lifespan) 
+    endmethod 
+    static method fadepoint takes texttag tt, real fadepoint returns nothing 
+        call SetTextTagFadepoint(tt, fadepoint) 
+    endmethod 
+    static method velocity takes texttag tt, real speed, real angle returns nothing 
+        local real vel = (speed * 0.071) / 128 
+        local real xvel = vel * Cos(angle * bj_DEGTORAD) 
+        local real yvel = vel * Sin(angle * bj_DEGTORAD) 
+        call SetTextTagVelocity(tt, xvel, yvel) 
+    endmethod 
+    static method permanent takes texttag tt, boolean flag returns nothing 
+        call SetTextTagPermanent(tt, flag) 
+    endmethod 
+    static method suspended takes texttag tt, boolean flag returns nothing 
+        call SetTextTagSuspended(tt, flag) 
+    endmethod 
+    static method text takes texttag tt, string str, real size returns nothing 
+        call SetTextTagText(tt, str, (size * 0.023) / 10) 
+    endmethod 
+    static method posunit takes texttag tt, unit u, real zoffset returns nothing 
+        call SetTextTagPosUnit(tt, u, zoffset) 
+    endmethod 
+    //Uses:              
+    //set bj_loc = MoveLocation(x,y)                   
+    //call TEXTTAG.posloc(str, bj_loc, z , size)               
+    static method posloc takes texttag tt, location loc, real zoffset returns nothing 
+        call SetTextTagPos(tt, GetLocationX(loc), GetLocationY(loc), zoffset) 
+    endmethod 
+    static method showforce takes texttag tt, force whichForce, boolean show returns nothing 
+        if(IsPlayerInForce(GetLocalPlayer(), whichForce)) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.        
+            call SetTextTagVisibility(tt, show) 
+        endif 
+    endmethod 
+    static method destroytt takes texttag tt returns nothing 
+        call DestroyTextTag(tt) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/16-NUMBER.j ---
+struct Num 
+    // Percent to real :                 
+    // Use: Math.p2r(100,60) = 60% of 100 = 60                 
+    static method p2r takes real CurrentNumber, real Percent returns real 
+        return CurrentNumber * (Percent / 100) 
+    endmethod 
+    static method r2i takes real r returns integer 
+        return R2I(r) 
+    endmethod 
+    static method i2r takes integer i returns real 
+        return I2R(i) 
+    endmethod 
+    static method ri2s takes real r returns string 
+        return I2S(R2I(r)) 
+    endmethod 
+endstruct
 
 //--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
 struct DESTRUCTABLE //Destructable  
@@ -1327,11 +1395,7 @@ endstruct
 //--- Content from folder: ./2-Objective/7.MATH.j ---
 struct Math 
     static location SetUnitZLoc = Location(0, 0) 
-    // Percent to real :               
-    // Use: Math.p2r(100,60) = 60% of 100 = 60               
-    static method p2r takes real CurrentNumber, real Percent returns real 
-        return CurrentNumber * (Percent / 100) 
-    endmethod 
+
     static method rate takes real r returns boolean
         local real rand = 0 
         set rand = GetRandomReal(0,100) 
@@ -1407,8 +1471,8 @@ struct Math
 endstruct
 
 //--- Content from folder: ./2-Objective/8-STRING.j ---
-struct STR
-    //Use:  STR.repeated(1234567,",",3,0) -> 123,456,7 
+struct Str
+    //Use:  Str.repeated(1234567,",",3,0) -> 123,456,7 
     static method repeated takes string s, string str, integer spacing, integer start returns string 
         local integer i = StringLength(s) 
         local integer p = 1 
@@ -1419,7 +1483,7 @@ struct STR
         endloop 
         return s 
     endmethod 
-    //Use: STR.reverse("1234") -> 4321
+    //Use: Str.reverse("1234") -> 4321
     static method reverse takes string s returns string
         local integer i = StringLength(s)
         local string rs = ""
@@ -1654,7 +1718,7 @@ endstruct
 //--- Content from folder: ./4-Event/10- Player - Chat.j ---
 
 struct EV_PLAYER_CHAT 
-    static RANDOM_POOL pool1 //if u have more pool then add more line variables or set it array    
+    static Randompool pool1 //if u have more pool then add more line variables or set it array    
     static method f_Checking takes nothing returns boolean 
         local string s = GetEventPlayerChatString() 
         local player p = GetTriggerPlayer() 
@@ -1681,7 +1745,7 @@ struct EV_PLAYER_CHAT
         return false 
     endmethod 
     static method f_SetupEvent takes nothing returns nothing 
-        set.pool1 = RANDOM_POOL.create() 
+        set.pool1 = Randompool.create() 
         call.pool1.new_value(1, 50, 0, 0) 
         call.pool1.new_value(2, 30, 0, 5) 
         call.pool1.new_value(3, 20, 0, 2) 

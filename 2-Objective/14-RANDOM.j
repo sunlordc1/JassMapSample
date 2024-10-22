@@ -1,23 +1,25 @@
 
-//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing 
-//Uses check example in 4-Event/10- Player - Chat.j
-//====Variables in struct 
-//  static RANDOM_POOL pool1 
-//====Setting 
-// set.pool1 = RANDOM_POOL.create() 
-// call.pool1.new_value(1, 50, 0, 0) 
-// call.pool1.new_value(2, 30, 0, 5) 
-// call.pool1.new_value(3, 20, 0, 2) 
-//====Call when want random
-// set random_value = .pool1.random() 
+//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing  
+//Uses check example in 4-Event/10- Player - Chat.j 
+//====Variables in struct  
+//  static Randompool pool1  
+//====Setting  
+// set.pool1 = Randompool.create()  
+// call.pool1.new_value(1, 50, 0, 0)  
+// call.pool1.new_value(2, 30, 0, 5)  
+// call.pool1.new_value(3, 20, 0, 2)  
+//====Call when want random 
+// set random_value = .pool1.random()  
+//====Destroy => use one time 
+// call .pool1.destroy()  
 
-//Set size array 10 to higher if u have more value            
-struct RANDOM_POOL 
-    integer array value[10] //Use for raw or number or id item                                
-    real array rate_default[10] //Constant rate default                                
-    real array rate[10] // Rate now of item                                
-    real array increase[10] //When drop call a time, rate = rate + increase                                
-    integer times //When the drop call a time, it increase 1                                 
+//Set size array 10 to higher if u have more value             
+struct Randompool 
+    integer array value[10] //Use for raw or number or id item                                 
+    real array rate_default[10] //Constant rate default                                 
+    real array rate[10] // Rate now of item                                 
+    real array increase[10] //When drop call a time, rate = rate + increase                                 
+    integer times //When the drop call a time, it increase 1                                  
     integer size = -1 
     method new_value takes integer value, integer rate_default, integer rate, integer increase returns nothing 
         set.size =.size + 1 
@@ -62,7 +64,7 @@ struct RANDOM_POOL
             set accumulated = accumulated +.rate[bj_int] 
             if random_val <= accumulated then 
                 set v =.value[bj_int] 
-                call.action(bj_int) // Make some stupid code               
+                call.action(bj_int) // Make some stupid code                
                 call.update_rate() 
                 set.times =.times + 1 
                 exitwhen true 
@@ -76,14 +78,14 @@ struct RANDOM_POOL
         return v 
     endmethod 
     method action takes integer index returns nothing 
-        //Code for example                 
+        //Code for example                  
         if.times == 5 then 
             call BJDebugMsg("Critical DROP! 5 times") 
 
         endif 
         if index == 2 then 
             call BJDebugMsg("Critical DROP! reset rate to default") 
-            //Reset when the value [9] drop                
+            //Reset when the value [9] drop                 
             set bj_int = 0 
             loop 
                 exitwhen bj_int >.size 

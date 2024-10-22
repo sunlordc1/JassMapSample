@@ -1,6 +1,6 @@
 
 struct EV_PLAYER_CHAT 
-    static RANDOM_POOL pool1 //if u have more pool then add more line variables or set it array    
+    static Randompool pool1 //if u have more pool then add more line variables or set it array    
     static method f_Checking takes nothing returns boolean 
         local string s = GetEventPlayerChatString() 
         local player p = GetTriggerPlayer() 
@@ -27,7 +27,7 @@ struct EV_PLAYER_CHAT
         return false 
     endmethod 
     static method f_SetupEvent takes nothing returns nothing 
-        set.pool1 = RANDOM_POOL.create() 
+        set.pool1 = Randompool.create() 
         call.pool1.new_value(1, 50, 0, 0) 
         call.pool1.new_value(2, 30, 0, 5) 
         call.pool1.new_value(3, 20, 0, 2) 

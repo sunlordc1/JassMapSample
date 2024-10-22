@@ -1,10 +1,6 @@
 struct Math 
     static location SetUnitZLoc = Location(0, 0) 
-    // Percent to real :               
-    // Use: Math.p2r(100,60) = 60% of 100 = 60               
-    static method p2r takes real CurrentNumber, real Percent returns real 
-        return CurrentNumber * (Percent / 100) 
-    endmethod 
+
     static method rate takes real r returns boolean
         local real rand = 0 
         set rand = GetRandomReal(0,100) 
