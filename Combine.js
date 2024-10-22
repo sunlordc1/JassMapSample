@@ -4,7 +4,7 @@ const path = require('path');
 // List of folders containing .j files
 const folderPaths = ['./1-Variables Library System Func', './2-Objective', './3-Skill', './4-Event', './5-Features', './6-Timers']; // Thay thế với đường dẫn thực tế của cậu
 // Replace with your actual folder paths
-const individualFiles = ['./GAME.j']; // Replace with your actual individual file paths
+const individualFiles = ['./GAME.j','./EXAMPLE.j']; // Replace with your actual individual file paths
 // Output file path with .j extension
 const outputPath = './combine.j';
 

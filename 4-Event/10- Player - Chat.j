@@ -4,6 +4,7 @@ struct EV_PLAYER_CHAT
     static method f_Checking takes nothing returns boolean 
         local string s = GetEventPlayerChatString() 
         local player p = GetTriggerPlayer() 
+        local integer id = GetPlayerId(p)
         local string n = SubString(s, 0, 3) 
         local string i = SubString(s, 3, 5) 
         
@@ -22,6 +23,15 @@ struct EV_PLAYER_CHAT
                 call BJDebugMsg("Type: " + n) 
             endif 
             call.pool1.random() 
+        endif 
+        if SubString(s, 0, 1) == "-" and n == "-ct" then 
+            if ENV_DEV then 
+                call BJDebugMsg("Command: Cheat Test") 
+                call BJDebugMsg("Type: " + n) 
+                call PLAYER.addgold(id,1000)
+                call PLAYER.addlumber(id,1000)
+                call PLAYER.addfoodcap(id,10)
+            endif 
         endif 
         set p = null 
         return false 

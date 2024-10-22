@@ -17,7 +17,8 @@ globals
     hashtable ht = InitHashtable() // This is the hashtable you will use in most situations of the game.          
     hashtable stats = InitHashtable() // For damage system  
     //Timer        
-    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.         
+    constant real TIME_SETUP_EVENT = 0.2 // The time to start setting up events for the game.    
+    constant real TIME_INTERVAL = 1.00 // You can use this varible for setting timer checking in game   (check file 6-Timers/1-Interval.j)
     constant real P32 = 0.03125 // Explore this number; it truly has significance.       
     constant real P64 = 0.03125 * 2 // Explore this number; it truly has significance.     
     //Environment Dev    

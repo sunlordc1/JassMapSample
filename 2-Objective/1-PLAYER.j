@@ -18,7 +18,7 @@ struct PLAYER
     endmethod 
     //=============LUMBER=================== 
     static method lumber takes integer id returns integer 
-        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_GOLD) 
+        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
     endmethod 
     static method setlumber takes integer id, integer value returns nothing 
         call SetPlayerStateBJ(Player(id), PLAYER_STATE_RESOURCE_LUMBER, value) 
@@ -27,6 +27,9 @@ struct PLAYER
         call AdjustPlayerStateBJ(value, Player(id), PLAYER_STATE_RESOURCE_LUMBER) 
     endmethod 
     //=============FOODCAP=================== 
+    static method food takes integer id returns integer 
+        return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_USED) 
+    endmethod 
     static method foodcap takes integer id returns integer 
         return GetPlayerState(Player(id), PLAYER_STATE_RESOURCE_FOOD_CAP) 
     endmethod 
