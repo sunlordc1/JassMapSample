@@ -1,6 +1,6 @@
 
 struct EV_PLAYER_CHAT 
-    static RANDOM_POOL pool1 //if u have more pool then add more line variables or set it array   
+    static RANDOM_POOL pool1 //if u have more pool then add more line variables or set it array    
     static method f_Checking takes nothing returns boolean 
         local string s = GetEventPlayerChatString() 
         local player p = GetTriggerPlayer() 
@@ -21,6 +21,7 @@ struct EV_PLAYER_CHAT
                 call BJDebugMsg("Command: Random Pool") 
                 call BJDebugMsg("Type: " + n) 
             endif 
+            call.pool1.random() 
         endif 
         set p = null 
         return false 
@@ -30,10 +31,10 @@ struct EV_PLAYER_CHAT
         call.pool1.new_value(1, 50, 0, 0) 
         call.pool1.new_value(2, 30, 0, 5) 
         call.pool1.new_value(3, 20, 0, 2) 
-        //This action everytime player chat, careful for use it.       
+        //This action everytime player chat, careful for use it.        
         call.add_chat("", true, function thistype.f_Checking) 
     endmethod 
-    //You can use it for make more command in game instead my .add_chat("",true,function thistype.f_Checking)       
+    //You can use it for make more command in game instead my .add_chat("",true,function thistype.f_Checking)        
     static method add_chat takes string phase, boolean b, code actionfunc returns nothing 
         local integer index 
         local trigger trig = CreateTrigger() 
