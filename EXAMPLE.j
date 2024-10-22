@@ -1,4 +1,4 @@
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                  
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -29,6 +29,9 @@ struct MULTILBOARD_EXAMPLE
     static string array hero_path 
     static method setindex takes integer pid returns nothing 
         call SaveInteger(ht, 0x63746264, GetHandleId(Player(pid)),.max_row) 
+        if ENV_DEV then 
+            call BJDebugMsg("Multiboard[]" + I2S(pid) + "[]" + I2S(.max_row)) 
+        endif 
     endmethod 
     static method I2Row takes integer pid returns integer 
         local integer r = LoadInteger(ht, 0x63746264, GetHandleId(Player(pid))) 
@@ -36,13 +39,13 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                 
+        //                                   
         set bj_int = bj_MAX_PLAYER_SLOTS 
         loop 
             set bj_int = bj_int - 1 
             set.hero_path[bj_int - 1] = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp" 
             if(GetPlayerController(Player(bj_int - 1)) == MAP_CONTROL_USER) and(GetPlayerSlotState(Player(bj_int - 1)) == PLAYER_SLOT_STATE_PLAYING) then 
-                call.setindex(max_row) 
+                call.setindex(.max_row) 
                 set.max_row =.max_row + 1 
             endif 
             exitwhen bj_int == 1 
@@ -57,25 +60,25 @@ struct MULTILBOARD_EXAMPLE
         loop 
             set bj_int = bj_int - 1 
             if I2Row(bj_int + 1) > 0 then 
-                call MULTILBOARD_EXAMPLE.MB.setstyle(1,.I2Row(bj_int), true, true) 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int))) 
-                call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int),.hero_path[bj_int]) 
-                call MULTILBOARD_EXAMPLE.MB.setwidth(1,.I2Row(bj_int), 8) 
+                call MULTILBOARD_EXAMPLE.MB.setstyle(1,.I2Row(bj_int + 1), true, true) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int + 1), GetPlayerName(Player(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
+                call MULTILBOARD_EXAMPLE.MB.setwidth(1,.I2Row(bj_int + 1), 8) 
                 
-                call MULTILBOARD_EXAMPLE.MB.setstyle(2,.I2Row(bj_int), true, true) 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int), I2S(PLAYER.gold(bj_int))) 
-                call MULTILBOARD_EXAMPLE.MB.seticon(2,.I2Row(bj_int), "UI\\Feedback\\Resources\\ResourceGold.blp") 
-                call MULTILBOARD_EXAMPLE.MB.setwidth(2,.I2Row(bj_int), 8) 
+                call MULTILBOARD_EXAMPLE.MB.setstyle(2,.I2Row(bj_int + 1), true, true) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.seticon(2,.I2Row(bj_int + 1), "UI\\Feedback\\Resources\\ResourceGold.blp") 
+                call MULTILBOARD_EXAMPLE.MB.setwidth(2,.I2Row(bj_int + 1), 8) 
             
-                call MULTILBOARD_EXAMPLE.MB.setstyle(3,.I2Row(bj_int), true, true) 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(3,.I2Row(bj_int), I2S(PLAYER.lumber(bj_int))) 
-                call MULTILBOARD_EXAMPLE.MB.seticon(3,.I2Row(bj_int), "UI\\Feedback\\Resources\\ResourceLumber.blp") 
-                call MULTILBOARD_EXAMPLE.MB.setwidth(3,.I2Row(bj_int), 8) 
+                call MULTILBOARD_EXAMPLE.MB.setstyle(3,.I2Row(bj_int + 1), true, true) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(3,.I2Row(bj_int + 1), I2S(PLAYER.lumber(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.seticon(3,.I2Row(bj_int + 1), "UI\\Feedback\\Resources\\ResourceLumber.blp") 
+                call MULTILBOARD_EXAMPLE.MB.setwidth(3,.I2Row(bj_int + 1), 8) 
 
-                call MULTILBOARD_EXAMPLE.MB.setstyle(4,.I2Row(bj_int), true, true) 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(4,.I2Row(bj_int), I2S(PLAYER.food(bj_int)) + "/" + I2S(PLAYER.foodcap(bj_int))) 
-                call MULTILBOARD_EXAMPLE.MB.seticon(4,.I2Row(bj_int), "UI\\Feedback\\Resources\\ResourceSupply.blp") 
-                call MULTILBOARD_EXAMPLE.MB.setwidth(4,.I2Row(bj_int), 8) 
+                call MULTILBOARD_EXAMPLE.MB.setstyle(4,.I2Row(bj_int + 1), true, true) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(4,.I2Row(bj_int + 1), I2S(PLAYER.food(bj_int)) + "/" + I2S(PLAYER.foodcap(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.seticon(4,.I2Row(bj_int + 1), "UI\\Feedback\\Resources\\ResourceSupply.blp") 
+                call MULTILBOARD_EXAMPLE.MB.setwidth(4,.I2Row(bj_int + 1), 8) 
             endif 
             exitwhen bj_int == 0 
         endloop 
@@ -85,14 +88,14 @@ struct MULTILBOARD_EXAMPLE
         loop 
             exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))   
-                call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int),.hero_path[bj_int]) 
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))     
+                call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int), I2S(PLAYER.gold(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
             
-                call MULTILBOARD_EXAMPLE.MB.setvalue(3,.I2Row(bj_int), I2S(PLAYER.lumber(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(3,.I2Row(bj_int + 1), I2S(PLAYER.lumber(bj_int))) 
 
-                call MULTILBOARD_EXAMPLE.MB.setvalue(4,.I2Row(bj_int), I2S(PLAYER.food(bj_int)) + "/" + I2S(PLAYER.foodcap(bj_int))) 
+                call MULTILBOARD_EXAMPLE.MB.setvalue(4,.I2Row(bj_int + 1), I2S(PLAYER.food(bj_int)) + "/" + I2S(PLAYER.foodcap(bj_int))) 
             endif 
             set bj_int = bj_int + 1 
         endloop 
