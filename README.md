@@ -1,7 +1,7 @@
 # JassMapSample
  Make a warcraft 3 map using jass, set up the game structure
  ## Im custom code where ?
- By I can upgrade more source, then it's our rule need know
+ By I can update code in source, then it's our rule need know
  ```bash
 
 # 1-Variables Library System Func\\MyCustomCode.j => Make more function support do something in your map
