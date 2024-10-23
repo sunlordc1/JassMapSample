@@ -8,18 +8,20 @@ struct EV_UNIT_DEATH
         local integer hkid = GetHandleId(killer) 
         local integer did = GetUnitTypeId(dying) 
         local integer kid = GetUnitTypeId(killer) 
-        local integer pdid = Num.uid(dying) //Id player of dying   
-        local integer pkid = Num.uid(killer) //Id player of killer   
+        local integer pdid = Num.uid(dying) //Id player of dying    
+        local integer pkid = Num.uid(killer) //Id player of killer    
 
-        //For EXAMPLE QUEST, comment it if not usse  
+        //For EXAMPLE QUEST, comment it if not use   
         if did == QUEST_EXAMPLE.archer_id then 
-            call QUEST_EXAMPLE.kill_archer()
+            call QUEST_EXAMPLE.kill_archer() 
         endif 
         if did == QUEST_EXAMPLE.warrior_id then 
-            call QUEST_EXAMPLE.kill_warrior()
+            call QUEST_EXAMPLE.kill_warrior() 
         endif 
-        //// 
-
+        ////  
+        // ROADLINE_EXAMPLE , comment it if not use   
+        call FlushChildHashtable(road, hdid) 
+        // 
         set killer = null 
         set dying = null 
         return false 

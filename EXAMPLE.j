@@ -1,4 +1,4 @@
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                      
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                               
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -39,7 +39,7 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                                                                       
+        //                                                                                                
         set bj_int = bj_MAX_PLAYER_SLOTS 
         loop 
             set bj_int = bj_int - 1 
@@ -88,7 +88,7 @@ struct MULTILBOARD_EXAMPLE
         loop 
             exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                         
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                                  
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -172,18 +172,39 @@ struct ROADLINE_EXAMPLE
     static integer Almove = 851988 
     static integer Attack = 851983 
     static method io takes unit u, integer order returns boolean 
-        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                            
+        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                                     
     endmethod 
     static method IsNotAction takes unit u returns boolean 
         return not(.io(u,.Move) or.io(u,.Almove) or.io(u,.Attack)) 
     endmethod 
     static method summon takes nothing returns nothing 
-        set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r1), GetRectCenterY(gg_rct_r1), 0) 
-        call Roadline.register(bj_unit, gg_rct_r1, "road1") 
+        local integer roll = GetRandomInt(0, 2) 
+        if roll == 2 then 
+            set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r1), GetRectCenterY(gg_rct_r1), 0) 
+            call Roadline.register(bj_unit, gg_rct_r1, "road1") 
+        elseif roll == 1 then 
+            set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r3), GetRectCenterY(gg_rct_r3), 0) 
+            call Roadline.register(bj_unit, gg_rct_r3, "road2") 
+        else 
+            set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r4), GetRectCenterY(gg_rct_r4), 0) 
+            call Roadline.register(bj_unit, gg_rct_r4, "road3") 
+        endif 
+        call SetUnitPathing(bj_unit, false) 
+
     endmethod 
     static method start takes nothing returns nothing 
-        call Roadline.new(gg_rct_r1, gg_rct_r2, 3, "road1") 
-        call Roadline.new(gg_rct_r2, gg_rct_r3, 3, "road1") 
+        // new ( your_region_now, your_region_come, your_delay , your_road_name , new_road, teleport?) 
+        call Roadline.new(gg_rct_r1, gg_rct_r2, 3, "road1", "", false) 
+        call Roadline.new(gg_rct_r2, gg_rct_r3, 3, "road1", "", false) 
+        
+        call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road1", "road2", false) 
+        //=>   
+        call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road2", "", false) 
+        call Roadline.new(gg_rct_r2, gg_rct_r1, 3, "road2", "road1", false) 
+
+        call Roadline.new(gg_rct_r4, gg_rct_r5, 3, "road3", "", true) 
+        call Roadline.new(gg_rct_r5, gg_rct_r4, 3, "road3", "", true) 
+
     endmethod 
     static method order takes nothing returns nothing 
         local unit e = null 
@@ -197,12 +218,17 @@ struct ROADLINE_EXAMPLE
             set id = GetHandleId(e) 
             if GetUnitState(e, UNIT_STATE_LIFE) > 0 and IsUnitType(e, UNIT_TYPE_STRUCTURE) == false and.IsNotAction(e) then 
                 if Roadline.LoadRoad(id) != "" then 
-                    call BJDebugMsg(I2S(Roadline.LoadDelay(id))) 
                     if Roadline.LoadDelay(id) > 0 then 
                         call Roadline.SaveDelay(id, Roadline.LoadDelay(id) -1) 
                     else 
-                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))   
-                        call IssuePointOrder(e, "move", LoadReal(road, id, StringHash("x")), LoadReal(road, id, StringHash("y"))) 
+                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))            
+                        if Roadline.IsTele(id) then 
+                            call SetUnitPosition(e, Roadline.LoadX(id), Roadline.LoadY(id)) 
+                            call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl", Roadline.LoadX(id), Roadline.LoadY(id))) 
+                        else 
+                            //Change it to "move" or "attack" if attack is target then contact me for more custom       
+                            call IssuePointOrder(e, "move", Roadline.LoadX(id), Roadline.LoadY(id)) 
+                        endif 
                     endif 
                 endif 
             endif 
