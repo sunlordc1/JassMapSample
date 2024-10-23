@@ -1,4 +1,4 @@
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                  
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                       
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -39,7 +39,7 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                   
+        //                                                                        
         set bj_int = bj_MAX_PLAYER_SLOTS 
         loop 
             set bj_int = bj_int - 1 
@@ -88,7 +88,7 @@ struct MULTILBOARD_EXAMPLE
         loop 
             exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))     
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                          
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -99,5 +99,73 @@ struct MULTILBOARD_EXAMPLE
             endif 
             set bj_int = bj_int + 1 
         endloop 
+    endmethod 
+endstruct 
+
+
+struct QUEST_EXAMPLE 
+    static Quest Kill_SkeletonQuest 
+    static Questitem Kill_SkeletonArcher 
+    static integer archer_id = 'nska' 
+    static integer archer = 0 
+    static integer max_archer = 3 
+    static Questitem Kill_SkeletonWarrior 
+    static integer warrior_id = 'nskg' 
+    static integer warrior = 0 
+    static integer max_warrior = 3 
+    static method check_count takes nothing returns nothing 
+   
+    endmethod 
+    static method kill_archer takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonArcher.completed() == false then 
+            set.archer =.archer + 1 
+            set.archer = IMinBJ(.archer,.max_archer) 
+            set str = "Kill Skeleton Archer: " + I2S(.archer) + "/" + I2S(.max_archer) 
+            call.Kill_SkeletonArcher.desc(str) 
+            if.archer ==.max_archer then 
+                call.Kill_SkeletonArcher.setcompleted(true) 
+                call PLAYER.questmsgforce(GetPlayersAll(), str, Questmsg.COMPLETED) 
+            endif 
+            call.update() 
+        endif 
+    endmethod 
+    static method kill_warrior takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonWarrior.completed() == false then 
+            set.warrior =.warrior + 1 
+            set.warrior = IMinBJ(.warrior,.max_warrior) 
+            set str = "Kill Giant Skeleton Warrior: " + I2S(.warrior) + "/" + I2S(.max_warrior) 
+            call.Kill_SkeletonWarrior.desc(str) 
+            if.warrior ==.max_warrior then 
+                call.Kill_SkeletonWarrior.setcompleted(true) 
+                call PLAYER.questmsgforce(GetPlayersAll(), str, Questmsg.COMPLETED) 
+            endif 
+            call.update() 
+        endif 
+    endmethod 
+    static method update takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonQuest != null and.Kill_SkeletonQuest.completed() == false then 
+            if.Kill_SkeletonArcher.completed() == true and.Kill_SkeletonWarrior.completed() == true then 
+                call.Kill_SkeletonQuest.setcompleted(true) 
+                call.Kill_SkeletonQuest.desc("[Complete] Deafeat Skeleton in Forest ") 
+                call PLAYER.questmsgforce(GetPlayersAll(), "Deafeat Skeleton in Forest", Questmsg.COMPLETED) 
+            endif 
+        endif 
+    endmethod 
+    static method start takes nothing returns nothing 
+        local string str = "" 
+        set.Kill_SkeletonQuest = Quest.create() 
+        set str = "Deafeat Skeleton in Forest" 
+        call.Kill_SkeletonQuest.new(Questtype.REQ_DISCOVERED, "Kill Skeleton", str, "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.tga") 
+        
+        set.Kill_SkeletonArcher = Questitem.create() 
+        set str = "Kill Skeleton Archer: " + I2S(.archer) + "/" + I2S(.max_archer) 
+        call.Kill_SkeletonArcher.new(.Kill_SkeletonQuest.q, str) 
+
+        set.Kill_SkeletonWarrior = Questitem.create() 
+        set str = "Kill Giant Skeleton Warrior: " + I2S(.warrior) + "/" + I2S(.max_warrior) 
+        call.Kill_SkeletonWarrior.new(.Kill_SkeletonQuest.q, str) 
     endmethod 
 endstruct

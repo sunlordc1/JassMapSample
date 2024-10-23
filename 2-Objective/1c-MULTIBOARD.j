@@ -1,3 +1,4 @@
+//Uses : see code in file EXAMPLE.j
 struct Multiboard 
     multiboard mb 
     multiboarditem mbitem = null 

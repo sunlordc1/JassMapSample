@@ -10,7 +10,7 @@ globals
     item bj_item = null // instead of bj_lastCreatedItem         
     unit bj_unit = null // instead of bj_lastCreatedUnit         
     effect bj_eff = null // instead of bj_lastCreatedEffect        
-    location bj_loc = Location(0, 0) 
+    location bj_loc = Location(0, 0) //Warning: Don't set bj_loc = Location() use MoveLocation instead
     texttag bj_texttag = null
     timer bj_timer = null
     //Storage        

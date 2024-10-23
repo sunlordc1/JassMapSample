@@ -11,7 +11,7 @@ globals
     item bj_item = null // instead of bj_lastCreatedItem         
     unit bj_unit = null // instead of bj_lastCreatedUnit         
     effect bj_eff = null // instead of bj_lastCreatedEffect        
-    location bj_loc = Location(0, 0) 
+    location bj_loc = Location(0, 0) //Warning: Don't set bj_loc = Location() use MoveLocation instead
     texttag bj_texttag = null
     timer bj_timer = null
     //Storage        
@@ -120,39 +120,14 @@ function Preload_Sound takes unit u, string path returns nothing
     call StartSound(s) 
     call KillSoundWhenDone(s) 
 endfunction 
-// Charge Item   
-function RemoveChargeItem takes item i, integer req returns nothing 
-    call SetItemCharges(i, GetItemCharges(i) -req) 
-    if GetItemCharges(i) <= 0 then 
-        call RemoveItem(i) 
-    endif 
-endfunction 
+
 //====================================================================================  
 ///======= Ultils   
 
 
 
-//====================================================================================
-///======Player 
-function GetPID takes player whichPlayer returns integer
-    return GetPlayerId(whichPlayer)
-endfunction
-   
-function GetUID takes unit u returns integer
-    return GetPlayerId(GetOwningPlayer(u))
-endfunction
 
-// Convert to string by Real to Int
-function RI2S takes real r returns string 
-    return I2S(R2I(r)) 
-endfunction 
-//Boolean to String
-function B2S takes boolean b returns string 
-    if b then 
-        return "True" 
-    endif 
-    return "False" 
-endfunction 
+
 
 //--- Content from folder: ./1-Variables Library System Func/4a-DamageTextTag.j ---
 
@@ -459,7 +434,7 @@ struct Proc
     endmethod 
 endstruct 
 
-//--- Content from folder: ./2-Objective/1-PLAYER.j ---
+//--- Content from folder: ./2-Objective/1a-PLAYER.j ---
 struct PLAYER 
     static boolean array IsDisconect 
 
@@ -537,6 +512,76 @@ struct PLAYER
             call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
         endif 
     endmethod 
+    static method questmsgplayer takes player p, string msg, integer msgtype returns nothing 
+        if GetLocalPlayer() == p then 
+            call.questmsg(GetLocalPlayer(), msg, msgtype) 
+        endif 
+    endmethod 
+
+    static method questmsgforce takes force f, string msg, integer msgtype returns nothing 
+        if(IsPlayerInForce(GetLocalPlayer(), f)) then 
+            call.questmsg(GetLocalPlayer(), msg, msgtype) 
+        endif 
+    endmethod 
+    static method questmsg takes player p, string message, integer msgtype returns nothing 
+        if(msgtype == Questmsg.DISCOVERED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUEST, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUEST, message) 
+            call StartSound(bj_questDiscoveredSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.UPDATED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTUPDATE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTUPDATE, message) 
+            call StartSound(bj_questUpdatedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.COMPLETED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTDONE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTDONE, message) 
+            call StartSound(bj_questCompletedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.FAILED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTFAILED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTFAILED, message) 
+            call StartSound(bj_questFailedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.REQUIREMENT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTREQUIREMENT, message) 
+        elseif(msgtype == Questmsg.MISSIONFAILED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_MISSIONFAILED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_MISSIONFAILED, message) 
+            call StartSound(bj_questFailedSound) 
+        elseif(msgtype == Questmsg.HINT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_HINT, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_HINT, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.ALWAYSHINT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.SECRET) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_SECRET, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_SECRET, message) 
+            call StartSound(bj_questSecretSound) 
+        elseif(msgtype == Questmsg.UNITACQUIRED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITACQUIRED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITACQUIRED, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.UNITAVAILABLE) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITAVAILABLE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITAVAILABLE, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.ITEMACQUIRED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ITEMACQUIRED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ITEMACQUIRED, message) 
+            call StartSound(bj_questItemAcquiredSound) 
+        elseif(msgtype == Questmsg.WARNING) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_WARNING, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_WARNING, message) 
+            call StartSound(bj_questWarningSound) 
+        else 
+            // Unrecognized message type - ignore the request.                                      
+        endif 
+    endmethod 
     //=============MISC=================== 
     //Force player use a key in board
     static method ForceUIKeyBJ takes player whichPlayer, string key, unit u returns nothing 
@@ -556,39 +601,143 @@ struct PLAYER
     endmethod 
 endstruct
 
-//--- Content from folder: ./2-Objective/10-GROUP.j ---
-struct Group 
-    static method pick takes group g returns unit 
-        return FirstOfGroup(g) 
+//--- Content from folder: ./2-Objective/1b-TIMERDIALOG.j ---
+  
+//Uses : see code in file EXAMPLE.j
+struct CountdownTimer 
+    timer t = null 
+    timerdialog td = null 
+    method newdialog takes string title, real timeout, boolean periodic, code func returns nothing 
+        set.t = CreateTimer() 
+        call TimerStart(.t, timeout, periodic, func) 
+        set.td = CreateTimerDialog(.t) 
+        call TimerDialogSetTitle(.td, title) 
+        call TimerDialogDisplay(.td, true) 
     endmethod 
-    static method get takes group whichGroup, integer index returns unit 
-        return BlzGroupUnitAt(whichGroup, index) 
+    method pause takes boolean status returns nothing 
+        if status then 
+            call PauseTimer(.t) 
+        else 
+            call ResumeTimer(.t) 
+        endif 
     endmethod 
-    static method size takes group whichGroup returns integer 
-        return BlzGroupGetSize(whichGroup) 
+    method title takes string title returns nothing 
+        call TimerDialogSetTitle(.td, title) 
     endmethod 
-    static method add takes unit whichUnit, group whichGroup returns boolean 
-        return GroupAddUnit(whichGroup, whichUnit) 
+    method titlecolor takes integer red, integer green, integer blue, integer transparency returns nothing 
+        call TimerDialogSetTitleColor(.td, red, green, blue, transparency) 
     endmethod 
-    static method remove takes unit whichUnit, group whichGroup returns boolean 
-        return GroupRemoveUnit(whichGroup, whichUnit) 
+    method timercolor takes integer red, integer green, integer blue, integer transparency returns nothing 
+        call TimerDialogSetTimeColor(.td, red, green, blue, transparency) 
     endmethod 
-    static method have takes unit whichUnit, group whichGroup returns boolean 
-        return IsUnitInGroup(whichUnit, whichGroup) 
+    method display takes boolean status returns nothing 
+        call TimerDialogDisplay(.td, status) 
     endmethod 
-    static method release takes group whichGroup returns nothing 
-        call GroupClear(whichGroup) 
-        call DestroyGroup(whichGroup) 
+    method displayx takes boolean status, player p returns nothing 
+        if(GetLocalPlayer() == p) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.       
+            call TimerDialogDisplay(.td, status) 
+        endif 
     endmethod 
-    static method enum takes group whichGroup, real x, real y, real radius returns nothing 
-        call GroupEnumUnitsInRange(whichGroup, x, y, radius, null) 
+    method destroytd takes nothing returns nothing 
+        call DestroyTimerDialog(.td) 
+        call DestroyTimer(.t) 
     endmethod 
-    static method new takes nothing returns group 
-        return CreateGroup() 
-    endmethod 
-endstruct 
+endstruct
 
-//--- Content from folder: ./2-Objective/11-FRAMEHANDLE.j ---
+//--- Content from folder: ./2-Objective/1c-MULTIBOARD.j ---
+//Uses : see code in file EXAMPLE.j
+struct Multiboard 
+    multiboard mb 
+    multiboarditem mbitem = null 
+
+    method new takes integer rows, integer cols, string title returns nothing 
+        set.mb = CreateMultiboard() 
+        call MultiboardSetRowCount(.mb, rows) 
+        call MultiboardSetColumnCount(.mb, cols) 
+        call MultiboardSetTitleText(.mb, title) 
+        call MultiboardDisplay(.mb, true) 
+    endmethod 
+    method display takes boolean status returns nothing 
+        call MultiboardDisplay(.mb, status) 
+    endmethod 
+    method displayx takes boolean status, player p returns nothing 
+        if(GetLocalPlayer() == p) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.                  
+            call MultiboardDisplay(.mb, status) 
+        endif 
+    endmethod 
+    method minimize takes boolean minimize returns nothing 
+        call MultiboardMinimize(.mb, minimize) 
+    endmethod 
+    method clear takes nothing returns nothing 
+        call MultiboardClear(.mb) 
+    endmethod 
+    method title takes string title returns nothing 
+        call MultiboardSetTitleText(.mb, title) 
+    endmethod 
+    method colortitle takes integer red, integer green, integer blue, integer transparency returns nothing 
+        call MultiboardSetTitleTextColor(.mb, red, green, blue, transparency) 
+    endmethod 
+    method rowcount takes integer row returns nothing 
+        call MultiboardSetRowCount(.mb, row) 
+    endmethod 
+    method colcount takes integer col returns nothing 
+        call MultiboardSetColumnCount(.mb, col) 
+    endmethod 
+    //Dont use it.    
+    method finditem takes integer col, integer row returns nothing 
+        local integer curRow = 0 
+        local integer curCol = 0 
+        local integer numRows = MultiboardGetRowCount(.mb) 
+        local integer numCols = MultiboardGetColumnCount(.mb) 
+        loop 
+            set curRow = curRow + 1 
+            exitwhen curRow > numRows 
+            if(row == 0 or row == curRow) then 
+                set curCol = 0 
+                loop 
+                    set curCol = curCol + 1 
+                    exitwhen curCol > numCols 
+                    if(col == 0 or col == curCol) then 
+                        set.mbitem = MultiboardGetItem(.mb, curRow - 1, curCol - 1) 
+                    endif 
+                endloop 
+            endif 
+        endloop 
+    endmethod 
+    //Show value and icon in col of row     
+    method setstyle takes integer col, integer row, boolean showValue, boolean showIcon returns nothing 
+        call.finditem(col, row) 
+        call MultiboardSetItemStyle(.mbitem, showValue, showIcon) 
+        call MultiboardReleaseItem(.mbitem) 
+    endmethod 
+    method setvalue takes integer col, integer row, string val returns nothing 
+        call.finditem(col, row) 
+        call MultiboardSetItemValue(.mbitem, val) 
+        call MultiboardReleaseItem(.mbitem) 
+    endmethod 
+    method setcolor takes integer col, integer row, integer red, integer green, integer blue, integer transparency returns nothing 
+        call.finditem(col, row) 
+        call MultiboardSetItemValueColor(.mbitem, red, green, blue, transparency) 
+        call MultiboardReleaseItem(.mbitem) 
+    endmethod 
+    method setwidth takes integer col, integer row, real width returns nothing 
+        call.finditem(col, row) 
+        call MultiboardSetItemWidth(.mbitem, width / 100.0) 
+        call MultiboardReleaseItem(.mbitem) 
+    endmethod 
+    method seticon takes integer col, integer row, string path returns nothing 
+        call.finditem(col, row) 
+        call MultiboardSetItemIcon(.mbitem, path) 
+        call MultiboardReleaseItem(.mbitem) 
+    endmethod 
+    method destroymb takes nothing returns nothing 
+        call DestroyMultiboard(.mb)
+    endmethod
+endstruct
+
+//--- Content from folder: ./2-Objective/1d-FRAMEHANDLE.j ---
 
 //Frame is in a higher category of map editing; I only provide a simple solution for this section.
 struct Frame 
@@ -627,7 +776,7 @@ struct Frame
         endif 
     endmethod 
     static method debug takes nothing returns nothing 
-        call.fixed(GetPID(GetTriggerPlayer())) 
+        call.fixed(Num.pid(GetTriggerPlayer())) 
     endmethod 
     static method get takes nothing returns framehandle 
         return BlzGetTriggerFrame() 
@@ -775,437 +924,200 @@ struct Frame
     endmethod 
 endstruct
 
-//--- Content from folder: ./2-Objective/12-DEBUFF.j ---
-struct Buff 
-    static boolean array is_target 
-    static boolean array is_point 
-    static boolean array is_notarget 
-    static string array order_name 
-    static integer array ability_id 
-    static integer id = -1 
-    static integer STUN = 0 
-    static integer SLOW = 0 
-    private static method newbuff takes boolean is_target, boolean is_point, boolean is_notarget, string order_name, integer ability_id returns nothing 
-        set.id =.id + 1 
-        set.is_target[.id] = is_target 
-        set.is_point[.id] = is_point 
-        set.is_notarget[.id] = is_notarget 
-        set.order_name[.id] = order_name 
-        set.ability_id[.id] = ability_id 
-        call Preload_Ability(ability_id) 
+//--- Content from folder: ./2-Objective/1e-LEADERBOARD.j ---
+//I don't use leaderboard and not have experience for do it...
+
+// call CreateLeaderboardBJ( GetPlayersAll(), "TRIGSTR_040" )    
+// call DestroyLeaderboardBJ( GetLastCreatedLeaderboard() )    
+// call LeaderboardSortItemsBJ( GetLastCreatedLeaderboard(), bj_SORTTYPE_SORTBYVALUE, false )    
+// call LeaderboardDisplayBJ( false, GetLastCreatedLeaderboard() )    
+// call LeaderboardSetLabelBJ( GetLastCreatedLeaderboard(), "TRIGSTR_042" )    
+// call LeaderboardSetLabelColorBJ( GetLastCreatedLeaderboard(), 100, 80, 20, 0 )    
+// call LeaderboardSetValueColorBJ( GetLastCreatedLeaderboard(), 100, 80, 20, 0 )    
+// call LeaderboardSetStyleBJ( GetLastCreatedLeaderboard(), true, true, true, true )    
+// call LeaderboardAddItemBJ( Player(0), GetLastCreatedLeaderboard(), "TRIGSTR_044", 0 )    
+// call LeaderboardRemovePlayerItemBJ( Player(0), GetLastCreatedLeaderboard() )    
+// call LeaderboardSetPlayerItemLabelBJ( Player(0), GetLastCreatedLeaderboard(), "TRIGSTR_046" )    
+// call LeaderboardSetPlayerItemLabelColorBJ( Player(0), GetLastCreatedLeaderboard(), 100, 80, 20, 0 )    
+// call LeaderboardSetPlayerItemValueBJ( Player(0), GetLastCreatedLeaderboard(), 0 )    
+// call LeaderboardSetPlayerItemValueColorBJ( Player(0), GetLastCreatedLeaderboard(), 100, 80, 20, 0 )    
+// call LeaderboardSetPlayerItemStyleBJ( Player(0), GetLastCreatedLeaderboard(), true, true, true )  
+
+//Uses : see code in file EXAMPLE.j
+// struct Leaderboard 
+//     leaderboard lb 
+//     method new takes string title returns nothing 
+//         set.lb = CreateLeaderboard() 
+//         call LeaderboardSetLabel(.lb, title) 
+//     endmethod 
+//     method setforce takes force f, boolean display returns nothing 
+//         call ForceSetLeaderboardBJ(.lb, f) 
+//         call LeaderboardDisplay(.lb, display) 
+//     endif 
+//     method display takes boolean status returns nothing 
+//         call LeaderboardDisplay(.lb, status) 
+//     endmethod 
+//     method displayx takes boolean status, player p returns nothing 
+//         if(GetLocalPlayer() == p) then 
+//             // Use only local code (no net traffic) within this block to avoid desyncs.                     
+//             call LeaderboardDisplay(.lb, status) 
+//         endif 
+//     endmethod 
+//     method setlabel takes string label returns nothing 
+//         local integer size = LeaderboardGetItemCount(lb) 
+//         call LeaderboardSetLabel(.lb, label) 
+//         if(LeaderboardGetLabelText(.lb) == "") then 
+//             set size = size - 1 
+//         endif 
+//         call LeaderboardSetSizeByItemCount(lb, size) 
+//     endmethod 
+
+//     method destroylb takes boolean status returns nothing 
+//         call DestroyLeaderboard(.lb) 
+//     endmethod 
+// endstruct
+
+//--- Content from folder: ./2-Objective/1e-QUEST.j ---
+// call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "TRIGSTR_048", "TRIGSTR_049", "ReplaceableTextures\\CommandButtons\\BTNAmbush.blp")                                  
+// call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "TRIGSTR_047")                        
+
+// call DestroyQuestBJ(GetLastCreatedQuestBJ())                       
+// call QuestSetEnabledBJ(false, GetLastCreatedQuestBJ())                      
+// call QuestSetCompletedBJ(GetLastCreatedQuestBJ(), true)                     
+// call QuestSetFailedBJ(GetLastCreatedQuestBJ(), true)                    
+// call QuestSetDiscoveredBJ(GetLastCreatedQuestBJ(), true)                    
+// call QuestSetTitleBJ(GetLastCreatedQuestBJ(), "TRIGSTR_052")                  
+// call QuestSetDescriptionBJ(GetLastCreatedQuestBJ(), "TRIGSTR_054")                  
+
+
+// call FlashQuestDialogButtonBJ()                  
+struct Questmsg 
+    static integer DISCOVERED = 0 
+    static integer UPDATED = 1 
+    static integer COMPLETED = 2 
+    static integer FAILED = 3 
+    static integer REQUIREMENT = 4 
+    static integer MISSIONFAILED = 5 
+    static integer ALWAYSHINT = 6 
+    static integer HINT = 7 
+    static integer SECRET = 8 
+    static integer UNITACQUIRED = 9 
+    static integer UNITAVAILABLE = 10 
+    static integer ITEMACQUIRED = 11 
+    static integer WARNING = 12 
+endstruct 
+struct Questtype 
+    static integer REQ_DISCOVERED = 0 
+    static integer OPT_DISCOVERED = 2 
+    static integer REQ_UNDISCOVERED = 1 
+    static integer OPT_UNDISCOVERED = 3 
+endstruct 
+//Make only one time with .new () deafeat condition in quest tab , change it with .desc if you change condition to defeat               
+struct DeafeatQuest 
+    static method new takes string desc returns nothing 
+        set bj_lastCreatedDefeatCondition = CreateDefeatCondition() 
+        call DefeatConditionSetDescription(bj_lastCreatedDefeatCondition, desc) 
+        call FlashQuestDialogButton() 
     endmethod 
-    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer buff_lv, integer buff_dur returns boolean 
-        if ENV_DEV then 
-            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(buff_lv)) 
-        endif 
-        //You can custom buff your rule, here is example                             
-        if buff_id > -1 and buff_id <= id then 
-            if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.target(.order_name[buff_id], target)    
-                // call Dummy.reset()    
-                call Dummy.target(.order_name[buff_id], target,.ability_id[buff_id], buff_lv) 
-
-                if ENV_DEV then 
-                    call PLAYER.systemchat(Player(0), "[] Target") 
-                endif 
-                return false 
-            endif 
-            if.is_point[buff_id] then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.point(.order_name[buff_id], x, y)    
-                // call Dummy.reset()    
-
-                return false 
-            endif 
-            if.is_notarget[buff_id] then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.notarget(.order_name[buff_id])    
-                // call Dummy.reset()    
-                return false 
-            endif 
-        endif 
-        return false 
+    static method desc takes string str returns nothing 
+        call DefeatConditionSetDescription(bj_lastCreatedDefeatCondition, str) 
+        call FlashQuestDialogButton() 
     endmethod 
-    private static method onInit takes nothing returns nothing 
-        call.newbuff(true, false, false, "creepthunderbolt", 'A001') 
-        set.STUN =.id 
-        call.newbuff(true, false, false, "slow", 'A002') 
-        set.SLOW =.id 
-    endmethod 
-endstruct
-
-//--- Content from folder: ./2-Objective/13-Quest.j ---
-
-
-//--- Content from folder: ./2-Objective/14-RANDOM.j ---
-
-//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing  
-//Uses check example in 4-Event/10- Player - Chat.j 
-//====Variables in struct  
-//  static Randompool pool1  
-//====Setting  
-// set.pool1 = Randompool.create()  
-// call.pool1.new_value(1, 50, 0, 0)  
-// call.pool1.new_value(2, 30, 0, 5)  
-// call.pool1.new_value(3, 20, 0, 2)  
-//====Call when want random 
-// set random_value = .pool1.random()  
-//====Destroy => use one time 
-// call .pool1.destroy()  
-
-//Set size array 10 to higher if u have more value             
-struct Randompool 
-    integer array value[10] //Use for raw or number or id item                                 
-    real array rate_default[10] //Constant rate default                                 
-    real array rate[10] // Rate now of item                                 
-    real array increase[10] //When drop call a time, rate = rate + increase                                 
-    integer times //When the drop call a time, it increase 1                                  
-    integer size = -1 
-    method new_value takes integer value, integer rate_default, integer rate, integer increase returns nothing 
-        set.size =.size + 1 
-        set.value[.size] = value 
-        set.rate_default[.size] = rate_default 
-        set.rate[.size] = rate + rate_default 
-        set.increase[.size] = increase 
-    endmethod 
-    method update_rate takes nothing returns nothing 
-        set bj_int = 0 
-        loop 
-            exitwhen bj_int >.size 
-            set.rate[bj_int] =.rate[bj_int] +.increase[bj_int] 
-            set bj_int = bj_int + 1 
-        endloop 
-    endmethod 
-    method total takes nothing returns real 
-        local real total = 0 
-        set bj_int = 0 
-        loop 
-            exitwhen bj_int >.size 
-            set total = total +.rate[bj_int] 
-            set bj_int = bj_int + 1 
-        endloop 
-        return total 
-    endmethod 
-    method random takes nothing returns integer 
-        local integer v = -1 
-        local real total = 0 
-        local real random_val = 0 
-        local real accumulated = 0 
-        set total =.total() 
-  
-        set random_val = GetRandomReal(0, total) 
-        if ENV_DEV then 
-            call BJDebugMsg("random_val: " + R2S(random_val) + " / " + "Total: " + R2S(total)) 
-            call BJDebugMsg("Number of Value Random: " + I2S(.size + 1)) 
-        endif 
-        set bj_int = 0 
-        loop 
-            exitwhen bj_int >.size 
-            set accumulated = accumulated +.rate[bj_int] 
-            if random_val <= accumulated then 
-                set v =.value[bj_int] 
-                call.action(bj_int) // Make some stupid code                
-                call.update_rate() 
-                set.times =.times + 1 
-                exitwhen true 
-            endif 
-            set bj_int = bj_int + 1 
-        endloop 
-        if ENV_DEV then 
-            call BJDebugMsg(".accumulated: " + R2S(accumulated) + " [] Values: " + R2S(v) + "[] Times: " + R2S(times)) 
-        endif 
-
-        return v 
-    endmethod 
-    method action takes integer index returns nothing 
-        //Code for example                  
-        if.times == 5 then 
-            call BJDebugMsg("Critical DROP! 5 times") 
-
-        endif 
-        if index == 2 then 
-            call BJDebugMsg("Critical DROP! reset rate to default") 
-            //Reset when the value [9] drop                 
-            set bj_int = 0 
-            loop 
-                exitwhen bj_int >.size 
-                set.rate[bj_int] =.rate_default[bj_int] 
-                set bj_int = bj_int + 1 
-            endloop 
-        endif 
+    static method destroydq takes string desc returns nothing 
+        call DestroyDefeatCondition(bj_lastCreatedDefeatCondition) 
     endmethod 
 endstruct 
 
-
-//--- Content from folder: ./2-Objective/15-TEXTTAG.j ---
-
-struct Texttag 
-    //Use:                    
-    //set bj_loc = MoveLocation(x,y)                    
-    //call TEXTTAG.newloc(str, bj_loc, z , size)                      
-    static method new takes string str, location loc, real zoffset, real size returns texttag 
-        set bj_texttag = CreateTextTag() 
-        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
-        call SetTextTagPos(bj_texttag, GetLocationX(loc), GetLocationY(loc), zoffset) 
-        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
-        return bj_texttag 
+struct Quest 
+    quest q = null 
+    //new ( questType,  title,  description,  iconPath)  
+    method new takes integer questType, string title, string description, string iconPath returns nothing 
+        local boolean required = (questType == 0) or(questType == 1) 
+        local boolean discovered = (questType == 0) or(questType == 2) 
+        set.q = CreateQuest() 
+        call QuestSetTitle(.q, title) 
+        call QuestSetDescription(.q, description) 
+        call QuestSetIconPath(.q, iconPath) 
+        call QuestSetRequired(.q, required) 
+        call QuestSetDiscovered(.q, discovered) 
+        call QuestSetCompleted(.q, false) 
     endmethod 
-    static method unit takes string str, unit u, real zoffset, real size returns texttag 
-        set bj_texttag = CreateTextTag() 
-        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
-        call SetTextTagPosUnit(bj_texttag, u, zoffset) 
-        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
-        return bj_texttag 
-    endmethod 
-    static method last takes nothing returns texttag 
-        return bj_texttag 
-    endmethod 
-    //Use: call TEXTTAG.color(tt,0-255,0-255,0-255,0-255,0-255)                      
-    static method color takes texttag tt, integer red, integer green, integer blue, integer transparency returns nothing 
-        call SetTextTagColor(tt, red, green, blue, transparency) 
-    endmethod 
-    static method colorpercent takes texttag tt, real red, real green, real blue, real transparency returns nothing 
-        call SetTextTagColor(tt, PercentToInt(red, 255), PercentToInt(green, 255), PercentToInt(blue, 255), PercentToInt((100.0 - transparency), 255)) 
-    endmethod 
-    static method age takes texttag tt, real age returns nothing 
-        call SetTextTagAge(tt, age) 
-    endmethod 
-    static method lifespan takes texttag tt, real lifespan returns nothing 
-        call SetTextTagLifespan(tt, lifespan) 
-    endmethod 
-    static method fadepoint takes texttag tt, real fadepoint returns nothing 
-        call SetTextTagFadepoint(tt, fadepoint) 
-    endmethod 
-    static method velocity takes texttag tt, real speed, real angle returns nothing 
-        local real vel = (speed * 0.071) / 128 
-        local real xvel = vel * Cos(angle * bj_DEGTORAD) 
-        local real yvel = vel * Sin(angle * bj_DEGTORAD) 
-        call SetTextTagVelocity(tt, xvel, yvel) 
-    endmethod 
-    static method permanent takes texttag tt, boolean flag returns nothing 
-        call SetTextTagPermanent(tt, flag) 
-    endmethod 
-    static method suspended takes texttag tt, boolean flag returns nothing 
-        call SetTextTagSuspended(tt, flag) 
-    endmethod 
-    static method text takes texttag tt, string str, real size returns nothing 
-        call SetTextTagText(tt, str, (size * 0.023) / 10) 
-    endmethod 
-    //Uses: Move texttag to point of unit           
-    static method posunit takes texttag tt, unit u, real zoffset returns nothing 
-        call SetTextTagPosUnit(tt, u, zoffset) 
-    endmethod 
-    //Uses: Move texttag to point x ,y           
-    //set bj_loc = MoveLocation(x,y)                    
-    //call TEXTTAG.posloc(str, bj_loc, z , size)                
-    static method posloc takes texttag tt, location loc, real zoffset returns nothing 
-        call SetTextTagPos(tt, GetLocationX(loc), GetLocationY(loc), zoffset) 
-    endmethod 
-    static method showforce takes texttag tt, force whichForce, boolean show returns nothing 
-        if(IsPlayerInForce(GetLocalPlayer(), whichForce)) then 
-            // Use only local code (no net traffic) within this block to avoid desyncs.         
-            call SetTextTagVisibility(tt, show) 
-        endif 
-    endmethod 
-    static method destroytt takes texttag tt returns nothing 
-        call DestroyTextTag(tt) 
-    endmethod 
-endstruct
-
-//--- Content from folder: ./2-Objective/16-NUMBER.j ---
-struct Num 
-    // Percent to real :                 
-    // Use: Math.p2r(100,60) = 60% of 100 = 60                 
-    static method p2r takes real CurrentNumber, real Percent returns real 
-        return CurrentNumber * (Percent / 100) 
-    endmethod 
-    static method r2i takes real r returns integer 
-        return R2I(r) 
-    endmethod 
-    static method i2r takes integer i returns real 
-        return I2R(i) 
-    endmethod 
-    static method ri2s takes real r returns string 
-        return I2S(R2I(r)) 
-    endmethod 
-endstruct
-
-//--- Content from folder: ./2-Objective/17-TIMERDIALOG.j ---
+ 
   
-struct CountdownTimer 
-    timer t = null 
-    timerdialog td = null 
-    method newdialog takes string title, real timeout, boolean periodic, code func returns nothing 
-        set.t = CreateTimer() 
-        call TimerStart(.t, timeout, periodic, func) 
-        set.td = CreateTimerDialog(.t) 
-        call TimerDialogSetTitle(.td, title) 
-        call TimerDialogDisplay(.td, true) 
+    //GET      
+    //======Status   
+    method enabled takes nothing returns boolean 
+        return IsQuestEnabled(.q) 
     endmethod 
-    method pause takes boolean status returns nothing 
-        if status then 
-            call PauseTimer(.t) 
-        else 
-            call ResumeTimer(.t) 
-        endif 
+    method completed takes nothing returns boolean 
+        return IsQuestCompleted(.q) 
     endmethod 
-    method title takes string title returns nothing 
-        call TimerDialogSetTitle(.td, title) 
+    method failed takes nothing returns boolean 
+        return IsQuestFailed(.q) 
     endmethod 
-    method titlecolor takes integer red, integer green, integer blue, integer transparency returns nothing 
-        call TimerDialogSetTitleColor(.td, red, green, blue, transparency) 
+    method discovered takes nothing returns boolean 
+        return IsQuestDiscovered(.q) 
     endmethod 
-    method timercolor takes integer red, integer green, integer blue, integer transparency returns nothing 
-        call TimerDialogSetTimeColor(.td, red, green, blue, transparency) 
+    method required takes nothing returns boolean 
+        return IsQuestRequired(.q) 
     endmethod 
-    method display takes boolean status returns nothing 
-        call TimerDialogDisplay(.td, status) 
+    //SET      
+    //=====Status   
+    method setenabled takes boolean status returns nothing 
+        call QuestSetEnabled(.q, status) 
     endmethod 
-    method displayx takes boolean status, player p returns nothing 
-        if(GetLocalPlayer() == p) then 
-            // Use only local code (no net traffic) within this block to avoid desyncs.       
-            call TimerDialogDisplay(.td, status) 
-        endif 
+    method setcompleted takes boolean status returns nothing 
+        call QuestSetCompleted(.q, status) 
     endmethod 
-    method destroytd takes nothing returns nothing 
-        call DestroyTimerDialog(.td) 
-        call DestroyTimer(.t) 
+    method setfailed takes boolean status returns nothing 
+        call QuestSetFailed(.q, status) 
     endmethod 
-endstruct
+    method setdiscovered takes boolean status returns nothing 
+        call QuestSetDiscovered(.q, status) 
+    endmethod 
+    method setrequired takes boolean status returns nothing 
+        call QuestSetRequired(.q, status) 
+    endmethod 
+    //=====Content   
+    method title takes string str returns nothing 
+        call QuestSetTitle(.q, str) 
+    endmethod 
+    method desc takes string str returns nothing 
+        call QuestSetDescription(.q, str) 
+    endmethod 
 
-//--- Content from folder: ./2-Objective/18-MULTIBOARD.j ---
-// call CreateMultiboardBJ(1, 1, "TRIGSTR_035")             
-// call DestroyMultiboardBJ(GetLastCreatedMultiboard()) 
-// call MultiboardDisplayBJ(false, GetLastCreatedMultiboard())           
-// call MultiboardAllowDisplayBJ(false) 
-// call MultiboardMinimizeBJ(true, GetLastCreatedMultiboard())           
-// call MultiboardClear(GetLastCreatedMultiboard())           
-// call MultiboardSetTitleText(GetLastCreatedMultiboard(), "TRIGSTR_034")          
-// call MultiboardSetTitleTextColorBJ(GetLastCreatedMultiboard(), 100, 80, 20, 0)         
-// call MultiboardSetRowCount(GetLastCreatedMultiboard(), 1)         
-// call MultiboardSetColumnCount(GetLastCreatedMultiboard(), 1)         
-// call MultiboardSetItemStyleBJ(GetLastCreatedMultiboard(), 1, 1, true, true)        
-// call MultiboardSetItemValueBJ(GetLastCreatedMultiboard(), 1, 1, "TRIGSTR_037")       
-// call MultiboardSetItemColorBJ(GetLastCreatedMultiboard(), 1, 1, 100, 80, 20, 0)   
-// call MultiboardSetItemWidthBJ(GetLastCreatedMultiboard(), 1, 1, 3)  
-// call MultiboardSetItemIconBJ(GetLastCreatedMultiboard(), 1, 1, "UI\\Feedback\\Resources\\ResourceGold.blp") 
-struct Multiboard 
-    multiboard mb 
-    multiboarditem mbitem = null 
-
-    method new takes integer rows, integer cols, string title returns nothing 
-        set.mb = CreateMultiboard() 
-        call MultiboardSetRowCount(.mb, rows) 
-        call MultiboardSetColumnCount(.mb, cols) 
-        call MultiboardSetTitleText(.mb, title) 
-        call MultiboardDisplay(.mb, true) 
+    /////////////      
+    method flash takes nothing returns nothing 
+        call FlashQuestDialogButton() 
     endmethod 
-    method display takes boolean status returns nothing 
-        call MultiboardDisplay(.mb, status) 
+    method destroyq takes nothing returns nothing 
+        call DestroyQuest(.q) 
     endmethod 
-    method displayx takes boolean status, player p returns nothing 
-        if(GetLocalPlayer() == p) then 
-            // Use only local code (no net traffic) within this block to avoid desyncs.                  
-            call MultiboardDisplay(.mb, status) 
-        endif 
-    endmethod 
-    method minimize takes boolean minimize returns nothing 
-        call MultiboardMinimize(.mb, minimize) 
-    endmethod 
-    method clear takes nothing returns nothing 
-        call MultiboardClear(.mb) 
-    endmethod 
-    method title takes string title returns nothing 
-        call MultiboardSetTitleText(.mb, title) 
-    endmethod 
-    method colortitle takes integer red, integer green, integer blue, integer transparency returns nothing 
-        call MultiboardSetTitleTextColor(.mb, red, green, blue, transparency) 
-    endmethod 
-    method rowcount takes integer row returns nothing 
-        call MultiboardSetRowCount(.mb, row) 
-    endmethod 
-    method colcount takes integer col returns nothing 
-        call MultiboardSetColumnCount(.mb, col) 
-    endmethod 
-    //Dont use it.    
-    method finditem takes integer col, integer row returns nothing 
-        local integer curRow = 0 
-        local integer curCol = 0 
-        local integer numRows = MultiboardGetRowCount(.mb) 
-        local integer numCols = MultiboardGetColumnCount(.mb) 
-        loop 
-            set curRow = curRow + 1 
-            exitwhen curRow > numRows 
-            if(row == 0 or row == curRow) then 
-                set curCol = 0 
-                loop 
-                    set curCol = curCol + 1 
-                    exitwhen curCol > numCols 
-                    if(col == 0 or col == curCol) then 
-                        set.mbitem = MultiboardGetItem(.mb, curRow - 1, curCol - 1) 
-                    endif 
-                endloop 
-            endif 
-        endloop 
-    endmethod 
-    //Show value and icon in col of row     
-    method setstyle takes integer col, integer row, boolean showValue, boolean showIcon returns nothing 
-        call.finditem(col, row) 
-        call MultiboardSetItemStyle(.mbitem, showValue, showIcon) 
-        call MultiboardReleaseItem(.mbitem) 
-    endmethod 
-    method setvalue takes integer col, integer row, string val returns nothing 
-        call.finditem(col, row) 
-        call MultiboardSetItemValue(.mbitem, val) 
-        call MultiboardReleaseItem(.mbitem) 
-    endmethod 
-    method setcolor takes integer col, integer row, integer red, integer green, integer blue, integer transparency returns nothing 
-        call.finditem(col, row) 
-        call MultiboardSetItemValueColor(.mbitem, red, green, blue, transparency) 
-        call MultiboardReleaseItem(.mbitem) 
-    endmethod 
-    method setwidth takes integer col, integer row, real width returns nothing 
-        call.finditem(col, row) 
-        call MultiboardSetItemWidth(.mbitem, width / 100.0) 
-        call MultiboardReleaseItem(.mbitem) 
-    endmethod 
-    method seticon takes integer col, integer row, string path returns nothing 
-        call.finditem(col, row) 
-        call MultiboardSetItemIcon(.mbitem, path) 
-        call MultiboardReleaseItem(.mbitem) 
-    endmethod 
-endstruct
-
-//--- Content from folder: ./2-Objective/2-DESTRUCTABLE.j ---
-struct DESTRUCTABLE //Destructable  
-    static method OpenGate takes destructable d returns nothing 
-        call KillDestructable(d) 
-        call SetDestructableAnimation(d, "death alternate") 
-        set d = null 
-    endmethod 
-    
-    static method DestroyGate takes destructable d returns nothing 
-        call KillDestructable(d) 
-        call SetDestructableAnimation(d, "death") 
-        set d = null 
-    endmethod 
-    
-    static method CloseGate takes destructable d returns nothing 
-        call DestructableRestoreLife(d, GetDestructableMaxLife(d), true) 
-        call SetDestructableAnimation(d, "stand") 
-        set d = null 
-    endmethod 
+   
 endstruct 
 
+struct Questitem 
+    questitem qi = null 
+    method new takes quest q, string description returns nothing 
+        set.qi = QuestCreateItem(q) 
+        call QuestItemSetDescription(.qi, description) 
+        call QuestItemSetCompleted(.qi, false) 
+    endmethod 
+    method desc takes string str returns nothing 
+        call QuestItemSetDescription(.qi, str) 
+    endmethod
+    method completed takes nothing returns boolean 
+        return IsQuestItemCompleted(.qi) 
+    endmethod 
+    method setcompleted takes boolean status returns nothing 
+        call QuestItemSetCompleted(.qi, status) 
+    endmethod 
+endstruct
 
-//--- Content from folder: ./2-Objective/2-TIMERDIALOG.j ---
+//--- Content from folder: ./2-Objective/1f----------------------.j ---
 
 
-//--- Content from folder: ./2-Objective/3-UNIT.j ---
+//--- Content from folder: ./2-Objective/3a-UNIT.j ---
 //Call struct then Unit instead UNIT      
 struct Unit 
     //=================Position================================         
@@ -1359,7 +1271,7 @@ struct Unit
     endmethod 
 endstruct
 
-//--- Content from folder: ./2-Objective/4-HERO.j ---
+//--- Content from folder: ./2-Objective/3b-HERO.j ---
 
 struct Hero extends Unit
     static method str takes unit u returns integer 
@@ -1373,6 +1285,147 @@ struct Hero extends Unit
     endmethod 
     static method all takes unit u returns integer 
         return GetHeroAgi(u, true) + GetHeroInt(u, true) + GetHeroStr(u, true) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/3c-ITEM.j ---
+struct Item 
+    // Charge Item     
+    static method removecharge takes item i, integer req returns nothing 
+        call SetItemCharges(i, GetItemCharges(i) -req) 
+        if GetItemCharges(i) <= 0 then 
+            call RemoveItem(i) 
+        endif 
+    endmethod 
+endstruct 
+
+
+//--- Content from folder: ./2-Objective/3d-DESTRUCTABLE.j ---
+struct DESTRUCTABLE //Destructable  
+    static method OpenGate takes destructable d returns nothing 
+        call KillDestructable(d) 
+        call SetDestructableAnimation(d, "death alternate") 
+        set d = null 
+    endmethod 
+    
+    static method DestroyGate takes destructable d returns nothing 
+        call KillDestructable(d) 
+        call SetDestructableAnimation(d, "death") 
+        set d = null 
+    endmethod 
+    
+    static method CloseGate takes destructable d returns nothing 
+        call DestructableRestoreLife(d, GetDestructableMaxLife(d), true) 
+        call SetDestructableAnimation(d, "stand") 
+        set d = null 
+    endmethod 
+endstruct 
+
+
+//--- Content from folder: ./2-Objective/3e-GROUP.j ---
+struct Group 
+    static method pick takes group g returns unit 
+        return FirstOfGroup(g) 
+    endmethod 
+    static method get takes group whichGroup, integer index returns unit 
+        return BlzGroupUnitAt(whichGroup, index) 
+    endmethod 
+    static method size takes group whichGroup returns integer 
+        return BlzGroupGetSize(whichGroup) 
+    endmethod 
+    static method add takes unit whichUnit, group whichGroup returns boolean 
+        return GroupAddUnit(whichGroup, whichUnit) 
+    endmethod 
+    static method remove takes unit whichUnit, group whichGroup returns boolean 
+        return GroupRemoveUnit(whichGroup, whichUnit) 
+    endmethod 
+    static method have takes unit whichUnit, group whichGroup returns boolean 
+        return IsUnitInGroup(whichUnit, whichGroup) 
+    endmethod 
+    static method release takes group whichGroup returns nothing 
+        call GroupClear(whichGroup) 
+        call DestroyGroup(whichGroup) 
+    endmethod 
+    static method enum takes group whichGroup, real x, real y, real radius returns nothing 
+        call GroupEnumUnitsInRange(whichGroup, x, y, radius, null) 
+    endmethod 
+    static method new takes nothing returns group 
+        return CreateGroup() 
+    endmethod 
+endstruct 
+
+//--- Content from folder: ./2-Objective/4-TEXTTAG.j ---
+
+struct Texttag 
+    //Use:                    
+    //set bj_loc = MoveLocation(x,y)                    
+    //call TEXTTAG.newloc(str, bj_loc, z , size)                      
+    static method new takes string str, location loc, real zoffset, real size returns texttag 
+        set bj_texttag = CreateTextTag() 
+        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
+        call SetTextTagPos(bj_texttag, GetLocationX(loc), GetLocationY(loc), zoffset) 
+        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
+        return bj_texttag 
+    endmethod 
+    static method unit takes string str, unit u, real zoffset, real size returns texttag 
+        set bj_texttag = CreateTextTag() 
+        call SetTextTagText(bj_texttag, str, (size * 0.023) / 10) 
+        call SetTextTagPosUnit(bj_texttag, u, zoffset) 
+        call SetTextTagColor(bj_texttag, 255, 255, 255, 255) 
+        return bj_texttag 
+    endmethod 
+    static method last takes nothing returns texttag 
+        return bj_texttag 
+    endmethod 
+    //Use: call TEXTTAG.color(tt,0-255,0-255,0-255,0-255,0-255)                      
+    static method color takes texttag tt, integer red, integer green, integer blue, integer transparency returns nothing 
+        call SetTextTagColor(tt, red, green, blue, transparency) 
+    endmethod 
+    static method colorpercent takes texttag tt, real red, real green, real blue, real transparency returns nothing 
+        call SetTextTagColor(tt, PercentToInt(red, 255), PercentToInt(green, 255), PercentToInt(blue, 255), PercentToInt((100.0 - transparency), 255)) 
+    endmethod 
+    static method age takes texttag tt, real age returns nothing 
+        call SetTextTagAge(tt, age) 
+    endmethod 
+    static method lifespan takes texttag tt, real lifespan returns nothing 
+        call SetTextTagLifespan(tt, lifespan) 
+    endmethod 
+    static method fadepoint takes texttag tt, real fadepoint returns nothing 
+        call SetTextTagFadepoint(tt, fadepoint) 
+    endmethod 
+    static method velocity takes texttag tt, real speed, real angle returns nothing 
+        local real vel = (speed * 0.071) / 128 
+        local real xvel = vel * Cos(angle * bj_DEGTORAD) 
+        local real yvel = vel * Sin(angle * bj_DEGTORAD) 
+        call SetTextTagVelocity(tt, xvel, yvel) 
+    endmethod 
+    static method permanent takes texttag tt, boolean flag returns nothing 
+        call SetTextTagPermanent(tt, flag) 
+    endmethod 
+    static method suspended takes texttag tt, boolean flag returns nothing 
+        call SetTextTagSuspended(tt, flag) 
+    endmethod 
+    static method text takes texttag tt, string str, real size returns nothing 
+        call SetTextTagText(tt, str, (size * 0.023) / 10) 
+    endmethod 
+    //Uses: Move texttag to point of unit           
+    static method posunit takes texttag tt, unit u, real zoffset returns nothing 
+        call SetTextTagPosUnit(tt, u, zoffset) 
+    endmethod 
+    //Uses: Move texttag to point x ,y           
+    //set bj_loc = MoveLocation(x,y)                    
+    //call TEXTTAG.posloc(str, bj_loc, z , size)                
+    static method posloc takes texttag tt, location loc, real zoffset returns nothing 
+        call SetTextTagPos(tt, GetLocationX(loc), GetLocationY(loc), zoffset) 
+    endmethod 
+    static method showforce takes texttag tt, force whichForce, boolean show returns nothing 
+        if(IsPlayerInForce(GetLocalPlayer(), whichForce)) then 
+            // Use only local code (no net traffic) within this block to avoid desyncs.         
+            call SetTextTagVisibility(tt, show) 
+        endif 
+    endmethod 
+    static method destroytt takes texttag tt returns nothing 
+        call DestroyTextTag(tt) 
     endmethod 
 endstruct
 
@@ -1430,7 +1483,7 @@ struct Eff
     endmethod
 endstruct
 
-//--- Content from folder: ./2-Objective/6-DUMMY.j ---
+//--- Content from folder: ./2-Objective/6a-DUMMY.j ---
 
 //Use :                           
 // Make new dummy :                       
@@ -1518,10 +1571,138 @@ struct Dummy
     endmethod 
 endstruct 
 
-//--- Content from folder: ./2-Objective/7.MATH.j ---
-struct Math 
-    static location SetUnitZLoc = Location(0, 0) 
+//--- Content from folder: ./2-Objective/6b-DEBUFF.j ---
+struct Buff 
+    static boolean array is_target 
+    static boolean array is_point 
+    static boolean array is_notarget 
+    static string array order_name 
+    static integer array ability_id 
+    static integer id = -1 
+    static integer STUN = 0 
+    static integer SLOW = 0 
+    private static method newbuff takes boolean is_target, boolean is_point, boolean is_notarget, string order_name, integer ability_id returns nothing 
+        set.id =.id + 1 
+        set.is_target[.id] = is_target 
+        set.is_point[.id] = is_point 
+        set.is_notarget[.id] = is_notarget 
+        set.order_name[.id] = order_name 
+        set.ability_id[.id] = ability_id 
+        call Preload_Ability(ability_id) 
+    endmethod 
+    static method effect takes unit caster, unit target, integer buff_id, real x, real y, integer buff_lv, integer buff_dur returns boolean 
+        if ENV_DEV then 
+            call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(buff_lv)) 
+        endif 
+        //You can custom buff your rule, here is example                             
+        if buff_id > -1 and buff_id <= id then 
+            if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.target(.order_name[buff_id], target)    
+                // call Dummy.reset()    
+                call Dummy.target(.order_name[buff_id], target,.ability_id[buff_id], buff_lv) 
 
+                if ENV_DEV then 
+                    call PLAYER.systemchat(Player(0), "[] Target") 
+                endif 
+                return false 
+            endif 
+            if.is_point[buff_id] then 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.point(.order_name[buff_id], x, y)    
+                // call Dummy.reset()    
+
+                return false 
+            endif 
+            if.is_notarget[buff_id] then 
+                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
+                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
+                // call Dummy.notarget(.order_name[buff_id])    
+                // call Dummy.reset()    
+                return false 
+            endif 
+        endif 
+        return false 
+    endmethod 
+    private static method onInit takes nothing returns nothing 
+        call.newbuff(true, false, false, "creepthunderbolt", 'A001') 
+        set.STUN =.id 
+        call.newbuff(true, false, false, "slow", 'A002') 
+        set.SLOW =.id 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/6d----------------------.j ---
+
+
+//--- Content from folder: ./2-Objective/7a-NUMBER.j ---
+struct Num 
+    // Percent to real :                   
+    // Use: Math.p2r(100,60) = 60% of 100 = 60                   
+    static method p2r takes real CurrentNumber, real Percent returns real 
+        return CurrentNumber * (Percent / 100) 
+    endmethod 
+    static method r2i takes real r returns integer 
+        return R2I(r) 
+    endmethod 
+    static method i2r takes integer i returns real 
+        return I2R(i) 
+    endmethod 
+    static method ri2s takes real r returns string 
+        return I2S(R2I(r)) 
+    endmethod 
+    //====================================================================================  
+    ///======Player   
+    static method pid takes player whichPlayer returns integer 
+        return GetPlayerId(whichPlayer) 
+    endmethod 
+   
+    static method uid takes unit u returns integer 
+        return GetPlayerId(GetOwningPlayer(u)) 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/7b-BOOLEAN.j ---
+struct Boo 
+    //Boolean to String 
+    static method b2s takes boolean b returns string 
+        if b then 
+            return "True" 
+        endif 
+        return "False" 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/7c-STRING.j ---
+struct Str
+    //Use:  Str.repeated(1234567,",",3,0) -> 123,456,7 
+    static method repeated takes string s, string str, integer spacing, integer start returns string 
+        local integer i = StringLength(s) 
+        local integer p = 1 
+        loop 
+            exitwhen p * spacing + start >= i 
+            set s = SubString(s, 0, p * spacing + p + start - 1) + str + SubString(s, p * spacing + p + start - 1, StringLength(s)) 
+            set p = p + 1 
+        endloop 
+        return s 
+    endmethod 
+    //Use: Str.reverse("1234") -> 4321
+    static method reverse takes string s returns string
+        local integer i = StringLength(s)
+        local string rs = ""
+        loop
+            set i = i - 1
+            set rs = rs + SubString(s, i, i + 1)
+            exitwhen i == 0
+        endloop
+        return rs
+    endmethod
+endstruct 
+
+//--- Content from folder: ./2-Objective/7d.MATH.j ---
+struct Math 
     static method rate takes real r returns boolean
         local real rand = 0 
         set rand = GetRandomReal(0,100) 
@@ -1533,8 +1714,8 @@ struct Math
     //Calculates the terrain height (Z-coordinate) at a specified (x, y) location in the game               
     //Use: Math.pz(x,y)              
     static method pz takes real x, real y returns real 
-        call MoveLocation(.SetUnitZLoc, x, y) 
-        return GetLocationZ(.SetUnitZLoc) 
+        call MoveLocation(bj_loc, x, y) 
+        return GetLocationZ(bj_loc) 
     endmethod 
 
     //Calculate the angle between two points. Facing (x1,y1) to (x2,y2)               
@@ -1584,45 +1765,117 @@ struct Math
     //calculates the combined height of a unit in the game, which consists of the terrain height at the unit's location and the unit's flying height above the ground.     
     //Use: Math.uz(u)       
     static method uz takes unit u returns real 
-        call MoveLocation(.SetUnitZLoc, GetUnitX(u), GetUnitY(u)) 
-        return GetLocationZ(.SetUnitZLoc) + GetUnitFlyHeight(u) 
+        call MoveLocation(bj_loc, GetUnitX(u), GetUnitY(u)) 
+        return GetLocationZ(bj_loc) + GetUnitFlyHeight(u) 
     endmethod 
 
-    //calculates the height (Z-coordinate) at a given horizontal position current_d along a parabolic path that spans a total distance d and reaches a maximum height of h. This is often used in games to simulate the motion of projectiles or objects following a curved path.    
-    //Use: Math.parabolaz(current_d,d,h)       
-    static method parabolaz takes real current_d, real d, real h returns real 
-		return 4 * h * current_d * (d - current_d) / (d * d) 
-	endmethod 
-
+  
 endstruct
 
-//--- Content from folder: ./2-Objective/8-STRING.j ---
-struct Str
-    //Use:  Str.repeated(1234567,",",3,0) -> 123,456,7 
-    static method repeated takes string s, string str, integer spacing, integer start returns string 
-        local integer i = StringLength(s) 
-        local integer p = 1 
-        loop 
-            exitwhen p * spacing + start >= i 
-            set s = SubString(s, 0, p * spacing + p + start - 1) + str + SubString(s, p * spacing + p + start - 1, StringLength(s)) 
-            set p = p + 1 
-        endloop 
-        return s 
+//--- Content from folder: ./2-Objective/7e-RANDOM.j ---
+
+//About code : https://docs.google.com/document/d/1WXxXdxNFZzz-QFSk-mtlMsDn1jJUn9v5NOE83cVnAC8/edit?usp=sharing  
+//Uses check example in 4-Event/10- Player - Chat.j 
+//====Variables in struct  
+//  static Randompool pool1  
+//====Setting  
+// set.pool1 = Randompool.create()  
+// call.pool1.new_value(1, 50, 0, 0)  
+// call.pool1.new_value(2, 30, 0, 5)  
+// call.pool1.new_value(3, 20, 0, 2)  
+//====Call when want random 
+// set random_value = .pool1.random()  
+//====Destroy => use one time 
+// call .pool1.destroy()  
+
+//Set size array 10 to higher if u have more value             
+struct Randompool 
+    integer array value[10] //Use for raw or number or id item                                 
+    real array rate_default[10] //Constant rate default                                 
+    real array rate[10] // Rate now of item                                 
+    real array increase[10] //When drop call a time, rate = rate + increase                                 
+    integer times //When the drop call a time, it increase 1                                  
+    integer size = -1 
+    method new_value takes integer value, integer rate_default, integer rate, integer increase returns nothing 
+        set.size =.size + 1 
+        set.value[.size] = value 
+        set.rate_default[.size] = rate_default 
+        set.rate[.size] = rate + rate_default 
+        set.increase[.size] = increase 
     endmethod 
-    //Use: Str.reverse("1234") -> 4321
-    static method reverse takes string s returns string
-        local integer i = StringLength(s)
-        local string rs = ""
-        loop
-            set i = i - 1
-            set rs = rs + SubString(s, i, i + 1)
-            exitwhen i == 0
-        endloop
-        return rs
-    endmethod
+    method update_rate takes nothing returns nothing 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set.rate[bj_int] =.rate[bj_int] +.increase[bj_int] 
+            set bj_int = bj_int + 1 
+        endloop 
+    endmethod 
+    method total takes nothing returns real 
+        local real total = 0 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set total = total +.rate[bj_int] 
+            set bj_int = bj_int + 1 
+        endloop 
+        return total 
+    endmethod 
+    method random takes nothing returns integer 
+        local integer v = -1 
+        local real total = 0 
+        local real random_val = 0 
+        local real accumulated = 0 
+        set total =.total() 
+  
+        set random_val = GetRandomReal(0, total) 
+        if ENV_DEV then 
+            call BJDebugMsg("random_val: " + R2S(random_val) + " / " + "Total: " + R2S(total)) 
+            call BJDebugMsg("Number of Value Random: " + I2S(.size + 1)) 
+        endif 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.size 
+            set accumulated = accumulated +.rate[bj_int] 
+            if random_val <= accumulated then 
+                set v =.value[bj_int] 
+                call.action(bj_int) // Make some stupid code                
+                call.update_rate() 
+                set.times =.times + 1 
+                exitwhen true 
+            endif 
+            set bj_int = bj_int + 1 
+        endloop 
+        if ENV_DEV then 
+            call BJDebugMsg(".accumulated: " + R2S(accumulated) + " [] Values: " + R2S(v) + "[] Times: " + R2S(times)) 
+        endif 
+
+        return v 
+    endmethod 
+    method action takes integer index returns nothing 
+        //Code for example                  
+        if.times == 5 then 
+            call BJDebugMsg("Critical DROP! 5 times") 
+
+        endif 
+        if index == 2 then 
+            call BJDebugMsg("Critical DROP! reset rate to default") 
+            //Reset when the value [9] drop                 
+            set bj_int = 0 
+            loop 
+                exitwhen bj_int >.size 
+                set.rate[bj_int] =.rate_default[bj_int] 
+                set bj_int = bj_int + 1 
+            endloop 
+        endif 
+    endmethod 
 endstruct 
 
-//--- Content from folder: ./2-Objective/9-HASHTABLE.j ---
+
+//--- Content from folder: ./2-Objective/7f---------------------.j ---
+
+
+//--- Content from folder: ./2-Objective/8-HASHTABLE.j ---
 
 
 //--- Content from folder: ./3-Skill/1-SampleSkill.j ---
@@ -1965,7 +2218,7 @@ struct EV_TARGET_ORDER
         local unit e = GetOrderTargetUnit() 
         local integer w = GetUnitTypeId(e) 
         local integer d = GetUnitTypeId(u) 
-        local integer id = GetUID(u) 
+        local integer id = Num.uid(u) 
         local integer orderid = GetIssuedOrderId() 
         //commonly used sample trick : Use item target spell  
         if i != null then 
@@ -2041,10 +2294,17 @@ struct EV_UNIT_DEATH
         local integer hkid = GetHandleId(killer) 
         local integer did = GetUnitTypeId(dying) 
         local integer kid = GetUnitTypeId(killer) 
-        local integer pdid = GetUID(dying) //Id player of dying  
-        local integer pkid = GetUID(killer) //Id player of killer  
+        local integer pdid = Num.uid(dying) //Id player of dying   
+        local integer pkid = Num.uid(killer) //Id player of killer   
 
-
+        //For EXAMPLE QUEST, comment it if not usse  
+        if did == QUEST_EXAMPLE.archer_id then 
+            call QUEST_EXAMPLE.kill_archer()
+        endif 
+        if did == QUEST_EXAMPLE.warrior_id then 
+            call QUEST_EXAMPLE.kill_warrior()
+        endif 
+        //// 
 
         set killer = null 
         set dying = null 
@@ -2067,7 +2327,7 @@ struct EV_CASTING_SPELL
         local unit target = GetSpellTargetUnit() 
         local integer spell_id = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local integer pid = GetUID(caster) 
+        local integer pid = Num.uid(caster) 
         local real targetX = GetSpellTargetX() 
         local real targetY = GetSpellTargetY() 
 
@@ -2225,7 +2485,7 @@ struct EV_PLAYER_LEAVES
     static method f_Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         
-        set PLAYER.IsDisconect[GetPID(p)] = true 
+        set PLAYER.IsDisconect[Num.pid(p)] = true 
         set GAME.CountPlayer = GAME.CountPlayer - 1 
 
 
@@ -2325,17 +2585,18 @@ struct GAME
     static Multiboard MB 
     private static method GameStart takes nothing returns nothing 
         local framehandle test1 = null 
-        call FogMaskEnable(false) 
-        call FogEnable(true) 
+
 
         // call PauseGame(false)              
         call CinematicModeBJ(false, GetPlayersAll()) 
+        call DisplayCineFilter(false)
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
         // COUNTDOWN TIMER EXAMPLE  If not use then delete this 
         call COUNTDOWN_TIMER_EXAMPLE.start()
         call MULTILBOARD_EXAMPLE.start()
+        call QUEST_EXAMPLE.start()
         //
         call Interval.start()
     endmethod 
@@ -2374,10 +2635,21 @@ struct GAME
          
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
-        call FogMaskEnable(true) 
-        call FogEnable(false) 
+
         // call PauseGame(true)              
         call CinematicModeBJ(true, GetPlayersAll()) 
+
+        call AbortCinematicFadeBJ()
+        call SetCineFilterTexture("ReplaceableTextures\\CameraMasks\\Black_mask.blp")
+        call SetCineFilterBlendMode(BLEND_MODE_BLEND)
+        call SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
+        call SetCineFilterStartUV(0, 0, 1, 1)
+        call SetCineFilterEndUV(0, 0, 1, 1)
+        call SetCineFilterStartColor(255, 255, 255, 255)
+        call SetCineFilterEndColor(255, 255, 255, 255)
+        call SetCineFilterDuration(GAME_START_TIME - GAME_PRELOAD_TIME)
+        call DisplayCineFilter(true)
+    
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 
@@ -2403,7 +2675,7 @@ endstruct
 
 
 //--- Content from individual file: ./EXAMPLE.j ---
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                  
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                       
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -2444,7 +2716,7 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                   
+        //                                                                        
         set bj_int = bj_MAX_PLAYER_SLOTS 
         loop 
             set bj_int = bj_int - 1 
@@ -2493,7 +2765,7 @@ struct MULTILBOARD_EXAMPLE
         loop 
             exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))     
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                          
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -2504,6 +2776,74 @@ struct MULTILBOARD_EXAMPLE
             endif 
             set bj_int = bj_int + 1 
         endloop 
+    endmethod 
+endstruct 
+
+
+struct QUEST_EXAMPLE 
+    static Quest Kill_SkeletonQuest 
+    static Questitem Kill_SkeletonArcher 
+    static integer archer_id = 'nska' 
+    static integer archer = 0 
+    static integer max_archer = 3 
+    static Questitem Kill_SkeletonWarrior 
+    static integer warrior_id = 'nskg' 
+    static integer warrior = 0 
+    static integer max_warrior = 3 
+    static method check_count takes nothing returns nothing 
+   
+    endmethod 
+    static method kill_archer takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonArcher.completed() == false then 
+            set.archer =.archer + 1 
+            set.archer = IMinBJ(.archer,.max_archer) 
+            set str = "Kill Skeleton Archer: " + I2S(.archer) + "/" + I2S(.max_archer) 
+            call.Kill_SkeletonArcher.desc(str) 
+            if.archer ==.max_archer then 
+                call.Kill_SkeletonArcher.setcompleted(true) 
+                call PLAYER.questmsgforce(GetPlayersAll(), str, Questmsg.COMPLETED) 
+            endif 
+            call.update() 
+        endif 
+    endmethod 
+    static method kill_warrior takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonWarrior.completed() == false then 
+            set.warrior =.warrior + 1 
+            set.warrior = IMinBJ(.warrior,.max_warrior) 
+            set str = "Kill Giant Skeleton Warrior: " + I2S(.warrior) + "/" + I2S(.max_warrior) 
+            call.Kill_SkeletonWarrior.desc(str) 
+            if.warrior ==.max_warrior then 
+                call.Kill_SkeletonWarrior.setcompleted(true) 
+                call PLAYER.questmsgforce(GetPlayersAll(), str, Questmsg.COMPLETED) 
+            endif 
+            call.update() 
+        endif 
+    endmethod 
+    static method update takes nothing returns nothing 
+        local string str = "" 
+        if.Kill_SkeletonQuest != null and.Kill_SkeletonQuest.completed() == false then 
+            if.Kill_SkeletonArcher.completed() == true and.Kill_SkeletonWarrior.completed() == true then 
+                call.Kill_SkeletonQuest.setcompleted(true) 
+                call.Kill_SkeletonQuest.desc("[Complete] Deafeat Skeleton in Forest ") 
+                call PLAYER.questmsgforce(GetPlayersAll(), "Deafeat Skeleton in Forest", Questmsg.COMPLETED) 
+            endif 
+        endif 
+    endmethod 
+    static method start takes nothing returns nothing 
+        local string str = "" 
+        set.Kill_SkeletonQuest = Quest.create() 
+        set str = "Deafeat Skeleton in Forest" 
+        call.Kill_SkeletonQuest.new(Questtype.REQ_DISCOVERED, "Kill Skeleton", str, "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.tga") 
+        
+        set.Kill_SkeletonArcher = Questitem.create() 
+        set str = "Kill Skeleton Archer: " + I2S(.archer) + "/" + I2S(.max_archer) 
+        call.Kill_SkeletonArcher.new(.Kill_SkeletonQuest.q, str) 
+
+        set.Kill_SkeletonWarrior = Questitem.create() 
+        set str = "Kill Giant Skeleton Warrior: " + I2S(.warrior) + "/" + I2S(.max_warrior) 
+        call.Kill_SkeletonWarrior.new(.Kill_SkeletonQuest.q, str) 
     endmethod 
 endstruct
 

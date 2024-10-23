@@ -1,6 +1,4 @@
 struct Math 
-    static location SetUnitZLoc = Location(0, 0) 
-
     static method rate takes real r returns boolean
         local real rand = 0 
         set rand = GetRandomReal(0,100) 
@@ -12,8 +10,8 @@ struct Math
     //Calculates the terrain height (Z-coordinate) at a specified (x, y) location in the game               
     //Use: Math.pz(x,y)              
     static method pz takes real x, real y returns real 
-        call MoveLocation(.SetUnitZLoc, x, y) 
-        return GetLocationZ(.SetUnitZLoc) 
+        call MoveLocation(bj_loc, x, y) 
+        return GetLocationZ(bj_loc) 
     endmethod 
 
     //Calculate the angle between two points. Facing (x1,y1) to (x2,y2)               
@@ -63,14 +61,9 @@ struct Math
     //calculates the combined height of a unit in the game, which consists of the terrain height at the unit's location and the unit's flying height above the ground.     
     //Use: Math.uz(u)       
     static method uz takes unit u returns real 
-        call MoveLocation(.SetUnitZLoc, GetUnitX(u), GetUnitY(u)) 
-        return GetLocationZ(.SetUnitZLoc) + GetUnitFlyHeight(u) 
+        call MoveLocation(bj_loc, GetUnitX(u), GetUnitY(u)) 
+        return GetLocationZ(bj_loc) + GetUnitFlyHeight(u) 
     endmethod 
 
-    //calculates the height (Z-coordinate) at a given horizontal position current_d along a parabolic path that spans a total distance d and reaches a maximum height of h. This is often used in games to simulate the motion of projectiles or objects following a curved path.    
-    //Use: Math.parabolaz(current_d,d,h)       
-    static method parabolaz takes real current_d, real d, real h returns real 
-		return 4 * h * current_d * (d - current_d) / (d * d) 
-	endmethod 
-
+  
 endstruct

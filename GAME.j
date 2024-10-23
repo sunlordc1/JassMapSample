@@ -7,17 +7,18 @@ struct GAME
     static Multiboard MB 
     private static method GameStart takes nothing returns nothing 
         local framehandle test1 = null 
-        call FogMaskEnable(false) 
-        call FogEnable(true) 
+
 
         // call PauseGame(false)              
         call CinematicModeBJ(false, GetPlayersAll()) 
+        call DisplayCineFilter(false)
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
         // COUNTDOWN TIMER EXAMPLE  If not use then delete this 
         call COUNTDOWN_TIMER_EXAMPLE.start()
         call MULTILBOARD_EXAMPLE.start()
+        call QUEST_EXAMPLE.start()
         //
         call Interval.start()
     endmethod 
@@ -56,10 +57,21 @@ struct GAME
          
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
-        call FogMaskEnable(true) 
-        call FogEnable(false) 
+
         // call PauseGame(true)              
         call CinematicModeBJ(true, GetPlayersAll()) 
+
+        call AbortCinematicFadeBJ()
+        call SetCineFilterTexture("ReplaceableTextures\\CameraMasks\\Black_mask.blp")
+        call SetCineFilterBlendMode(BLEND_MODE_BLEND)
+        call SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
+        call SetCineFilterStartUV(0, 0, 1, 1)
+        call SetCineFilterEndUV(0, 0, 1, 1)
+        call SetCineFilterStartColor(255, 255, 255, 255)
+        call SetCineFilterEndColor(255, 255, 255, 255)
+        call SetCineFilterDuration(GAME_START_TIME - GAME_PRELOAD_TIME)
+        call DisplayCineFilter(true)
+    
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 

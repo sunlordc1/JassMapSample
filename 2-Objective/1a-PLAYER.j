@@ -75,6 +75,76 @@ struct PLAYER
             call DisplayTimedTextToPlayer(ForPlayer, 0, 0, 2.00, message) 
         endif 
     endmethod 
+    static method questmsgplayer takes player p, string msg, integer msgtype returns nothing 
+        if GetLocalPlayer() == p then 
+            call.questmsg(GetLocalPlayer(), msg, msgtype) 
+        endif 
+    endmethod 
+
+    static method questmsgforce takes force f, string msg, integer msgtype returns nothing 
+        if(IsPlayerInForce(GetLocalPlayer(), f)) then 
+            call.questmsg(GetLocalPlayer(), msg, msgtype) 
+        endif 
+    endmethod 
+    static method questmsg takes player p, string message, integer msgtype returns nothing 
+        if(msgtype == Questmsg.DISCOVERED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUEST, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUEST, message) 
+            call StartSound(bj_questDiscoveredSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.UPDATED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTUPDATE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTUPDATE, message) 
+            call StartSound(bj_questUpdatedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.COMPLETED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTDONE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTDONE, message) 
+            call StartSound(bj_questCompletedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.FAILED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTFAILED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTFAILED, message) 
+            call StartSound(bj_questFailedSound) 
+            call FlashQuestDialogButton() 
+        elseif(msgtype == Questmsg.REQUIREMENT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_QUESTREQUIREMENT, message) 
+        elseif(msgtype == Questmsg.MISSIONFAILED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_MISSIONFAILED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_MISSIONFAILED, message) 
+            call StartSound(bj_questFailedSound) 
+        elseif(msgtype == Questmsg.HINT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_HINT, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_HINT, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.ALWAYSHINT) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ALWAYSHINT, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.SECRET) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_SECRET, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_SECRET, message) 
+            call StartSound(bj_questSecretSound) 
+        elseif(msgtype == Questmsg.UNITACQUIRED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITACQUIRED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITACQUIRED, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.UNITAVAILABLE) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITAVAILABLE, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_UNITAVAILABLE, message) 
+            call StartSound(bj_questHintSound) 
+        elseif(msgtype == Questmsg.ITEMACQUIRED) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ITEMACQUIRED, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_ITEMACQUIRED, message) 
+            call StartSound(bj_questItemAcquiredSound) 
+        elseif(msgtype == Questmsg.WARNING) then 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_WARNING, " ") 
+            call DisplayTimedTextToPlayer(p, 0, 0, bj_TEXT_DELAY_WARNING, message) 
+            call StartSound(bj_questWarningSound) 
+        else 
+            // Unrecognized message type - ignore the request.                                      
+        endif 
+    endmethod 
     //=============MISC=================== 
     //Force player use a key in board
     static method ForceUIKeyBJ takes player whichPlayer, string key, unit u returns nothing 

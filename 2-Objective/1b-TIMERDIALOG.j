@@ -1,4 +1,5 @@
   
+//Uses : see code in file EXAMPLE.j
 struct CountdownTimer 
     timer t = null 
     timerdialog td = null 

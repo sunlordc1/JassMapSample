@@ -5,5 +5,5 @@ struct Item
         if GetItemCharges(i) <= 0 then 
             call RemoveItem(i) 
         endif 
-    endstruct 
+    endmethod 
 endstruct 
