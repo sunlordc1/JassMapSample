@@ -1,16 +1,3 @@
-// call CreateQuestBJ(bj_QUESTTYPE_REQ_DISCOVERED, "TRIGSTR_048", "TRIGSTR_049", "ReplaceableTextures\\CommandButtons\\BTNAmbush.blp")                                  
-// call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, "TRIGSTR_047")                        
-
-// call DestroyQuestBJ(GetLastCreatedQuestBJ())                       
-// call QuestSetEnabledBJ(false, GetLastCreatedQuestBJ())                      
-// call QuestSetCompletedBJ(GetLastCreatedQuestBJ(), true)                     
-// call QuestSetFailedBJ(GetLastCreatedQuestBJ(), true)                    
-// call QuestSetDiscoveredBJ(GetLastCreatedQuestBJ(), true)                    
-// call QuestSetTitleBJ(GetLastCreatedQuestBJ(), "TRIGSTR_052")                  
-// call QuestSetDescriptionBJ(GetLastCreatedQuestBJ(), "TRIGSTR_054")                  
-
-
-// call FlashQuestDialogButtonBJ()                  
 struct Questmsg 
     static integer DISCOVERED = 0 
     static integer UPDATED = 1 
@@ -32,7 +19,7 @@ struct Questtype
     static integer REQ_UNDISCOVERED = 1 
     static integer OPT_UNDISCOVERED = 3 
 endstruct 
-//Make only one time with .new () deafeat condition in quest tab , change it with .desc if you change condition to defeat               
+//Make only one time with .new () deafeat condition in quest tab , change it with .desc if you change condition to defeat                
 struct DeafeatQuest 
     static method new takes string desc returns nothing 
         set bj_lastCreatedDefeatCondition = CreateDefeatCondition() 
@@ -50,7 +37,7 @@ endstruct
 
 struct Quest 
     quest q = null 
-    //new ( questType,  title,  description,  iconPath)  
+    //new ( questType,  title,  description,  iconPath)   
     method new takes integer questType, string title, string description, string iconPath returns nothing 
         local boolean required = (questType == 0) or(questType == 1) 
         local boolean discovered = (questType == 0) or(questType == 2) 
@@ -64,8 +51,8 @@ struct Quest
     endmethod 
  
   
-    //GET      
-    //======Status   
+    //GET       
+    //======Status    
     method enabled takes nothing returns boolean 
         return IsQuestEnabled(.q) 
     endmethod 
@@ -81,8 +68,8 @@ struct Quest
     method required takes nothing returns boolean 
         return IsQuestRequired(.q) 
     endmethod 
-    //SET      
-    //=====Status   
+    //SET       
+    //=====Status    
     method setenabled takes boolean status returns nothing 
         call QuestSetEnabled(.q, status) 
     endmethod 
@@ -98,7 +85,7 @@ struct Quest
     method setrequired takes boolean status returns nothing 
         call QuestSetRequired(.q, status) 
     endmethod 
-    //=====Content   
+    //=====Content    
     method title takes string str returns nothing 
         call QuestSetTitle(.q, str) 
     endmethod 
@@ -106,7 +93,7 @@ struct Quest
         call QuestSetDescription(.q, str) 
     endmethod 
 
-    /////////////      
+    /////////////       
     method flash takes nothing returns nothing 
         call FlashQuestDialogButton() 
     endmethod 
@@ -125,7 +112,7 @@ struct Questitem
     endmethod 
     method desc takes string str returns nothing 
         call QuestItemSetDescription(.qi, str) 
-    endmethod
+    endmethod 
     method completed takes nothing returns boolean 
         return IsQuestItemCompleted(.qi) 
     endmethod 

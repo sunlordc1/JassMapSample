@@ -24,6 +24,9 @@ struct Group
     static method enum takes group whichGroup, real x, real y, real radius returns nothing 
         call GroupEnumUnitsInRange(whichGroup, x, y, radius, null) 
     endmethod 
+    static method enump takes group whichGroup, player p returns nothing 
+        call GroupEnumUnitsOfPlayer(whichGroup, p, null) 
+    endmethod 
     static method new takes nothing returns group 
         return CreateGroup() 
     endmethod 

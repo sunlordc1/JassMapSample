@@ -43,6 +43,6 @@ globals
     constant real GAME_STATUS_TIME = 1.00 
     constant real GAME_SETTING_TIME = 3.00 
     constant real GAME_START_TIME = 5.00 
-    
+
 endglobals 
 

@@ -19,6 +19,7 @@ struct GAME
         call COUNTDOWN_TIMER_EXAMPLE.start()
         call MULTILBOARD_EXAMPLE.start()
         call QUEST_EXAMPLE.start()
+        call ROADLINE_EXAMPLE.start()
         //
         call Interval.start()
     endmethod 
