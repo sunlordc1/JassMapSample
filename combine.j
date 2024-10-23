@@ -2579,7 +2579,7 @@ endstruct
 
 //--- Content from folder: ./5-Features/2-Roadline.j ---
 globals 
-    hashtable road = InitHashtable() // For damage system                                            
+    hashtable road = InitHashtable() // For damage system                                             
     constant integer MAX_SIZE_ROADLINE = 99 
 endglobals 
 
@@ -2686,7 +2686,7 @@ struct Roadline
         local integer rgid =.find(rg) 
         local string roadtype = LoadStr(road, id, StringHash("road")) 
         local integer n = 0 
-        // call PLAYER.systemchat(Player(0),.regions[rgid].name[n])                
+        // call PLAYER.systemchat(Player(0),.regions[rgid].name[n])                 
         
         loop 
             exitwhen n >.regions[rgid].size 
@@ -2694,11 +2694,7 @@ struct Roadline
                 call SaveReal(road, id, StringHash("x"),.regions[rgid].x[n]) 
                 call SaveReal(road, id, StringHash("y"),.regions[rgid].y[n]) 
                 call SaveInteger(road, id, StringHash("delay"),.regions[rgid].delay[n]) 
-                call PLAYER.systemchat(Player(0),.regions[rgid].name[n]) 
-                call PLAYER.systemchat(Player(0), R2S(.regions[rgid].x[n])) 
-                call PLAYER.systemchat(Player(0), R2S(.regions[rgid].y[n])) 
-                call PLAYER.systemchat(Player(0), I2S(.regions[rgid].delay[n])) 
-                call PLAYER.systemchat(Player(0), R2S(LoadReal(road, id, StringHash("x"))) + " [] " + R2S(LoadReal(road, id, StringHash("y")))) 
+
             endif 
             set n = n + 1 
         endloop 
@@ -2715,8 +2711,7 @@ struct Roadline
                 call SaveStr(road, hid, StringHash("road"),.regions[id].name[size]) 
                 call SaveReal(road, hid, StringHash("x"),.regions[id].x[size]) 
                 call SaveReal(road, hid, StringHash("y"),.regions[id].y[size]) 
-                call SaveReal(road, hid, StringHash("delay"),.regions[id].delay[size]) 
-                call BJDebugMsg("REgister delay" + I2S(.regions[id].delay[size])) 
+                call SaveInteger(road, hid, StringHash("delay"),.regions[id].delay[size]) 
             endif 
         endif 
     endmethod 
@@ -2737,7 +2732,7 @@ struct Roadline
             set.regions[.i].name[size] = name 
             set.regions[.i].x[size] = GetRectCenterX(r2) 
             set.regions[.i].y[size] = GetRectCenterY(r2) 
-            // call BJDebugMsg(R2S(.regions[.i].x[size]) + " [] " + R2S(.regions[.i].y[size]))  
+            // call BJDebugMsg(R2S(.regions[.i].x[size]) + " [] " + R2S(.regions[.i].y[size]))   
             set.regions[.i].delay[size] = delay 
 
         else 
@@ -2748,27 +2743,27 @@ struct Roadline
             set.regions[id].x[size] = GetRectCenterX(r2) 
             set.regions[id].y[size] = GetRectCenterY(r2) 
             set.regions[.i].delay[size] = delay 
-            // call BJDebugMsg(R2S(.regions[.i].x[size]) + " [] " + R2S(.regions[.i].y[size]))  
+            // call BJDebugMsg(R2S(.regions[.i].x[size]) + " [] " + R2S(.regions[.i].y[size]))   
 
         endif 
 
-        //Link                                     
+        //Link                                      
 
-        // if not.is_have(r2) then                                            
-        //     set.i =.i + 1                                            
-        //     set.regions[.i] = Region.create()                                            
-        //     set.regions[.i].r = r                                            
-        //     //It's for debug                                                  
-        //     set.regions[.i].name = name                                            
-        //     //Make trigger event                                                  
-        //     set.regions[.i].t = CreateTrigger()                                            
-        //     set.regions[.i].rg = CreateRegion()                                            
-        //     call RegionAddRect(.regions[.i].rg, r)                                            
-        //     call TriggerRegisterEnterRegion(.regions[.i].t,.regions[.i].rg, null)                                            
-        //     call TriggerAddAction(.regions[.i].t, function thistype.Runto)                                            
-        // else                                            
+        // if not.is_have(r2) then                                             
+        //     set.i =.i + 1                                             
+        //     set.regions[.i] = Region.create()                                             
+        //     set.regions[.i].r = r                                             
+        //     //It's for debug                                                   
+        //     set.regions[.i].name = name                                             
+        //     //Make trigger event                                                   
+        //     set.regions[.i].t = CreateTrigger()                                             
+        //     set.regions[.i].rg = CreateRegion()                                             
+        //     call RegionAddRect(.regions[.i].rg, r)                                             
+        //     call TriggerRegisterEnterRegion(.regions[.i].t,.regions[.i].rg, null)                                             
+        //     call TriggerAddAction(.regions[.i].t, function thistype.Runto)                                             
+        // else                                             
 
-        // endif                                            
+        // endif                                             
     endmethod 
 endstruct 
 
@@ -2783,57 +2778,57 @@ endstruct
 
 
 
-// struct Roadline                                                   
-//     rect array Region[MAX_SIZE_ROADLINE]                                                   
-//     rect array RoadTo[MAX_SIZE_ROADLINE]                                                   
-//     integer array Delay[MAX_SIZE_ROADLINE]                                                   
-//     trigger array t[MAX_SIZE_ROADLINE]                                                   
-//     integer i = 0                                                   
-//     string RoadType = ""                                                   
-//     string NextRoad = ""                                                   
-//     rect Teleport = null                                                   
-//     static method FilterUnit takes nothing returns boolean                                                   
+// struct Roadline                                                    
+//     rect array Region[MAX_SIZE_ROADLINE]                                                    
+//     rect array RoadTo[MAX_SIZE_ROADLINE]                                                    
+//     integer array Delay[MAX_SIZE_ROADLINE]                                                    
+//     trigger array t[MAX_SIZE_ROADLINE]                                                    
+//     integer i = 0                                                    
+//     string RoadType = ""                                                    
+//     string NextRoad = ""                                                    
+//     rect Teleport = null                                                    
+//     static method FilterUnit takes nothing returns boolean                                                    
 
-//     endmethod                                                   
-//     static method RunTo takes nothing returns nothing                                                   
-//         local integer n = 0                                                   
-//         local unit u = GetEnteringUnit()                                                   
+//     endmethod                                                    
+//     static method RunTo takes nothing returns nothing                                                    
+//         local integer n = 0                                                    
+//         local unit u = GetEnteringUnit()                                                    
 
-//         local integer id = GetHandleId(GetEnteringUnit())                                                   
-//         if GetPlayerId(GetOwningPlayer(u)) == 10 and ORDER.LoadRoad(id) ==.RoadType then                                                   
-//             set n = 0                                                   
-//             loop                                                   
-//                 exitwhen n >.i                                                   
-//                 if RectContainsCoords(.Region[n], GetUnitX(u), GetUnitY(u)) or RectContainsCoords(.Region[n], GetPPX(GetUnitX(u), 150, GetUnitFacing(u)), GetPPY(GetUnitY(u), 150, GetUnitFacing(u))) then                                                   
-//                     // call BJDebugMsg("ID: " + I2S(n) + " Delay: " + I2S(.Delay[n]))                                                                                                                                         
-//                     call ORDER.SaveDelay(id,.Delay[n])                                                   
-//                     call ORDER.Save(id, n)                                                   
-//                     // call IssueImmediateOrder(u, "stop")                                                                                                                            
-//                     if ORDER.Load(id) == (.i - 1) then                                                   
-//                         if.Teleport != null then                                                   
-//                             call SetUnitPosition(u, GetRectCenterX(.Teleport), GetRectCenterY(.Teleport))                                                   
-//                         endif                                                   
-//                         call SaveStr(road, id, StringHash("Road"),.NextRoad)                                                   
-//                         call ORDER.Save(id, 0)                                                   
+//         local integer id = GetHandleId(GetEnteringUnit())                                                    
+//         if GetPlayerId(GetOwningPlayer(u)) == 10 and ORDER.LoadRoad(id) ==.RoadType then                                                    
+//             set n = 0                                                    
+//             loop                                                    
+//                 exitwhen n >.i                                                    
+//                 if RectContainsCoords(.Region[n], GetUnitX(u), GetUnitY(u)) or RectContainsCoords(.Region[n], GetPPX(GetUnitX(u), 150, GetUnitFacing(u)), GetPPY(GetUnitY(u), 150, GetUnitFacing(u))) then                                                    
+//                     // call BJDebugMsg("ID: " + I2S(n) + " Delay: " + I2S(.Delay[n]))                                                                                                                                          
+//                     call ORDER.SaveDelay(id,.Delay[n])                                                    
+//                     call ORDER.Save(id, n)                                                    
+//                     // call IssueImmediateOrder(u, "stop")                                                                                                                             
+//                     if ORDER.Load(id) == (.i - 1) then                                                    
+//                         if.Teleport != null then                                                    
+//                             call SetUnitPosition(u, GetRectCenterX(.Teleport), GetRectCenterY(.Teleport))                                                    
+//                         endif                                                    
+//                         call SaveStr(road, id, StringHash("Road"),.NextRoad)                                                    
+//                         call ORDER.Save(id, 0)                                                    
                       
-//                     endif                                                   
-//                     exitwhen true                                                   
-//                 endif                                                   
-//                 set n = n + 1                                                   
-//             endloop                                                   
-//             set u = null                                                   
-//         endif                                                   
-//     endmethod                                                   
-//     static method New takes rect r2, rect r, integer delay returns nothing                                                   
-//         set.Region[.i] = r                                                   
-//         set.RoadTo[.i] = r2                                                   
-//         set.Delay[.i] = delay                                                   
-//         set.t[.i] = CreateTrigger()                                                   
-//         call TriggerRegisterEnterRectSimple(.t[.i], r)                                                   
+//                     endif                                                    
+//                     exitwhen true                                                    
+//                 endif                                                    
+//                 set n = n + 1                                                    
+//             endloop                                                    
+//             set u = null                                                    
+//         endif                                                    
+//     endmethod                                                    
+//     static method New takes rect r2, rect r, integer delay returns nothing                                                    
+//         set.Region[.i] = r                                                    
+//         set.RoadTo[.i] = r2                                                    
+//         set.Delay[.i] = delay                                                    
+//         set.t[.i] = CreateTrigger()                                                    
+//         call TriggerRegisterEnterRectSimple(.t[.i], r)                                                    
         
-//         call TriggerAddAction(.t[.i], function thistype.RunTo)                                                   
-//         set.i =.i + 1                                                   
-//     endmethod                                                   
+//         call TriggerAddAction(.t[.i], function thistype.RunTo)                                                    
+//         set.i =.i + 1                                                    
+//     endmethod                                                    
 // endstruct 
 
 //--- Content from folder: ./6-Timers/1-Interval.j ---
@@ -2957,7 +2952,7 @@ endstruct
 
 
 //--- Content from individual file: ./EXAMPLE.j ---
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                     
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                      
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -2998,7 +2993,7 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                                                                      
+        //                                                                                       
         set bj_int = bj_MAX_PLAYER_SLOTS 
         loop 
             set bj_int = bj_int - 1 
@@ -3047,7 +3042,7 @@ struct MULTILBOARD_EXAMPLE
         loop 
             exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                        
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                         
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -3131,14 +3126,14 @@ struct ROADLINE_EXAMPLE
     static integer Almove = 851988 
     static integer Attack = 851983 
     static method io takes unit u, integer order returns boolean 
-        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                           
+        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                            
     endmethod 
     static method IsNotAction takes unit u returns boolean 
         return not(.io(u,.Move) or.io(u,.Almove) or.io(u,.Attack)) 
     endmethod 
     static method summon takes nothing returns nothing 
         set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r1), GetRectCenterY(gg_rct_r1), 0) 
-        call Roadline.register(bj_unit,gg_rct_r1,"road1")
+        call Roadline.register(bj_unit, gg_rct_r1, "road1") 
     endmethod 
     static method start takes nothing returns nothing 
         call Roadline.new(gg_rct_r1, gg_rct_r2, 3, "road1") 
@@ -3156,10 +3151,11 @@ struct ROADLINE_EXAMPLE
             set id = GetHandleId(e) 
             if GetUnitState(e, UNIT_STATE_LIFE) > 0 and IsUnitType(e, UNIT_TYPE_STRUCTURE) == false and.IsNotAction(e) then 
                 if Roadline.LoadRoad(id) != "" then 
+                    call BJDebugMsg(I2S(Roadline.LoadDelay(id))) 
                     if Roadline.LoadDelay(id) > 0 then 
                         call Roadline.SaveDelay(id, Roadline.LoadDelay(id) -1) 
                     else 
-                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id))) 
+                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))   
                         call IssuePointOrder(e, "move", LoadReal(road, id, StringHash("x")), LoadReal(road, id, StringHash("y"))) 
                     endif 
                 endif 
