@@ -8,8 +8,8 @@ struct EV_UNIT_DEATH
         local integer hkid = GetHandleId(killer) 
         local integer did = GetUnitTypeId(dying) 
         local integer kid = GetUnitTypeId(killer) 
-        local integer pdid = GetUID(dying) //Id player of dying  
-        local integer pkid = GetUID(killer) //Id player of killer  
+        local integer pdid = Num.uid(dying) //Id player of dying  
+        local integer pkid = Num.uid(killer) //Id player of killer  
 
 
 

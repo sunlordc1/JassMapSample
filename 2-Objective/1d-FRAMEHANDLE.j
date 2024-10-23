@@ -36,7 +36,7 @@ struct Frame
         endif 
     endmethod 
     static method debug takes nothing returns nothing 
-        call.fixed(GetPID(GetTriggerPlayer())) 
+        call.fixed(Num.pid(GetTriggerPlayer())) 
     endmethod 
     static method get takes nothing returns framehandle 
         return BlzGetTriggerFrame() 

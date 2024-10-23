@@ -6,7 +6,7 @@ struct EV_CASTING_SPELL
         local unit target = GetSpellTargetUnit() 
         local integer spell_id = GetSpellAbilityId() 
         local item it = GetSpellTargetItem() 
-        local integer pid = GetUID(caster) 
+        local integer pid = Num.uid(caster) 
         local real targetX = GetSpellTargetX() 
         local real targetY = GetSpellTargetY() 
 

@@ -2,7 +2,7 @@ struct EV_PLAYER_LEAVES
     static method f_Checking takes nothing returns boolean 
         local player p = GetTriggerPlayer() 
         
-        set PLAYER.IsDisconect[GetPID(p)] = true 
+        set PLAYER.IsDisconect[Num.pid(p)] = true 
         set GAME.CountPlayer = GAME.CountPlayer - 1 
 
 

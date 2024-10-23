@@ -1,18 +1,3 @@
-// call CreateMultiboardBJ(1, 1, "TRIGSTR_035")             
-// call DestroyMultiboardBJ(GetLastCreatedMultiboard()) 
-// call MultiboardDisplayBJ(false, GetLastCreatedMultiboard())           
-// call MultiboardAllowDisplayBJ(false) 
-// call MultiboardMinimizeBJ(true, GetLastCreatedMultiboard())           
-// call MultiboardClear(GetLastCreatedMultiboard())           
-// call MultiboardSetTitleText(GetLastCreatedMultiboard(), "TRIGSTR_034")          
-// call MultiboardSetTitleTextColorBJ(GetLastCreatedMultiboard(), 100, 80, 20, 0)         
-// call MultiboardSetRowCount(GetLastCreatedMultiboard(), 1)         
-// call MultiboardSetColumnCount(GetLastCreatedMultiboard(), 1)         
-// call MultiboardSetItemStyleBJ(GetLastCreatedMultiboard(), 1, 1, true, true)        
-// call MultiboardSetItemValueBJ(GetLastCreatedMultiboard(), 1, 1, "TRIGSTR_037")       
-// call MultiboardSetItemColorBJ(GetLastCreatedMultiboard(), 1, 1, 100, 80, 20, 0)   
-// call MultiboardSetItemWidthBJ(GetLastCreatedMultiboard(), 1, 1, 3)  
-// call MultiboardSetItemIconBJ(GetLastCreatedMultiboard(), 1, 1, "UI\\Feedback\\Resources\\ResourceGold.blp") 
 struct Multiboard 
     multiboard mb 
     multiboarditem mbitem = null 
@@ -98,4 +83,7 @@ struct Multiboard
         call MultiboardSetItemIcon(.mbitem, path) 
         call MultiboardReleaseItem(.mbitem) 
     endmethod 
+    method destroymb takes nothing returns nothing 
+        call DestroyMultiboard(.mb)
+    endmethod
 endstruct

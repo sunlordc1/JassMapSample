@@ -6,7 +6,7 @@ struct EV_TARGET_ORDER
         local unit e = GetOrderTargetUnit() 
         local integer w = GetUnitTypeId(e) 
         local integer d = GetUnitTypeId(u) 
-        local integer id = GetUID(u) 
+        local integer id = Num.uid(u) 
         local integer orderid = GetIssuedOrderId() 
         //commonly used sample trick : Use item target spell  
         if i != null then 
