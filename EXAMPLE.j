@@ -113,9 +113,6 @@ struct QUEST_EXAMPLE
     static integer warrior_id = 'nskg' 
     static integer warrior = 0 
     static integer max_warrior = 3 
-    static method check_count takes nothing returns nothing 
-   
-    endmethod 
     static method kill_archer takes nothing returns nothing 
         local string str = "" 
         if.Kill_SkeletonArcher.completed() == false then 
