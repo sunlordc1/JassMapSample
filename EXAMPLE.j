@@ -188,6 +188,7 @@ struct ROADLINE_EXAMPLE
         else 
             set bj_unit = CreateUnit(Player(10), 'hpea', GetRectCenterX(gg_rct_r4), GetRectCenterY(gg_rct_r4), 0) 
             call Roadline.register(bj_unit, gg_rct_r4, "road3") 
+          
         endif 
         call SetUnitPathing(bj_unit, false) 
 

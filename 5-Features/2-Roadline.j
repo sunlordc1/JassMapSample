@@ -177,9 +177,9 @@ struct Roadline
         else 
             set id =.findbyrect(r) 
         endif 
-        set id =.findbyrect(r) 
+
         set.regions[id].size =.regions[id].size + 1 
-        set size =.regions[.i].size 
+        set size =.regions[id].size 
         set.regions[id].name[size] = name 
         set.regions[id].x[size] = GetRectCenterX(r2) 
         set.regions[id].y[size] = GetRectCenterY(r2) 

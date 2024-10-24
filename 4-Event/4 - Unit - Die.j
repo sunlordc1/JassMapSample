@@ -22,6 +22,7 @@ struct EV_UNIT_DEATH
         // ROADLINE_EXAMPLE , comment it if not use   
         call FlushChildHashtable(road, hdid) 
         // 
+    
         set killer = null 
         set dying = null 
         return false 
