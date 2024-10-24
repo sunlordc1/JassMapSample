@@ -37,6 +37,8 @@ globals
     constant string RN = "|r|n" 
     //Setting Game      
     constant real ARMOR_CONSTANT = 0.03 // Assign it with the value you set in the gameplay constant.  
+    constant integer MAX_PLAYER = 24
+    constant integer MAX_SIZE_DIALOG_BUTTON = 24
     constant boolean CREEP_SLEEP = false 
     constant boolean LOCK_RESOURCE_TRADING = true 
     constant boolean SHARED_ADVANCED_CONTROL = false 
@@ -1104,7 +1106,56 @@ struct Questitem
     endmethod 
 endstruct
 
-//--- Content from folder: ./2-Objective/1f----------------------.j ---
+//--- Content from folder: ./2-Objective/1f-DIALOG-BUTTON.j ---
+struct Dialog 
+    dialog d = DialogCreate() 
+    button array btn[MAX_SIZE_DIALOG_BUTTON] 
+    integer i = -1 
+    trigger t = null 
+    method displayx takes boolean flag, player p returns nothing 
+        call DialogDisplay(p,.d, flag) 
+    endmethod 
+    method title takes string str returns nothing 
+        call DialogSetMessage(.d, str) 
+    endmethod 
+    method event takes code func returns nothing 
+        set.t = CreateTrigger() 
+        call TriggerRegisterDialogEventBJ(.t,.d) 
+        call TriggerAddAction(.t, func) 
+    endmethod 
+    //hotkey default 0    
+    method addbtn takes string btn_text, integer hotkey returns button 
+        set.i =.i + 1 
+        set.btn[.i] = DialogAddButton(.d, btn_text, hotkey) 
+        return.btn[i] 
+    endmethod 
+    method find takes button btn returns integer 
+        local integer res = -1 
+        set bj_int = 0 
+        loop 
+            exitwhen bj_int >.i 
+            if.btn[bj_int] == btn then 
+                set res = bj_int 
+                exitwhen true 
+            endif 
+            set bj_int = bj_int + 1 
+        endloop 
+        return res 
+    endmethod 
+    //When button click u end the game, careful to use :))   
+    method addbtnquit takes string btn_text, boolean endgame, integer hotkey returns nothing 
+        set.i =.i + 1 
+        set.btn[.i] = DialogAddQuitButton(.d, endgame, btn_text, hotkey) 
+    endmethod 
+    method destroyd takes nothing returns nothing 
+        call DialogClear(.d) 
+        call DialogDestroy(.d) 
+        call DestroyTrigger(.t) 
+        call.destroy() 
+    endmethod 
+endstruct
+
+//--- Content from folder: ./2-Objective/1g----------------------.j ---
 
 
 //--- Content from folder: ./2-Objective/3a-UNIT.j ---
@@ -2163,7 +2214,7 @@ struct EV_PLAYER_CHAT
         loop 
             call TriggerRegisterPlayerChatEvent(trig, Player(index), phase, b) 
             set index = index + 1 
-            exitwhen index == GetBJMaxPlayerSlots() 
+            exitwhen index == (MAX_PLAYER - 1)
         endloop 
         call TriggerAddAction(trig, actionfunc) 
         set trig = null 
@@ -2322,6 +2373,7 @@ struct EV_UNIT_DEATH
         // ROADLINE_EXAMPLE , comment it if not use   
         call FlushChildHashtable(road, hdid) 
         // 
+    
         set killer = null 
         set dying = null 
         return false 
@@ -2509,10 +2561,10 @@ struct EV_PLAYER_LEAVES
         return false 
     endmethod 
     static method f_SetupEvent takes nothing returns nothing 
-        local trigger t = CreateTrigger() // Create a trigger                                                                                                                           
+        local trigger t = CreateTrigger() // Create a trigger                                                                                                                             
         local integer n = 0 
         loop 
-            exitwhen n > bj_MAX_PLAYER_SLOTS 
+            exitwhen n > (MAX_PLAYER - 1) 
             call TriggerRegisterPlayerEventLeave(t, Player(n)) 
             set n = n + 1 
         endloop 
@@ -2817,19 +2869,20 @@ struct GAME
         local framehandle test1 = null 
 
 
-        // call PauseGame(false)              
+        // call PauseGame(false)               
         call CinematicModeBJ(false, GetPlayersAll()) 
-        call DisplayCineFilter(false)
+        call DisplayCineFilter(false) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Game Start ...") 
         endif 
-        // COUNTDOWN TIMER EXAMPLE  If not use then delete this 
-        call COUNTDOWN_TIMER_EXAMPLE.start()
-        call MULTILBOARD_EXAMPLE.start()
-        call QUEST_EXAMPLE.start()
-        call ROADLINE_EXAMPLE.start()
-        //
-        call Interval.start()
+        // COUNTDOWN TIMER EXAMPLE  If not use then delete this  
+        call COUNTDOWN_TIMER_EXAMPLE.start() 
+        call MULTILBOARD_EXAMPLE.start() 
+        call QUEST_EXAMPLE.start() 
+        call ROADLINE_EXAMPLE.start() 
+        call DIALOGBUTTON_EXAMPLE.start()
+        // 
+        call Interval.start() 
     endmethod 
 
     private static method GameSetting takes nothing returns nothing 
@@ -2850,10 +2903,10 @@ struct GAME
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Checking Status ...") 
         endif 
-        // Check player is online in game                     
+        // Check player is online in game                      
         set n = 0 
         loop 
-            exitwhen n > bj_MAX_PLAYER_SLOTS 
+            exitwhen n > (MAX_PLAYER - 1) 
             if PLAYER.IsPlayerOnline(Player(n)) then 
                 set PLAYER.IsDisconect[n] = false 
                 set GAME.CountPlayer = GAME.CountPlayer + 1 
@@ -2867,32 +2920,32 @@ struct GAME
     endmethod 
     private static method PreloadMap takes nothing returns nothing 
 
-        // call PauseGame(true)              
+        // call PauseGame(true)               
         call CinematicModeBJ(true, GetPlayersAll()) 
 
-        call AbortCinematicFadeBJ()
-        call SetCineFilterTexture("ReplaceableTextures\\CameraMasks\\Black_mask.blp")
-        call SetCineFilterBlendMode(BLEND_MODE_BLEND)
-        call SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE)
-        call SetCineFilterStartUV(0, 0, 1, 1)
-        call SetCineFilterEndUV(0, 0, 1, 1)
-        call SetCineFilterStartColor(255, 255, 255, 255)
-        call SetCineFilterEndColor(255, 255, 255, 255)
-        call SetCineFilterDuration(GAME_START_TIME - GAME_PRELOAD_TIME)
-        call DisplayCineFilter(true)
+        call AbortCinematicFadeBJ() 
+        call SetCineFilterTexture("ReplaceableTextures\\CameraMasks\\Black_mask.blp") 
+        call SetCineFilterBlendMode(BLEND_MODE_BLEND) 
+        call SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE) 
+        call SetCineFilterStartUV(0, 0, 1, 1) 
+        call SetCineFilterEndUV(0, 0, 1, 1) 
+        call SetCineFilterStartColor(255, 255, 255, 255) 
+        call SetCineFilterEndColor(255, 255, 255, 255) 
+        call SetCineFilterDuration(GAME_START_TIME - GAME_PRELOAD_TIME) 
+        call DisplayCineFilter(true) 
     
         call PanCameraToTimed(0, 0, 0) 
         if ENV_DEV then 
             call DisplayTextToForce(GetPlayersAll(), "Preload ...") 
         endif 
-        //For setup framhandle setting, if u not use my code UI then delete it     
+        //For setup framhandle setting, if u not use my code UI then delete it      
         call Frame.init() 
-        //From to: https://www.hiveworkshop.com/threads/ui-showing-3-multiboards.316610/     
-        //Will add more multilboard     
+        //From to: https://www.hiveworkshop.com/threads/ui-showing-3-multiboards.316610/      
+        //Will add more multilboard      
         call BlzLoadTOCFile("war3mapImported\\multiboard.toc") 
-        call Preload_Ability('Amls') // Preload skill                                  
-        call Preload_Unit('uloc') // Preload unit                                 
-        call Preload_Unit('e000') // Preload dummy                                 
+        call Preload_Ability('Amls') // Preload skill                                   
+        call Preload_Unit('uloc') // Preload unit                                  
+        call Preload_Unit('e000') // Preload dummy                                  
         call DestroyTimer(GetExpiredTimer()) 
     endmethod 
 
@@ -2906,7 +2959,7 @@ endstruct
 
 
 //--- Content from individual file: ./EXAMPLE.j ---
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                               
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                                            
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -2947,8 +3000,8 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                                                                                
-        set bj_int = bj_MAX_PLAYER_SLOTS 
+        //                                                                                                             
+        set bj_int = MAX_PLAYER 
         loop 
             set bj_int = bj_int - 1 
             set.hero_path[bj_int - 1] = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp" 
@@ -2964,7 +3017,7 @@ struct MULTILBOARD_EXAMPLE
         call MULTILBOARD_EXAMPLE.MB.minimize(false) 
     endmethod 
     static method setup takes nothing returns nothing 
-        set bj_int = bj_MAX_PLAYER_SLOTS - 1 
+        set bj_int = MAX_PLAYER - 1 
         loop 
             set bj_int = bj_int - 1 
             if I2Row(bj_int + 1) > 0 then 
@@ -2994,9 +3047,9 @@ struct MULTILBOARD_EXAMPLE
     static method update takes nothing returns nothing 
         set bj_int = 0 
         loop 
-            exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
+            exitwhen bj_int > MAX_PLAYER - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                                  
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                                               
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -3080,7 +3133,7 @@ struct ROADLINE_EXAMPLE
     static integer Almove = 851988 
     static integer Attack = 851983 
     static method io takes unit u, integer order returns boolean 
-        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                                     
+        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                                                  
     endmethod 
     static method IsNotAction takes unit u returns boolean 
         return not(.io(u,.Move) or.io(u,.Almove) or.io(u,.Attack)) 
@@ -3102,12 +3155,12 @@ struct ROADLINE_EXAMPLE
 
     endmethod 
     static method start takes nothing returns nothing 
-        // new ( your_region_now, your_region_come, your_delay , your_road_name , new_road, teleport?) 
+        // new ( your_region_now, your_region_come, your_delay , your_road_name , new_road, teleport?)              
         call Roadline.new(gg_rct_r1, gg_rct_r2, 3, "road1", "", false) 
         call Roadline.new(gg_rct_r2, gg_rct_r3, 3, "road1", "", false) 
         
         call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road1", "road2", false) 
-        //=>   
+        //=>                
         call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road2", "", false) 
         call Roadline.new(gg_rct_r2, gg_rct_r1, 3, "road2", "road1", false) 
 
@@ -3130,12 +3183,12 @@ struct ROADLINE_EXAMPLE
                     if Roadline.LoadDelay(id) > 0 then 
                         call Roadline.SaveDelay(id, Roadline.LoadDelay(id) -1) 
                     else 
-                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))            
+                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))                         
                         if Roadline.IsTele(id) then 
                             call SetUnitPosition(e, Roadline.LoadX(id), Roadline.LoadY(id)) 
                             call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl", Roadline.LoadX(id), Roadline.LoadY(id))) 
                         else 
-                            //Change it to "move" or "attack" if attack is target then contact me for more custom       
+                            //Change it to "move" or "attack" if attack is target then contact me for more custom                    
                             call IssuePointOrder(e, "move", Roadline.LoadX(id), Roadline.LoadY(id)) 
                         endif 
                     endif 
@@ -3146,5 +3199,47 @@ struct ROADLINE_EXAMPLE
         call Group.release(g) 
         set e = null 
     endmethod 
-endstruct
+endstruct 
+
+struct DIALOGBUTTON_EXAMPLE 
+    static Dialog SelectDifficult 
+    static button Normal 
+    static button Hard 
+    static button Nightmare 
+    static method click takes nothing returns nothing 
+        local button btnclicked = GetClickedButton() 
+        local dialog d = GetClickedDialog() 
+        local boolean is_select = false 
+        if btnclicked ==.Normal then 
+            call PLAYER.systemchat(Player(0), "You select difficult Normal ") 
+            set is_select = true 
+        elseif btnclicked ==.Hard then 
+            call PLAYER.systemchat(Player(0), "You select difficult Hard ") 
+            set is_select = true 
+        elseif btnclicked ==.Nightmare then 
+            call PLAYER.systemchat(Player(0), "You select difficult Nightmare ") 
+            set is_select = true 
+        endif 
+        if is_select then 
+            call.SelectDifficult.destroyd() 
+        endif 
+        set btnclicked = null 
+        set d = null 
+    endmethod 
+    //Careful, one dialog only use for one player , dont display a dialog for 2 or more than ( 2 player use a dialog instead one dialog per player), it's will make game confuse 
+    static method start takes nothing returns nothing 
+        set.SelectDifficult = Dialog.create() 
+        call.SelectDifficult.title("Select Difficult") 
+        //https://www.hiveworkshop.com/threads/extended-hotkeys-spacebar-etc.245278/          
+        //Or here : https://en.wikipedia.org/wiki/List_of_Unicode_characters          
+        //Find on column Decimal, character is uppercase with hotkey          
+        set.Normal =.SelectDifficult.addbtn("Normal [A]", 65) 
+        set.Hard =.SelectDifficult.addbtn("Hard [S]", 83) 
+        set.Nightmare =.SelectDifficult.addbtn("Nightmare [D]", 68) 
+        call.SelectDifficult.event(function thistype.click) 
+        call.SelectDifficult.displayx(true, Player(0)) 
+        
+    endmethod 
+endstruct 
+
 

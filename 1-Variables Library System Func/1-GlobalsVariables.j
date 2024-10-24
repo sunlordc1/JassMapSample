@@ -36,6 +36,8 @@ globals
     constant string RN = "|r|n" 
     //Setting Game      
     constant real ARMOR_CONSTANT = 0.03 // Assign it with the value you set in the gameplay constant.  
+    constant integer MAX_PLAYER = 24
+    constant integer MAX_SIZE_DIALOG_BUTTON = 24
     constant boolean CREEP_SLEEP = false 
     constant boolean LOCK_RESOURCE_TRADING = true 
     constant boolean SHARED_ADVANCED_CONTROL = false 

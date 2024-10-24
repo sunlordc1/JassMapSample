@@ -1,4 +1,4 @@
-// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                               
+// COUNTDOWN TIMER EXAMPLE  If not use then delete this                                                                                                                            
 struct COUNTDOWN_TIMER_EXAMPLE 
     static CountdownTimer StartEvent 
     static integer TimesStartEvent = 0 
@@ -39,8 +39,8 @@ struct MULTILBOARD_EXAMPLE
     endmethod 
     static method start takes nothing returns nothing 
         set MULTILBOARD_EXAMPLE.MB = Multiboard.create() 
-        //                                                                                                
-        set bj_int = bj_MAX_PLAYER_SLOTS 
+        //                                                                                                             
+        set bj_int = MAX_PLAYER 
         loop 
             set bj_int = bj_int - 1 
             set.hero_path[bj_int - 1] = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp" 
@@ -56,7 +56,7 @@ struct MULTILBOARD_EXAMPLE
         call MULTILBOARD_EXAMPLE.MB.minimize(false) 
     endmethod 
     static method setup takes nothing returns nothing 
-        set bj_int = bj_MAX_PLAYER_SLOTS - 1 
+        set bj_int = MAX_PLAYER - 1 
         loop 
             set bj_int = bj_int - 1 
             if I2Row(bj_int + 1) > 0 then 
@@ -86,9 +86,9 @@ struct MULTILBOARD_EXAMPLE
     static method update takes nothing returns nothing 
         set bj_int = 0 
         loop 
-            exitwhen bj_int > bj_MAX_PLAYER_SLOTS - 1 
+            exitwhen bj_int > MAX_PLAYER - 1 
             if I2Row(bj_int + 1) > 0 then 
-                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                                  
+                // call MULTILBOARD_EXAMPLE.MB.setvalue(1,.I2Row(bj_int), GetPlayerName(Player(bj_int)))                                                                               
                 call MULTILBOARD_EXAMPLE.MB.seticon(1,.I2Row(bj_int + 1),.hero_path[bj_int]) 
                 
                 call MULTILBOARD_EXAMPLE.MB.setvalue(2,.I2Row(bj_int + 1), I2S(PLAYER.gold(bj_int))) 
@@ -172,7 +172,7 @@ struct ROADLINE_EXAMPLE
     static integer Almove = 851988 
     static integer Attack = 851983 
     static method io takes unit u, integer order returns boolean 
-        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                                     
+        return GetUnitCurrentOrder(u) == order // Returns true or false when comparing the input order id value with the current unit's order value                                                                                                                  
     endmethod 
     static method IsNotAction takes unit u returns boolean 
         return not(.io(u,.Move) or.io(u,.Almove) or.io(u,.Attack)) 
@@ -194,12 +194,12 @@ struct ROADLINE_EXAMPLE
 
     endmethod 
     static method start takes nothing returns nothing 
-        // new ( your_region_now, your_region_come, your_delay , your_road_name , new_road, teleport?) 
+        // new ( your_region_now, your_region_come, your_delay , your_road_name , new_road, teleport?)              
         call Roadline.new(gg_rct_r1, gg_rct_r2, 3, "road1", "", false) 
         call Roadline.new(gg_rct_r2, gg_rct_r3, 3, "road1", "", false) 
         
         call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road1", "road2", false) 
-        //=>   
+        //=>                
         call Roadline.new(gg_rct_r3, gg_rct_r2, 3, "road2", "", false) 
         call Roadline.new(gg_rct_r2, gg_rct_r1, 3, "road2", "road1", false) 
 
@@ -222,12 +222,12 @@ struct ROADLINE_EXAMPLE
                     if Roadline.LoadDelay(id) > 0 then 
                         call Roadline.SaveDelay(id, Roadline.LoadDelay(id) -1) 
                     else 
-                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))            
+                        // call BJDebugMsg(R2S(Roadline.LoadX(id)) + " [] " + R2S(Roadline.LoadY(id)))                         
                         if Roadline.IsTele(id) then 
                             call SetUnitPosition(e, Roadline.LoadX(id), Roadline.LoadY(id)) 
                             call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl", Roadline.LoadX(id), Roadline.LoadY(id))) 
                         else 
-                            //Change it to "move" or "attack" if attack is target then contact me for more custom       
+                            //Change it to "move" or "attack" if attack is target then contact me for more custom                    
                             call IssuePointOrder(e, "move", Roadline.LoadX(id), Roadline.LoadY(id)) 
                         endif 
                     endif 
@@ -238,4 +238,45 @@ struct ROADLINE_EXAMPLE
         call Group.release(g) 
         set e = null 
     endmethod 
-endstruct
+endstruct 
+
+struct DIALOGBUTTON_EXAMPLE 
+    static Dialog SelectDifficult 
+    static button Normal 
+    static button Hard 
+    static button Nightmare 
+    static method click takes nothing returns nothing 
+        local button btnclicked = GetClickedButton() 
+        local dialog d = GetClickedDialog() 
+        local boolean is_select = false 
+        if btnclicked ==.Normal then 
+            call PLAYER.systemchat(Player(0), "You select difficult Normal ") 
+            set is_select = true 
+        elseif btnclicked ==.Hard then 
+            call PLAYER.systemchat(Player(0), "You select difficult Hard ") 
+            set is_select = true 
+        elseif btnclicked ==.Nightmare then 
+            call PLAYER.systemchat(Player(0), "You select difficult Nightmare ") 
+            set is_select = true 
+        endif 
+        if is_select then 
+            call.SelectDifficult.destroyd() 
+        endif 
+        set btnclicked = null 
+        set d = null 
+    endmethod 
+    //Careful, one dialog only use for one player , dont display a dialog for 2 or more than ( 2 player use a dialog instead one dialog per player), it's will make game confuse 
+    static method start takes nothing returns nothing 
+        set.SelectDifficult = Dialog.create() 
+        call.SelectDifficult.title("Select Difficult") 
+        //https://www.hiveworkshop.com/threads/extended-hotkeys-spacebar-etc.245278/          
+        //Or here : https://en.wikipedia.org/wiki/List_of_Unicode_characters          
+        //Find on column Decimal, character is uppercase with hotkey          
+        set.Normal =.SelectDifficult.addbtn("Normal [A]", 65) 
+        set.Hard =.SelectDifficult.addbtn("Hard [S]", 83) 
+        set.Nightmare =.SelectDifficult.addbtn("Nightmare [D]", 68) 
+        call.SelectDifficult.event(function thistype.click) 
+        call.SelectDifficult.displayx(true, Player(0)) 
+        
+    endmethod 
+endstruct 

@@ -10,10 +10,10 @@ struct EV_PLAYER_LEAVES
         return false 
     endmethod 
     static method f_SetupEvent takes nothing returns nothing 
-        local trigger t = CreateTrigger() // Create a trigger                                                                                                                           
+        local trigger t = CreateTrigger() // Create a trigger                                                                                                                             
         local integer n = 0 
         loop 
-            exitwhen n > bj_MAX_PLAYER_SLOTS 
+            exitwhen n > (MAX_PLAYER - 1) 
             call TriggerRegisterPlayerEventLeave(t, Player(n)) 
             set n = n + 1 
         endloop 

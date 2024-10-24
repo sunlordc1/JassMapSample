@@ -52,7 +52,7 @@ struct EV_PLAYER_CHAT
         loop 
             call TriggerRegisterPlayerChatEvent(trig, Player(index), phase, b) 
             set index = index + 1 
-            exitwhen index == GetBJMaxPlayerSlots() 
+            exitwhen index == (MAX_PLAYER - 1)
         endloop 
         call TriggerAddAction(trig, actionfunc) 
         set trig = null 
