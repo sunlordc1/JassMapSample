@@ -143,7 +143,10 @@ struct Unit
     static method addmana takes unit v, real newVal returns nothing 
         call SetUnitState(v, UNIT_STATE_MANA, GetUnitState(v, UNIT_STATE_MANA) + newVal) 
     endmethod 
-
+    //Status 
+    static method ispause takes unit u returns boolean 
+        return IsUnitPaused(u)
+    endmethod
 
 
     private static method onInit takes nothing returns nothing 
