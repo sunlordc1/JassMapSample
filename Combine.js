@@ -6,7 +6,7 @@ const folderPaths = ['./1-Variables Library System Func', './2-Objective', './3-
 // Replace with your actual folder paths
 const individualFiles = ['./GAME.j','./EXAMPLE.j']; // Replace with your actual individual file paths
 // Output file path with .j extension
-const outputPath = './combine.j';
+const outputPath = './combine.txt';
 
 
 

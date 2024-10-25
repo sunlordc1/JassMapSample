@@ -20,33 +20,26 @@ struct Buff
         if ENV_DEV then 
             call PLAYER.systemchat(Player(0), "[] buff_id:" + I2S(buff_id) + " [] level: " + I2S(buff_lv)) 
         endif 
-        //You can custom buff your rule, here is example                             
+        //You can custom buff your rule, here is example                                       
         if buff_id > -1 and buff_id <= id then 
             if.is_target[buff_id] and not IsUnitDeadBJ(target) and target != null then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.target(.order_name[buff_id], target)    
-                // call Dummy.reset()    
-                call Dummy.target(.order_name[buff_id], target,.ability_id[buff_id], buff_lv) 
-
-                if ENV_DEV then 
-                    call PLAYER.systemchat(Player(0), "[] Target") 
-                endif 
+                call Dummy.target(.order_name[buff_id], Dummy.load, target,.ability_id[buff_id], buff_lv) 
+                // if ENV_DEV then         
+                //     call PLAYER.systemchat(Player(0), "[] Target")         
+                // endif         
                 return false 
             endif 
             if.is_point[buff_id] then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.point(.order_name[buff_id], x, y)    
-                // call Dummy.reset()    
+                call Dummy.newx(Num.pid(GetOwningPlayer(caster))) 
+                call UnitApplyTimedLife(bj_unit, 'BTLF', buff_dur) // time for u finish cast or channeling spell then dummy will destroy      
+                call Dummy.point(.order_name[buff_id], Dummy.load, x, y, buff_lv,.ability_id[buff_id]) 
 
                 return false 
             endif 
             if.is_notarget[buff_id] then 
-                // call Dummy.new(x, y, buff_dur, GetOwningPlayer(caster))    
-                // call Dummy.abi(.ability_id[buff_id], buff_lv)    
-                // call Dummy.notarget(.order_name[buff_id])    
-                // call Dummy.reset()    
+                call Dummy.newx(Num.pid(GetOwningPlayer(caster))) 
+                call UnitApplyTimedLife(bj_unit, 'BTLF', buff_dur) // time for u finish cast or channeling spell then dummy will destroy      
+                call Dummy.notarget(.order_name[buff_id], Dummy.load, x, y, buff_lv,.ability_id[buff_id]) 
                 return false 
             endif 
         endif 
