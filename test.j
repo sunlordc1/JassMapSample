@@ -23,6 +23,7 @@ struct RandomMap
                         call.AddRandomDestructables(x * 2048, y * 2048) 
                     else 
                         call SetTerrainType(x * 2048, y * 2048, 'Lgrs', GetRandomInt(0, 7), 9, 1) 
+                        call.AddRandomDestructables(x * 2048, y * 2048) 
                     endif 
                 endif 
                 set count = count + 1 //961 = 31x31    

@@ -1,6 +1,6 @@
-//Call struct then Unit instead UNIT      
+//Call struct then Unit instead UNIT        
 struct Unit 
-    //=================Position================================         
+    //=================Position================================           
     method x takes unit u returns real 
         return GetUnitX(u) 
     endmethod 
@@ -16,48 +16,48 @@ struct Unit
     method sety takes unit u, real y returns nothing 
         call SetUnitY(u, y) 
     endmethod 
-    // Set Flying Height (Required unit have crow form or fly)            
-    // Use: Unit.setz(u,height)            
+    // Set Flying Height (Required unit have crow form or fly)              
+    // Use: Unit.setz(u,height)              
     method setz takes unit u, real height returns nothing 
         call SetUnitFlyHeight(u, height, 0.) 
     endmethod 
 
     
-    //==================Movespeed=========================         
-    // Reset MoveSpeed of unit to default         
+    //==================Movespeed=========================           
+    // Reset MoveSpeed of unit to default           
     method resetms takes unit whichUnit returns nothing 
         call SetUnitMoveSpeed(whichUnit, GetUnitDefaultMoveSpeed(whichUnit)) 
     endmethod 
-    // Get MoveSpeed of unit         
-    // Use: Unit.ms(u)           
+    // Get MoveSpeed of unit           
+    // Use: Unit.ms(u)             
     method ms takes unit whichUnit returns real 
         return GetUnitMoveSpeed(whichUnit) 
     endmethod 
 
-    //==================Vertex Color=========================         
-    //Reset Vertex Color [Change Color and Alpha of Unit]         
-    //Use:  Unit.resetvertexcolor(u)          
+    //==================Vertex Color=========================           
+    //Reset Vertex Color [Change Color and Alpha of Unit]           
+    //Use:  Unit.resetvertexcolor(u)            
     method resetvertexcolor takes unit u returns nothing 
         call SetUnitVertexColor(u, 255, 255, 255, 255) 
     endmethod 
 
-    //Set Vertex Color [Change Color and Alpha of Unit]         
-    //Use:  Unit.vertexcolor(u)          
+    //Set Vertex Color [Change Color and Alpha of Unit]           
+    //Use:  Unit.vertexcolor(u)            
     method vertexcolor takes unit u, integer red, integer green, integer blue, integer alpha returns nothing 
         call SetUnitVertexColor(u, red, green, blue, alpha) 
     endmethod 
 
-    //==================Misc=========================       
-    //Get scaling value of unit    
+    //==================Misc=========================         
+    //Get scaling value of unit      
     static method size takes unit u returns real 
         return BlzGetUnitRealField(u, UNIT_RF_SCALING_VALUE) 
     endmethod 
-    //Set scaling value of unit    
+    //Set scaling value of unit      
     static method setsize takes unit u, real r returns nothing 
         call BlzSetUnitRealField(u, UNIT_RF_SCALING_VALUE, r) 
         call SetUnitScale(u, r, r, r) 
     endmethod 
-    //Get level unit or hero     
+    //Get level unit or hero       
     static method lv takes unit u returns integer 
         local integer i = GetHeroLevel(u) 
         if i < 0 then 
@@ -66,8 +66,8 @@ struct Unit
         return i 
     endmethod 
 
-    // Get Collision of unit u            
-    // Use: Unit.collision(u)            
+    // Get Collision of unit u              
+    // Use: Unit.collision(u)              
     method collision takes unit u returns real 
         local real l = 0 
         local real h = 300 
@@ -87,7 +87,7 @@ struct Unit
         endloop 
         return R2I(m * 10) / 10. 
     endmethod 
-    //==================== Ability =======================     
+    //==================== Ability =======================       
     static method abilv takes unit u, integer a returns integer 
         local integer i = 0 
         set i = GetUnitAbilityLevel(u, a) 
@@ -115,7 +115,7 @@ struct Unit
     static method disabledabi takes unit u, integer a returns nothing 
         call BlzUnitDisableAbility(u, a, true, false) 
     endmethod 
-    //===========================STATS========================  
+    //===========================STATS========================    
     static method damage_reduce takes unit u returns real 
         return(BlzGetUnitArmor(u) * ARMOR_CONSTANT) / (1 + ARMOR_CONSTANT * BlzGetUnitArmor(u)) 
     endmethod 
@@ -143,11 +143,15 @@ struct Unit
     static method addmana takes unit v, real newVal returns nothing 
         call SetUnitState(v, UNIT_STATE_MANA, GetUnitState(v, UNIT_STATE_MANA) + newVal) 
     endmethod 
-    //Status 
+    //Status   
     static method ispause takes unit u returns boolean 
-        return IsUnitPaused(u)
-    endmethod
-
+        return IsUnitPaused(u) 
+    endmethod 
+    //Item   
+    //Return inventory size of unit (0-6) 0 is not have
+    static method invsize takes unit u returns integer 
+        return UnitInventorySize(u) 
+    endmethod 
 
     private static method onInit takes nothing returns nothing 
         local thistype this = thistype.create() 
